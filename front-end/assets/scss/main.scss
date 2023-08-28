@@ -1,0 +1,22 @@
+.app-header {
+  background-color: transparent !important;
+  height: 85px !important;
+  .navbar-nav {
+    align-items: center;
+  }
+  .v-toolbar {
+    background-color: transparent;
+  }
+  &.header1,
+  &.header2 {
+    top: 0 !important;
+    height: auto !important;
+    .v-toolbar__content {
+      height: 85px !important;
+    }
+  }
+  .v-btn__overlay,
+  .v-btn--variant-text .v-btn__overlay {
+    background-color: transparent !important;
+  }
+}

@@ -1,0 +1,48 @@
+version: "3.8"
+services:
+  express-mysql:
+    image: mysql:8
+    ports:
+      - "33070:3306"
+    volumes:
+      - ./dbdata:/var/lib/mysql/
+      - ./mysql/my.cnf:/etc/mysql/my.cnf
+    environment:
+      MYSQL_DATABASE: express
+      MYSQL_ROOT_PASSWORD: RootPassword
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci --default_authentication_plugin=mysql_native_password
+    container_name: express-mysql
+    networks:
+      - learn-network
+
+  # api:
+  #   build:
+  #     context: ../api
+  #     dockerfile: ./cicd/development/Dockerfile
+  #   depends_on:
+  #     - express-mysql
+  #   ports:
+  #     - 8080:8080
+  #   volumes:
+  #     - ../api:/api
+  #   container_name: api
+  #   networks:
+  #     - learn-network
+
+  # front-end:
+  #   build:
+  #     context: ../front-end
+  #     dockerfile: ./cicd/development/Dockerfile
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ../front-end:/front-end
+  #   container_name: front-end
+  #   networks:
+  #     - learn-network
+
+networks:
+  learn-network:
+volumes:
+  dbdata:
+    driver: local

@@ -1,0 +1,81 @@
+{
+  "name": "express",
+  "version": "2.0.1",
+  "main": "index.js",
+  "type": "module",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "setup:verify": "cp code-verify.template.json code-verify.json",
+    "setup:firebase": "cp firebase-config.template.json firebase-config.json",
+    "setup:token": "cp token.template.json token.json",
+    "setup": "cp .env.template .env & yarn setup:token && yarn setup:firebase && yarn setup:verify",
+    "prisma:migrate": "yarn prisma migrate dev --schema=./prisma/schema.prisma",
+    "prisma:generate": "yarn prisma generate --schema=./prisma/schema.prisma",
+    "dev": "env $(grep -v '^#' .env) nodemon --legacy-watch index.js --ignore code-verify.json --ignore token.json --exec 'node --experimental-specifier-resolution=node --experimental-modules --experimental-json-modules --loader ./helpers/module-alias/loader.js'",
+    "start": "env $(grep -v '^#' .env) node --experimental-specifier-resolution=node --experimental-modules --experimental-json-modules --loader ./helpers/module-alias/loader.js index.js",
+    "lint": "eslint --ext .js --ignore-path .gitignore .",
+    "prisma:seeding": "npx prisma db seed",
+    "build": "yarn prisma:generate",
+    "deploy:delete-staging-tag": "git fetch --tags && git push origin --delete $(git tag -l 'staging-learn-gcp-*') || true && git fetch origin --prune 'refs/tags/*:refs/tags/*'",
+    "deploy:staging": "yarn deploy:delete-staging-tag && TAG=`echo staging-learn-gcp-$(date +%Y%m%d-%H%M%S)` && git tag $TAG && git push origin $TAG"
+  },
+  "dependencies": {
+    "@prisma/client": "4.10.1",
+    "@sentry/node": "^7.14.1",
+    "@sentry/tracing": "^7.14.1",
+    "bcrypt": "^5.1.0",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "date-fns": "^2.29.2",
+    "debug": "^4.3.4",
+    "express": "^4.17.3",
+    "express-openapi-validator": "^5.0.0",
+    "express-promise-router": "^4.1.1",
+    "firebase": "^9.23.0",
+    "formdata-node": "^5.0.0",
+    "fs": "^0.0.1-security",
+    "google-auth-library": "^8.8.0",
+    "googleapis": "^114.0.0",
+    "got": "^12.5.3",
+    "jsonwebtoken": "^8.5.1",
+    "jws": "^4.0.0",
+    "lodash": "^4.17.21",
+    "multer": "^1.4.5-lts.1",
+    "nnn-router": "^1.1.5",
+    "nodemailer": "^6.9.1",
+    "prettier-plugin-prisma": "^4.10.0",
+    "statuses": "^2.0.1",
+    "stripe": "^12.5.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.18.6",
+    "@babel/eslint-parser": "^7.18.2",
+    "eslint": "^8.19.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-prettier": "^4.0.0",
+    "nodemon": "^2.0.15",
+    "prettier": "^2.6.1",
+    "prisma": "4.10.1"
+  },
+  "_moduleAliases": {
+    "@routes": "./routes",
+    "@const": "./constants",
+    "@middleware": "./middleware",
+    "@helpers": "./helpers",
+    "@database": "./database",
+    "@utils": "./utils",
+    "@root": "./"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "volta": {
+    "node": "16.8.0",
+    "yarn": "1.22.17"
+  },
+  "engines": {
+    "node": "16"
+  }
+}

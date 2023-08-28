@@ -1,0 +1,35 @@
+steps:
+  # this builds app docker image
+  - id: "build-app-image"
+    name: "gcr.io/kaniko-project/executor:latest"
+    waitFor: ["-"]
+    args:
+      - --dockerfile=${_APP_DOCKER_FILE}
+      - --context=dir://${_CONTEXT_FOLDER}
+      - --destination=gcr.io/${PROJECT_ID}/${_ENV}-${_CLOUD_RUN_SERVICE_NAME}:latest
+      - --destination=gcr.io/${PROJECT_ID}/${_ENV}-${_CLOUD_RUN_SERVICE_NAME}:${TAG_NAME}
+      - --cache=true
+      - --cache-ttl=336h
+
+  # deploy container image to Cloud Run
+  - id: "deploy-app"
+    name: "gcr.io/cloud-builders/gcloud"
+    waitFor: ["build-app-image"]
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+        gcloud run deploy ${_ENV}-${_CLOUD_RUN_SERVICE_NAME} \
+          --image=gcr.io/$PROJECT_ID/${_ENV}-${_CLOUD_RUN_SERVICE_NAME}:latest \
+          --allow-unauthenticated \
+          --region=asia-northeast1 \
+          --platform=managed \
+          --timeout 900
+
+substitutions:
+  _ENV: staging
+  _CONTEXT_FOLDER: /workspace/learn-front-end
+  _APP_DOCKER_FILE: ${_CONTEXT_FOLDER}/cicd/release/Dockerfile
+  _CLOUD_RUN_SERVICE_NAME: learn-front-end
+options:
+  dynamic_substitutions: true

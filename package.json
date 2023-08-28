@@ -1,0 +1,15 @@
+{
+  "name": "learn",
+  "version": "1.0.0",
+  "description": "learn project",
+  "main": "index.js",
+  "author": "azoom-nguyen-van-uc",
+  "license": "MIT",
+  "scripts": {
+    "dcc": "cd development && docker-compose",
+    "dcc:up": "yarn dcc up -d",
+    "dcc:down": "yarn dcc down",
+    "deploy:delete-staging-tag": "git fetch --tags && git push origin --delete $(git tag -l 'staging-learn-gcp-*') || true && git fetch origin --prune 'refs/tags/*:refs/tags/*'",
+    "deploy:staging": "yarn deploy:delete-staging-tag && TAG=`echo staging-learn-gcp-$(date +%Y%m%d-%H%M%S)` && git tag $TAG && git push origin $TAG"
+  }
+}
