@@ -1,15 +1,13 @@
 <template>
   <v-app>
-    <v-layout>
-      <layout-admin-navbar />
-      <layout-admin-header />
-      <v-main>
-        <div class="main">
-          <slot />
-        </div>
-        <layout-admin-footer />
-      </v-main>
-    </v-layout>
+    <layout-admin-navbar />
+    <layout-admin-header />
+    <v-main>
+      <div class="main">
+        <slot />
+      </div>
+      <layout-admin-footer />
+    </v-main>
   </v-app>
 </template>
 

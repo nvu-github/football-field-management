@@ -17,7 +17,7 @@ export default defineNuxtConfig({
   css: [
     "vuetify/lib/styles/main.sass",
     "@mdi/font/css/materialdesignicons.min.css",
-    "~/assets/scss/main.scss",
+    "@/assets/scss/main.scss",
   ],
   modules: [["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs"] }]],
   build: {
