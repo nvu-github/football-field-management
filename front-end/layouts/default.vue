@@ -14,8 +14,6 @@
 </template>
 <style lang="scss" scoped>
 .layout-default {
-  :deep(.v-application__wrap) {
-  }
   :deep(.v-application__wrap) > .header {
     border-top: 2px solid #a9ca31;
   }
@@ -40,7 +38,7 @@
 .main {
   margin: 0 auto;
   padding: 10px 20px;
-  width: 1200px;
+  max-width: 1200px;
   min-height: 500px;
 }
 

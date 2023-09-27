@@ -1,7 +1,13 @@
+<script setup lang="ts">
+let toggleMenu = ref<Boolean>(true)
+function toggleShowNavBar(drawer: Boolean) {
+  toggleMenu.value = drawer
+}
+</script>
 <template>
   <v-app>
-    <layout-admin-navbar />
-    <layout-admin-header />
+    <layout-admin-navbar :toggle-menu="toggleMenu" />
+    <layout-admin-header @drawer="toggleShowNavBar" />
     <v-main>
       <div class="main">
         <slot />

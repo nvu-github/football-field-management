@@ -1,20 +1,31 @@
 <script lang="ts" setup>
-const drawer = ref<boolean>(true);
-const rail = ref<boolean>(false);
+const props = defineProps({
+  toggleMenu: {
+    type: Boolean,
+    required: true,
+  },
+});
 
+let drawer = computed({
+  get: () => props.toggleMenu,
+  set: (newValue: Boolean) => {
+    return newValue;
+  },
+});
 const admins = ref([
   ["Management", "mdi-account-multiple-outline"],
   ["Settings", "mdi-cog-outline"],
 ]);
+function closeNavbar() {
+  drawer.value = false;
+  console.log(drawer);
+}
 </script>
-
 <template>
   <v-navigation-drawer
     v-model="drawer"
-    :rail="rail"
-    permanent
     @click="rail = false"
-    class="navigation"
+    class="navigationadmin"
   >
     <v-list-item
       prepend-avatar="https://randomuser.me/api/portraits/men/85.jpg"
@@ -22,16 +33,10 @@ const admins = ref([
       nav
       class="info"
     >
-      <template v-slot:append>
-        <v-btn
-          variant="text"
-          icon="mdi-menu"
-          @click.stop="rail = !rail"
-        ></v-btn>
+      <template #append>
+        <v-icon class="icon" @click="closeNavbar"> mdi mdi-close-thick </v-icon>
       </template>
     </v-list-item>
-
-    <!-- <v-divider></v-divider> -->
 
     <v-list density="compact" nav>
       <v-list-item
