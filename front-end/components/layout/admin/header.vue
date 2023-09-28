@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineEmits } from "vue";
-let drawer = false;
+let drawer = true;
 const emit = defineEmits(["drawer"]);
 
 function handleShowMenu() {

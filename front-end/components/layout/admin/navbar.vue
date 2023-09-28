@@ -6,24 +6,17 @@ const props = defineProps({
   },
 });
 
-let drawer = computed({
-  get: () => props.toggleMenu,
-  set: (newValue: Boolean) => {
-    return newValue;
-  },
-});
 const admins = ref([
   ["Management", "mdi-account-multiple-outline"],
   ["Settings", "mdi-cog-outline"],
 ]);
 function closeNavbar() {
-  drawer.value = false;
-  console.log(drawer);
+  // drawer.value = false;
 }
 </script>
 <template>
   <v-navigation-drawer
-    v-model="drawer"
+    v-model="props.toggleMenu"
     @click="rail = false"
     class="navigationadmin"
   >
@@ -69,4 +62,13 @@ function closeNavbar() {
   </v-navigation-drawer>
 </template>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.navigationadmin {
+  :deep(.v-list-item__append) > .icon {
+    display: none;
+  }
+  :deep(.v-navigation-drawer__content) > .info {
+    padding: 20px;
+  }
+}
+</style>

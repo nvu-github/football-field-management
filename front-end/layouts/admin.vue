@@ -19,7 +19,7 @@ function toggleShowNavBar(drawer: Boolean) {
 
 <style lang="scss" scoped>
 .main {
-  padding: 30px 20px;
+  padding: 40px 35px;
   min-height: 600px;
 }
 </style>
