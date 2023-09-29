@@ -1,10 +1,6 @@
 <script lang="ts" setup>
-const props = defineProps({
-  toggleMenu: {
-    type: Boolean,
-    required: true,
-  },
-});
+const appStore = useAppStore();
+const { isShowSidebar } = storeToRefs(appStore);
 
 const admins = ref([
   ["Management", "mdi-account-multiple-outline"],
@@ -16,7 +12,7 @@ function closeNavbar() {
 </script>
 <template>
   <v-navigation-drawer
-    v-model="props.toggleMenu"
+    v-model="isShowSidebar"
     @click="rail = false"
     class="navigationadmin"
   >

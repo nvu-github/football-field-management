@@ -1,7 +1,7 @@
 export interface User {
-  username: string;
-  email: string;
-  loggedIn: string;
+  username: string | null;
+  email: string | null;
+  loggedIn: boolean;
 }
 
 export interface loginPayload {

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 const headers = [
   {
-    title: "Dessert (100g serving)",
+    title: "STT",
     align: "start",
     sortable: false,
-    key: "name",
+    key: "Số thứ tự",
   },
   { title: "Calories", key: "calories" },
   { title: "Fat (g)", key: "fat" },
@@ -84,6 +84,10 @@ const desserts = [
     protein: 7,
   },
 ];
+const appStore = useAppStore();
+const { app } = storeToRefs(appStore);
+app.value.title = "Quản lý tài khoản";
+console.log(app);
 </script>
 <template>
   <div class="user-page">
@@ -94,12 +98,12 @@ const desserts = [
     </v-row>
     <v-row>
       <v-col md="12">
-        <v-data-table :headers="headers" :items="desserts" class="elevation-1">
-          <template v-slot:item.actions="{ item }">
+        <v-data-table :headers="headers" :items="desserts">
+          <template #[`item.actions`]="{ item }">
             <v-icon size="small" class="me-2"> mdi-pencil </v-icon>
             <v-icon size="small"> mdi-delete </v-icon>
           </template>
-          <template v-slot:no-data>
+          <template #[`no-data`]>
             <v-btn color="primary"> Reset </v-btn>
           </template>
         </v-data-table>

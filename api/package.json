@@ -16,6 +16,7 @@
     "start": "env $(grep -v '^#' .env) node --experimental-specifier-resolution=node --experimental-modules --experimental-json-modules --loader ./helpers/module-alias/loader.js index.js",
     "lint": "eslint --ext .js --ignore-path .gitignore .",
     "prisma:seeding": "npx prisma db seed",
+    "prisma:format": "yarn prisma format",
     "build": "yarn prisma:generate",
     "deploy:delete-staging-tag": "git fetch --tags && git push origin --delete $(git tag -l 'staging-learn-gcp-*') || true && git fetch origin --prune 'refs/tags/*:refs/tags/*'",
     "deploy:staging": "yarn deploy:delete-staging-tag && TAG=`echo staging-learn-gcp-$(date +%Y%m%d-%H%M%S)` && git tag $TAG && git push origin $TAG"

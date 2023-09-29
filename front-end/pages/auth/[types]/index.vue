@@ -52,7 +52,7 @@ async function loginGoogle() {
   const credential = GoogleAuthProvider.credentialFromResult(result);
   cookie.value = credential?.idToken;
   const { displayName, email } = result.user;
-  user.value = { email, displayName, loggedIn: true };
+  user.value = { email, username: displayName, loggedIn: true };
   localStorage.setItem(
     "userLogin",
     JSON.stringify({ username: displayName, email, loggedIn: true })
