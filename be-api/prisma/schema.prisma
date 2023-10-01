@@ -1,0 +1,328 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Role {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  account Account[]
+
+  @@map("roles")
+}
+
+model Account {
+  id        Int           @id @default(autoincrement())
+  email     String        @unique
+  password  String
+  status    StatusAccount @default(PENDING)
+  roleId    Int           @map("role_id")
+  createdAt DateTime      @default(now()) @map("created_at")
+  updatedAt DateTime      @updatedAt @map("updated_at")
+
+  staff    Staff?
+  customer Customer?
+  role     Role      @relation(fields: [roleId], references: [id])
+
+  @@map("accounts")
+}
+
+model Staff {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(255)
+  phoneNumber String    @map("phone_number")
+  dateOfBirth DateTime? @map("date_of_birth")
+  address     String
+  gender      Gender
+  avatar      String?
+  accountId   Int       @unique @map("account_id")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  invoice       Invoice[]
+  contact       Contact[]
+  notification  Notification[]
+  footballPitch FootballPitch[]
+  account       Account         @relation(fields: [accountId], references: [id])
+
+  @@map("staffs")
+}
+
+model Customer {
+  id          Int      @id @default(autoincrement())
+  name        String   @db.VarChar(255)
+  teamName    String   @map("team_name") @db.VarChar(255)
+  phoneNumber String   @map("phone_number")
+  avatar      String?
+  accountId   Int      @unique @map("account_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  contact                     Contact[]
+  notification                Notification[]
+  customerFootballPitchRental CustomerFootballPitchRental[]
+  account                     Account                       @relation(fields: [accountId], references: [id])
+
+  @@map("customers")
+}
+
+model AccessoryType {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  accessory Accessory[]
+
+  @@map("accessory_types")
+}
+
+model Accessory {
+  id              Int             @id @default(autoincrement())
+  name            String          @db.VarChar(255)
+  desciption      String?         @db.Text
+  amount          Int
+  price           Decimal         @db.Decimal(12, 0)
+  status          StatusAccessory @default(AVAILABLE)
+  accessoryTypeId Int             @map("accessory_type_id")
+  createdAt       DateTime        @default(now()) @map("created_at")
+  updatedAt       DateTime        @updatedAt @map("updated_at")
+
+  invoiceDetail           InvoiceDetail[]
+  accessoryImage          AccessoryImage[]
+  accessoryRentalCustomer AccessoryRentalCustomer[]
+  accessoryType           AccessoryType             @relation(fields: [accessoryTypeId], references: [id])
+
+  @@map("accessories")
+}
+
+model AccessoryImage {
+  id          Int      @id @default(autoincrement())
+  url         String   @db.VarChar(255)
+  title       String   @db.VarChar(255)
+  accessoryId Int      @map("accessory_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  accessory Accessory @relation(fields: [accessoryId], references: [id])
+
+  @@map("accessory_images")
+}
+
+model FootbalType {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  footballPitch FootballPitch[]
+
+  @@map("football_types")
+}
+
+model FootballPitch {
+  id             Int            @id @default(autoincrement())
+  name           String         @db.VarChar(255)
+  desciption     String?        @db.Text
+  status         StatusFootball @default(EMPTY)
+  staffId        Int            @map("staff_id")
+  footballTypeId Int            @map("football_type_id")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  footballImage                FootballImage[]
+  footballPitchLeasingDuration FootballPitchLeasingDuration[]
+  staff                        Staff                          @relation(fields: [staffId], references: [id])
+  footballType                 FootbalType                    @relation(fields: [footballTypeId], references: [id])
+
+  @@map("football_pitches")
+}
+
+model FootballImage {
+  id              Int      @id @default(autoincrement())
+  url             String   @db.VarChar(255)
+  title           String?  @db.VarChar(255)
+  footballPitchId Int      @map("football_pitch_id")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  footballPitch FootballPitch @relation(fields: [footballPitchId], references: [id])
+
+  @@map("football_images")
+}
+
+model LeasingDuration {
+  id        Int      @id @default(autoincrement())
+  startTime DateTime @map("start_time")
+  endTime   DateTime @map("end_time")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  footballPitchLeasingDuration FootballPitchLeasingDuration[]
+
+  @@map("leasing_durations")
+}
+
+model FootballPitchLeasingDuration {
+  id                Int      @id @default(autoincrement())
+  price             Decimal  @db.Decimal(12, 0)
+  footballPitchId   Int      @map("football_pitch_id")
+  leasingDurationId Int      @map("leasing_duration_id")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  customerFootballPitchRental CustomerFootballPitchRental[]
+  footballPitch               FootballPitch                 @relation(fields: [footballPitchId], references: [id])
+  leasingDuration             LeasingDuration               @relation(fields: [leasingDurationId], references: [id])
+
+  @@map("football_pitch_leasing_duration")
+}
+
+model Contact {
+  id         Int      @id @default(autoincrement())
+  content    String   @db.Text
+  image      Json?
+  staffId    Int      @map("staff_id")
+  customerId Int      @map("customer_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  staff    Staff    @relation(fields: [staffId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@map("contacts")
+}
+
+model Notification {
+  id         Int      @id @default(autoincrement())
+  content    String   @db.Text
+  file       Json?
+  staffId    Int      @map("staff_id")
+  customerId Int      @map("customer_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  staff    Staff    @relation(fields: [staffId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
+
+  @@map("notifications")
+}
+
+model CustomerFootballPitchRental {
+  id                             Int      @id @default(autoincrement())
+  customerId                     Int      @map("customer_id")
+  footballPitchLeasingDurationId Int      @map("football_pitch_lease_duration_id")
+  createdAt                      DateTime @default(now()) @map("created_at")
+  updatedAt                      DateTime @updatedAt @map("updated_at")
+
+  invoice                      Invoice[]
+  accessoryRentalCustomer      AccessoryRentalCustomer[]
+  customer                     Customer                     @relation(fields: [customerId], references: [id])
+  footballPitchLeasingDuration FootballPitchLeasingDuration @relation(fields: [footballPitchLeasingDurationId], references: [id])
+
+  @@map("customer_football_pitch_rental")
+}
+
+model AccessoryRentalCustomer {
+  id                            Int      @id @default(autoincrement())
+  customerFootballPitchRentalId Int      @map("customer_football_pitch_rental_id")
+  accessoryId                   Int      @map("accessory_id")
+  createdAt                     DateTime @default(now()) @map("created_at")
+  updatedAt                     DateTime @updatedAt @map("updated_at")
+
+  accessory                   Accessory                   @relation(fields: [accessoryId], references: [id])
+  customerFootballPitchRental CustomerFootballPitchRental @relation(fields: [customerFootballPitchRentalId], references: [id])
+
+  @@map("accessory_rental_customer")
+}
+
+model InvoiceType {
+  id   Int    @id @default(autoincrement())
+  name String
+
+  invoice Invoice[]
+
+  @@map("invoice_types")
+}
+
+model Invoice {
+  id                 Int           @id @default(autoincrement())
+  totalPrice         Decimal       @db.Decimal(12, 0)
+  status             InvoiceStatus @default(UNPAID)
+  staffId            Int           @map("staff_id")
+  invoiceTypeId      Int           @map("invoice_type_id")
+  customerFootballId Int           @map("customer_football_id")
+  createdAt          DateTime      @default(now()) @map("created_at")
+  updatedAt          DateTime      @updatedAt @map("updated_at")
+
+  invoiceDetail               InvoiceDetail[]
+  staff                       Staff                       @relation(fields: [staffId], references: [id])
+  invoiceType                 InvoiceType                 @relation(fields: [invoiceTypeId], references: [id])
+  customerFootballPitchRental CustomerFootballPitchRental @relation(fields: [customerFootballId], references: [id])
+
+  @@map("invoices")
+}
+
+model InvoiceDetail {
+  id          Int      @id @default(autoincrement())
+  price       Decimal  @db.Decimal(12, 0)
+  amount      Int
+  finalCost   Decimal  @map("final_cost") @db.Decimal(12, 0)
+  invoiceId   Int      @map("invoice_id")
+  accessoryId Int      @map("accessory_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  invoice   Invoice   @relation(fields: [invoiceId], references: [id])
+  accessory Accessory @relation(fields: [accessoryId], references: [id])
+
+  @@map("invoice_details")
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+
+  @@map("genders")
+}
+
+enum StatusAccount {
+  PENDING
+  APPROVED
+  DELETED
+
+  @@map("status_accounts")
+}
+
+enum StatusAccessory {
+  AVAILABLE
+  NOT_AVAILABLE
+
+  @@map("status_accessories")
+}
+
+enum StatusFootball {
+  EMPTY
+  NOT_EMPTY
+  MAINTENANCE
+
+  @@map("status_footballs")
+}
+
+enum InvoiceStatus {
+  PAID
+  UNPAID
+
+  @@map("invoice_status")
+}

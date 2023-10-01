@@ -85,15 +85,20 @@ const desserts = [
   },
 ];
 const appStore = useAppStore();
+const dialogStore = useDialogStore();
 const { app } = storeToRefs(appStore);
 app.value.title = "Quản lý tài khoản";
-console.log(app);
+function openDiaglogUserCreate() {
+  dialogStore.showDialog(resolveComponent("admins-users-dialog-user-create"));
+}
 </script>
 <template>
   <div class="user-page">
     <v-row class="row">
       <v-col md="12" class="column">
-        <button class="button">Thêm tài khoản</button>
+        <button class="button" @click="openDiaglogUserCreate">
+          Thêm tài khoản
+        </button>
       </v-col>
     </v-row>
     <v-row>

@@ -2,6 +2,15 @@ export interface App {
   title: string | null;
 }
 
+type DialogContent = Component | string
+
+export interface Dialog {
+  isVisible?: boolean
+  isPersistent?: boolean
+  data?: { [key: string]: any }
+  content: DialogContent
+}
+
 export const useAppStore = defineStore("appStore", () => {
   const app = reactive<App>({
     title: "",
@@ -10,30 +19,21 @@ export const useAppStore = defineStore("appStore", () => {
 
   return { app, isShowSidebar };
 });
+export const useDialogStore = defineStore('dialog', () => {
+  const defaultDialog = { isVisible: false, isPersistent: false, data: undefined, content: '' }
+  const dialog = ref<Dialog>(defaultDialog)
 
-export const useDialogStore = defineStore("dialog", () => {
-  const defaultDialog = {
-    isVisible: false,
-    isPersistent: false,
-    data: undefined,
-    content: "",
-  };
-  const dialog = ref<Dialog>(defaultDialog);
-
-  function showDialog(content: DialogContent, data?: { [key: string]: any }) {
-    dialog.value = { isVisible: true, isPersistent: false, content, data };
+  function showDialog (content: DialogContent, data?: { [key: string]: any }) {
+    dialog.value = { isVisible: true, isPersistent: false, content, data }
   }
 
-  function showPersistentDialog(
-    content: DialogContent,
-    data?: { [key: string]: any }
-  ) {
-    dialog.value = { isVisible: true, isPersistent: true, content, data };
+  function showPersistentDialog (content: DialogContent, data?: { [key: string]: any }) {
+    dialog.value = { isVisible: true, isPersistent: true, content, data }
   }
 
-  function closeDialog() {
-    dialog.value = defaultDialog;
+  function closeDialog () {
+    dialog.value = defaultDialog
   }
 
-  return { dialog, showDialog, showPersistentDialog, closeDialog };
-});
+  return { dialog, showDialog, showPersistentDialog, closeDialog }
+})

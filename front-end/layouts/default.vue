@@ -1,15 +1,15 @@
 <template>
   <v-app class="layout-default">
     <div class="layout-header">
-      <layout-user-header class="header" />
+      <users-layout-header class="header" />
     </div>
     <div class="layout-toolbar">
-      <layout-user-toolbar class="toolbar" />
+      <users-layout-toolbar class="toolbar" />
     </div>
     <div class="main">
       <slot />
     </div>
-    <layout-user-footer class="footer" />
+    <users-layout-footer class="footer" />
   </v-app>
 </template>
 <style lang="scss" scoped>

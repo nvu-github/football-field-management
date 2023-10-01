@@ -1,4 +1,10 @@
-<script setup lang="ts">
+<script lang="ts" setup>
+const appStore = useAppStore();
+const { app } = storeToRefs(appStore);
+const { title } = app.value;
+useHead({
+  title: title || "Sân bóng Hoàng Quân",
+});
 let toggleMenu = ref<Boolean>(true);
 function toggleShowNavBar(drawer: Boolean) {
   toggleMenu.value = drawer;
@@ -6,14 +12,15 @@ function toggleShowNavBar(drawer: Boolean) {
 </script>
 <template>
   <v-app>
-    <layout-admin-navbar :toggle-menu="toggleMenu" />
-    <layout-admin-header @drawer="toggleShowNavBar" />
+    <admins-layout-navbar :toggle-menu="toggleMenu" />
+    <admins-layout-header @drawer="toggleShowNavBar" />
     <v-main>
       <div class="main">
         <slot />
       </div>
-      <layout-admin-footer />
+      <admins-layout-footer />
     </v-main>
+    <common-dialog />
   </v-app>
 </template>
 

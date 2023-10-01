@@ -13,6 +13,7 @@
     "prisma:migrate": "yarn prisma migrate dev --schema=./prisma/schema.prisma",
     "prisma:generate": "yarn prisma generate --schema=./prisma/schema.prisma",
     "dev": "env $(grep -v '^#' .env) nodemon --legacy-watch index.js --ignore code-verify.json --ignore token.json --exec 'node --experimental-specifier-resolution=node --experimental-modules --experimental-json-modules --loader ./helpers/module-alias/loader.js'",
+    "dev:window": "set /p DUMMY_VAR= < .env && nodemon --legacy-watch index.js --ignore code-verify.json --ignore token.json --exec \"node --experimental-specifier-resolution=node --experimental-modules --experimental-json-modules --loader ./helpers/module-alias/loader.js\"",
     "start": "env $(grep -v '^#' .env) node --experimental-specifier-resolution=node --experimental-modules --experimental-json-modules --loader ./helpers/module-alias/loader.js index.js",
     "lint": "eslint --ext .js --ignore-path .gitignore .",
     "prisma:seeding": "npx prisma db seed",
@@ -67,6 +68,15 @@
     "@utils": "./utils",
     "@root": "./"
   },
+  "imports": {
+    "@routes": "./routes",
+    "@const": "./constants",
+    "@middleware": "./middleware",
+    "@helpers": "./helpers",
+    "@database": "./database",
+    "@utils": "./utils",
+    "@root": "./"
+  },
   "prisma": {
     "seed": "node prisma/seed.js"
   },
@@ -75,6 +85,6 @@
     "yarn": "1.22.17"
   },
   "engines": {
-    "node": "16"
+    "node": ">=16"
   }
 }
