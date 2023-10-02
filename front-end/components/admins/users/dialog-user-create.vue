@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-const { closeDialog } = useDialogStore();
+const userStore = useUserStore();
+const { accountCreate } = storeToRefs(userStore);
+const { dialog, closeDialog } = useDialogStore();
+const { data } = dialog;
 
 function closeDialogUserCreate() {
   closeDialog();
@@ -9,20 +12,35 @@ function closeDialogUserCreate() {
   <div class="dialog-user-create">
     <v-card>
       <v-card-title>
-        <span class="text-h5">User Profile</span>
+        <span class="text-h5">{{
+          data && data.type === "create"
+            ? "Thêm tài khoản"
+            : "Cập nhật tài khoản"
+        }}</span>
       </v-card-title>
       <v-card-text>
         <v-container>
           <v-row>
             <v-col cols="12">
-              <v-text-field label="Email*" required></v-text-field>
-            </v-col>
-            <v-col cols="12">
               <v-text-field
-                label="Password*"
-                type="password"
+                v-model.trim="accountCreate.email"
+                label="Email*"
+                variant="underlined"
                 required
               ></v-text-field>
+              <v-text-field
+                v-model.trim="accountCreate.password"
+                label="Mật khẩu*"
+                type="password"
+                variant="underlined"
+                required
+              ></v-text-field>
+              <v-autocomplete
+                v-model.trim="accountCreate.role"
+                label="Quyền"
+                :items="['Nhân viên', 'Khách hàng']"
+                variant="underlined"
+              ></v-autocomplete>
             </v-col>
           </v-row>
         </v-container>
@@ -34,11 +52,16 @@ function closeDialogUserCreate() {
           variant="text"
           @click="closeDialogUserCreate"
         >
-          Close
+          Đóng
         </v-btn>
-        <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
-          Save
+        <v-btn
+          v-if="data && data.type === 'create'"
+          color="blue-darken-1"
+          variant="text"
+        >
+          Lưu
         </v-btn>
+        <v-btn v-else color="blue-darken-1" variant="text"> Cập nhật </v-btn>
       </v-card-actions>
     </v-card>
   </div>

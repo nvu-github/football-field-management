@@ -32,5 +32,20 @@ function toggleShowNavBar(drawer: Boolean) {
     background: #f2f2f2 !important;
     border-bottom: 1px solid #b3b3b3 !important;
   }
+  :deep(.v-data-table-footer__pagination) > .v-btn {
+    box-shadow: 0px 0px 1px 1px #999;
+    border-radius: 5px;
+    margin: 10px 10px;
+    &:first-child {
+      display: none;
+    }
+    &:last-child {
+      display: none;
+    }
+  }
+  :deep(.v-data-table-footer__items-per-page),
+  :deep(.v-data-table-footer__info) {
+    display: none;
+  }
 }
 </style>

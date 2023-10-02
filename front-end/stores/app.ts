@@ -19,9 +19,9 @@ export const useAppStore = defineStore("appStore", () => {
 
   return { app, isShowSidebar };
 });
-export const useDialogStore = defineStore('dialog', () => {
+export const useDialogStore = defineStore('dialogStore', () => {
   const defaultDialog = { isVisible: false, isPersistent: false, data: undefined, content: '' }
-  const dialog = ref<Dialog>(defaultDialog)
+  const dialog = shallowRef<Dialog>(defaultDialog)
 
   function showDialog (content: DialogContent, data?: { [key: string]: any }) {
     dialog.value = { isVisible: true, isPersistent: false, content, data }
