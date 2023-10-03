@@ -25,11 +25,11 @@ CREATE TABLE `accounts` (
 -- CreateTable
 CREATE TABLE `staffs` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
-    `phone_number` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(255) NULL,
+    `phone_number` VARCHAR(191) NULL,
     `date_of_birth` DATETIME(3) NULL,
-    `address` VARCHAR(191) NOT NULL,
-    `gender` ENUM('MALE', 'FEMALE', 'OTHER') NOT NULL,
+    `address` VARCHAR(191) NULL,
+    `gender` ENUM('MALE', 'FEMALE', 'OTHER') NULL,
     `avatar` VARCHAR(191) NULL,
     `account_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
@@ -42,9 +42,9 @@ CREATE TABLE `staffs` (
 -- CreateTable
 CREATE TABLE `customers` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(255) NOT NULL,
-    `team_name` VARCHAR(255) NOT NULL,
-    `phone_number` VARCHAR(191) NOT NULL,
+    `name` VARCHAR(255) NULL,
+    `team_name` VARCHAR(255) NULL,
+    `phone_number` VARCHAR(191) NULL,
     `avatar` VARCHAR(191) NULL,
     `account_id` INTEGER NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),

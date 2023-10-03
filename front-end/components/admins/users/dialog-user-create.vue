@@ -1,9 +1,10 @@
 <script lang="ts" setup>
+import { useUserStore } from "~/stores/user";
+
 const userStore = useUserStore();
 const { accountCreate } = storeToRefs(userStore);
 const { dialog, closeDialog } = useDialogStore();
 const { data } = dialog;
-
 function closeDialogUserCreate() {
   closeDialog();
 }

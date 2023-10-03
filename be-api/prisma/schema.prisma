@@ -39,11 +39,11 @@ model Account {
 
 model Staff {
   id          Int       @id @default(autoincrement())
-  name        String    @db.VarChar(255)
-  phoneNumber String    @map("phone_number")
+  name        String?   @db.VarChar(255)
+  phoneNumber String?   @map("phone_number")
   dateOfBirth DateTime? @map("date_of_birth")
-  address     String
-  gender      Gender
+  address     String?
+  gender      Gender?
   avatar      String?
   accountId   Int       @unique @map("account_id")
   createdAt   DateTime  @default(now()) @map("created_at")
@@ -60,9 +60,9 @@ model Staff {
 
 model Customer {
   id          Int      @id @default(autoincrement())
-  name        String   @db.VarChar(255)
-  teamName    String   @map("team_name") @db.VarChar(255)
-  phoneNumber String   @map("phone_number")
+  name        String?  @db.VarChar(255)
+  teamName    String?  @map("team_name") @db.VarChar(255)
+  phoneNumber String?  @map("phone_number")
   avatar      String?
   accountId   Int      @unique @map("account_id")
   createdAt   DateTime @default(now()) @map("created_at")

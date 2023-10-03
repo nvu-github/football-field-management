@@ -1,12 +1,7 @@
 export interface AccountCreate {
   email: string
   password: string
-  role: ''
-}
-
-enum Role {
-  STAFF,
-  CUSTOMER
+  role: string
 }
 
 export const useUserStore = defineStore("userStore", () => {

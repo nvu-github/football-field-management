@@ -1,26 +1,79 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+
+import { PrismaService } from '@src/prisma.service';
+
+import { IStaff } from './interfaces';
+import { IUser } from '@app/auth/interfaces';
+import { StaffDto, CreateAccountDto } from './dto';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(private readonly prisma: PrismaService) {}
+
+  getAccountByEmail(email: string) : Promise<IUser | {}> {
+    return this.prisma.account.findUnique({
+      where: {
+        email
+      }
+    })
   }
 
-  findAll() {
-    return `This action returns all users`;
+  createAccount(account: CreateAccountDto): Promise<IUser> {
+    return this.prisma.account.create({
+      data: {
+        ...account
+      }
+    })
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  createStaff(accountId: number): Promise<IUser | {}> {
+    return this.prisma.staff.create({
+      data: {
+        name: '',
+        phoneNumber: '',
+        dateOfBirth: null,
+        address: '',
+        gender: 'OTHER',
+        account: {
+          connect: {id: accountId}
+        }
+      }
+    })
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  createCustomer(accountId: number): Promise<IUser | {}> {
+    return this.prisma.customer.create({
+      data: {
+        name: '',
+        teamName: '',
+        phoneNumber: '',
+        account: {
+          connect: {id: accountId}
+        }
+      }
+    })
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  updateStaffInfo(id: string, staffInfo: StaffDto): Promise<IStaff | {}> {
+    return this.prisma.staff.update({
+      where: {
+        id: +id
+      }, 
+      data: {
+        ...staffInfo
+      }
+    })
+  }
+
+  getStaffById(id: string): Promise<IStaff | {}> {
+    return this.prisma.staff.findUnique({
+      where: {
+        id: +id
+      }
+    })
+  }
+
+  getStaffs(): Promise<IStaff[] | []> {
+    return this.prisma.staff.findMany()
   }
 }

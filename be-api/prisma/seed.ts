@@ -16,8 +16,9 @@ async function main() {
     await prisma.role.createMany({
       data: [
         { name: 'Admin' },
-        { name: 'Staff' },
-        { name: 'User' },
+        { name: 'AccountAnt' },
+        { name: 'RentalAndSale' },
+        { name: 'Customer' },
       ],
     });
 
@@ -49,7 +50,7 @@ async function main() {
             saltDefault,
           ),
           status: 'APPROVED',
-          roleId: 2, 
+          roleId: 3, 
         },
         {
           email: 'user1@gmail.com',
@@ -58,7 +59,7 @@ async function main() {
             saltDefault,
           ),
           status: 'APPROVED',
-          roleId: 3, 
+          roleId: 4, 
         },
         {
           email: 'user2@gmail.com',
@@ -67,7 +68,7 @@ async function main() {
             saltDefault,
           ),
           status: 'APPROVED',
-          roleId: 3, 
+          roleId: 4, 
         },
       ],
     });

@@ -12,7 +12,8 @@ export default defineNuxtConfig({
     "@mdi/font/css/materialdesignicons.min.css",
     "@/assets/scss/main.scss",
   ],
-  modules: [["@pinia/nuxt", { autoImports: ["defineStore", "storeToRefs", "defineEmits"] }]],
+  modules: ["@pinia/nuxt"],
+  pinia: { autoImports: ["defineStore", "storeToRefs", "defineEmits"] },
   imports: {
     dirs: ["stores"],
   },
