@@ -1,15 +1,26 @@
 export interface AccountCreate {
-  email: string
-  password: string
-  role: string
+  email: string;
+  password: string;
+  role: string;
 }
 
 export const useUserStore = defineStore("userStore", () => {
+  const { $apis } = useNuxtApp();
   const accountCreate = reactive<AccountCreate>({
-    email: '',
-    password: '',
-    role: ''
+    email: "",
+    password: "",
+    role: "",
   });
 
-  return { accountCreate };
+  function createAccount(params: AccountCreate) {
+    return $apis
+      .post("users/account", {
+        json: {
+          params,
+        },
+      })
+      .json();
+  }
+
+  return { accountCreate, createAccount };
 });

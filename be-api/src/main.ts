@@ -29,8 +29,8 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('FOOTBALL_FIELD_MANAGEMENT API')
-    .setDescription('The FOOTBALL_FIELD_MANAGEMENT API documents.')
+    .setTitle('FOOTBALL FIELD API')
+    .setDescription('The FOOTBALL FIELD API documents.')
     .setVersion('1.0')
     .addBearerAuth()
     .build();

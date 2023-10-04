@@ -1,0 +1,92 @@
+steps:
+  # # run from the start
+  # # this will (create and) change cloudsql folder permission
+  # - id: 'prepare-socket-folder'
+  #   name: 'gcr.io/cloud-builders/gcloud'
+  #   waitFor: ['-']
+  #   entrypoint: 'bash'
+  #   args:
+  #     - '-c'
+  #     - |
+  #       mkdir /cloudsql || true
+  #       chmod -R 777 /cloudsql
+  #   volumes:
+  #     - name: cloudsql
+  #       path: /cloudsql
+
+  # # this start sql-proxy for migration task
+  # - id: 'start-cloudsql-proxy'
+  #   name: '${_CLOUD_SQL_PROXY_IMAGE_NAME}'
+  #   waitFor: ['prepare-socket-folder']
+  #   args:
+  #     - '/cloud_sql_proxy'
+  #     - '-dir=/cloudsql'
+  #     - '-instances=${_CLOUD_SQL_INSTANCES}'
+  #   volumes:
+  #     - name: cloudsql
+  #       path: /cloudsql
+
+  # # do migrate
+  # - id: 'migrate-database'
+  #   name: 'gcr.io/cloud-builders/docker'
+  #   entrypoint: 'bash'
+  #   waitFor: ['prepare-socket-folder']
+  #   args:
+  #     - '-c'
+  #     - |
+  #       docker run --rm \
+  #         -v cloudsql:/cloudsql \
+  #         -v $(pwd)/prisma:/prisma/prisma \
+  #         -v $(pwd)/.env:/prisma/.env \
+  #         ${_PRISMA_IMAGE_NAME} yarn prisma migrate deploy
+  #   volumes:
+  #     - name: cloudsql
+  #       path: /cloudsql
+
+  # # this kill sql-proxy
+  # - id: 'kill-cloudsql-proxy'
+  #   name: 'gcr.io/cloud-builders/docker'
+  #   waitFor: ['migrate-database']
+  #   entrypoint: 'sh'
+  #   args:
+  #     - '-c'
+  #     - 'docker ps -q --filter ancestor="${_CLOUD_SQL_PROXY_IMAGE_NAME}" | xargs docker stop'
+
+  # this builds app docker image
+  - id: 'build-app-image'
+    name: 'gcr.io/kaniko-project/executor:latest'
+    waitFor: ['-']
+    args:
+      - --dockerfile=${_APP_DOCKER_FILE}
+      - --context=dir://${_CONTEXT_FOLDER}
+      - --destination=gcr.io/${PROJECT_ID}/${_ENV}-${_CLOUD_RUN_SERVICE_NAME}:latest
+      - --destination=gcr.io/${PROJECT_ID}/${_ENV}-${_CLOUD_RUN_SERVICE_NAME}:${TAG_NAME}
+      - --cache=true
+      - --cache-ttl=336h
+
+  # deploy container image to Cloud Run
+  - id: 'deploy-app'
+    name: 'gcr.io/cloud-builders/gcloud'
+    waitFor: ['build-app-image']
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        gcloud run deploy ${_ENV}-${_CLOUD_RUN_SERVICE_NAME} \
+          --image=gcr.io/$PROJECT_ID/${_ENV}-${_CLOUD_RUN_SERVICE_NAME}:latest \
+          --allow-unauthenticated \
+          --region=asia-northeast1 \
+          --platform=managed \
+          --timeout=900 \
+          --add-cloudsql-instances ${_CLOUD_SQL_INSTANCES}
+
+substitutions:
+  _ENV: staging
+  # _CLOUD_SQL_PROXY_IMAGE_NAME: gcr.io/cloudsql-docker/gce-proxy:1.23.0
+  # _PRISMA_IMAGE_NAME: gcr.io/azoom-x/prisma
+  _CONTEXT_FOLDER: /workspace/learn-api
+  _APP_DOCKER_FILE: ${_CONTEXT_FOLDER}/cicd/release/Dockerfile
+  _CLOUD_RUN_SERVICE_NAME: learn-api
+  _CLOUD_SQL_INSTANCES: staging-learn-gcp:asia-northeast1:staging-learn-gcp
+options:
+  dynamic_substitutions: true

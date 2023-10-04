@@ -1,12 +1,19 @@
 <script lang="ts" setup>
 import { useUserStore } from "~/stores/user";
 
+const { $toast } = useNuxtApp();
 const userStore = useUserStore();
+const { createAccount } = userStore;
 const { accountCreate } = storeToRefs(userStore);
 const { dialog, closeDialog } = useDialogStore();
 const { data } = dialog;
+
 function closeDialogUserCreate() {
   closeDialog();
+}
+async function addAccount() {
+  $toast.success("ok");
+  // const user = await createAccount(accountCreate);
 }
 </script>
 <template>
@@ -59,6 +66,7 @@ function closeDialogUserCreate() {
           v-if="data && data.type === 'create'"
           color="blue-darken-1"
           variant="text"
+          @click="addAccount"
         >
           Lưu
         </v-btn>
