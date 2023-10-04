@@ -1,7 +1,20 @@
 export interface AccountCreate {
   email: string;
   password: string;
+  roleId: string;
+}
+
+export interface Account {
+  name: string;
+  email: string;
   role: string;
+  status: string;
+}
+
+export const statuses:any = {
+  PENDING: "Chờ xác nhận",
+  APPROVED: "Xác nhận",
+  DELETED: "Đã xóa"
 }
 
 export const useUserStore = defineStore("userStore", () => {
@@ -11,6 +24,7 @@ export const useUserStore = defineStore("userStore", () => {
     password: "",
     role: "",
   });
+  const accounts = ref<Account[]>([])
 
   function createAccount(params: AccountCreate) {
     return $apis
@@ -22,5 +36,12 @@ export const useUserStore = defineStore("userStore", () => {
       .json();
   }
 
-  return { accountCreate, createAccount };
+  async function getAccounts() {
+    const allAccounts = await $apis
+      .get("users/accounts")
+      .json();
+      accounts.value = allAccounts.data
+  }
+
+  return { accountCreate, accounts, createAccount, getAccounts };
 });

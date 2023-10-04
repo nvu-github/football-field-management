@@ -1,24 +1,21 @@
 <script lang="ts" setup>
+import { useAppStore } from "~/stores";
 const appStore = useAppStore();
-const { app } = storeToRefs(appStore);
+const { app, isShowSidebar } = storeToRefs(appStore);
 const { title } = app.value;
 useHead({
   title: title || "Sân bóng Hoàng Quân",
 });
-let toggleMenu = ref<Boolean>(true);
-function toggleShowNavBar(drawer: Boolean) {
-  toggleMenu.value = drawer;
-}
 </script>
 <template>
   <v-app>
-    <admins-layout-navbar :toggle-menu="toggleMenu" />
-    <admins-layout-header @drawer="toggleShowNavBar" />
+    <admins-layout-navbar />
+    <admins-layout-header />
     <v-main>
       <div class="main">
         <slot />
       </div>
-      <admins-layout-footer />
+      <admins-layout-footer :class="['footer', { '-full': !isShowSidebar }]" />
     </v-main>
     <common-dialog />
   </v-app>
@@ -47,5 +44,8 @@ function toggleShowNavBar(drawer: Boolean) {
   :deep(.v-data-table-footer__info) {
     display: none;
   }
+}
+.footer.-full {
+  width: 100%;
 }
 </style>

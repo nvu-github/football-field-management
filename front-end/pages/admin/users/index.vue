@@ -1,4 +1,7 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { useAppStore, useUserStore, useDialogStore, statuses } from "~/stores";
+
 const headers = [
   {
     title: "STT",
@@ -155,8 +158,10 @@ const desserts = [
   },
 ];
 const appStore = useAppStore();
+const userStore = useUserStore();
 const dialogStore = useDialogStore();
 const { app } = storeToRefs(appStore);
+const { accounts } = storeToRefs(userStore);
 app.value.title = "Quản lý tài khoản";
 function openDiaglogUserCreate(type: string) {
   dialogStore.showDialog(resolveComponent("admins-users-dialog-user-create"), {
@@ -168,6 +173,8 @@ function openDiaglogConfirm() {
     isDelete: false,
   });
 }
+
+userStore.getAccounts();
 </script>
 <template>
   <div class="user-page">
@@ -180,9 +187,12 @@ function openDiaglogConfirm() {
     </v-row>
     <v-row>
       <v-col md="12">
-        <v-data-table :headers="headers" :items="desserts">
+        <v-data-table :headers="headers" :items="accounts">
           <template #[`item.Sno`]="{ item }">
             {{ item.index + 1 }}
+          </template>
+          <template #[`item.status`]="{ item }">
+            {{ statuses[item.raw.status] }}
           </template>
           <template #[`item.actions`]="{ item }">
             <v-icon
@@ -195,9 +205,6 @@ function openDiaglogConfirm() {
             <v-icon size="small" @click="openDiaglogConfirm">
               mdi-delete
             </v-icon>
-          </template>
-          <template #[`no-data`]>
-            <v-btn color="primary"> Reset </v-btn>
           </template>
         </v-data-table>
       </v-col>

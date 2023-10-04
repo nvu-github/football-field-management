@@ -18,7 +18,7 @@ function closeNavbar() {
   >
     <v-list-item
       prepend-avatar="https://randomuser.me/api/portraits/men/85.jpg"
-      title="John Leider"
+      title="Admin"
       nav
       class="info"
     >
@@ -30,15 +30,20 @@ function closeNavbar() {
     <v-list density="compact" nav>
       <v-list-item
         prepend-icon="mdi-home"
-        title="Home"
+        title="Trang chủ"
         value="home"
+      ></v-list-item>
+      <v-list-item
+        prepend-icon="mdi-account"
+        title="Quản lý tài khoản"
+        value="account"
       ></v-list-item>
       <v-list-group value="Users">
         <template v-slot:activator="{ props }">
           <v-list-item
             v-bind="props"
-            prepend-icon="mdi-account-circle"
-            title="Users"
+            prepend-icon="mdi mdi-soccer-field"
+            title="Quản lý sân bóng"
           ></v-list-item>
         </template>
         <v-list-item
@@ -49,11 +54,6 @@ function closeNavbar() {
           :value="title"
         ></v-list-item>
       </v-list-group>
-      <v-list-item
-        prepend-icon="mdi-account"
-        title="My Account"
-        value="account"
-      ></v-list-item>
     </v-list>
   </v-navigation-drawer>
 </template>

@@ -6,7 +6,7 @@ const createInstance = (apiUrl: string) => {
     headers: {
       "Content-Type": "application/json",
     },
-    credentials: "include",
+    // credentials: "include",
     hooks: {
       beforeRequest: [setTokenHeader],
     },
