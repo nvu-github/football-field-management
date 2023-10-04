@@ -66,9 +66,9 @@ export class UsersController {
     return staffUpdate
   }
 
-  @Get('staffs')
-  async findAll() {
-    return await this.usersService.getStaffs();
+  @Get('accounts')
+  async getAccounts() {
+    return await this.usersService.getAccounts();
   }
 
   @Get('staffs/:id')

@@ -15,10 +15,10 @@ async function main() {
     // Seed roles
     await prisma.role.createMany({
       data: [
-        { name: 'Admin' },
-        { name: 'AccountAnt' },
-        { name: 'RentalAndSale' },
-        { name: 'Customer' },
+        { name: 'Ban quản lý sân' },
+        { name: 'Nhân viên kế toán' },
+        { name: 'Nhân viên cho thuê và bán phụ kiện' },
+        { name: 'Khách hàng' },
       ],
     });
 

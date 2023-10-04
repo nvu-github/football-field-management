@@ -73,7 +73,31 @@ export class UsersService {
     })
   }
 
-  getStaffs(): Promise<IStaff[] | []> {
-    return this.prisma.staff.findMany()
+  async getAccounts(): Promise<any> {
+    const accounts = await this.prisma.account.findMany({
+      where: { roleId: {not: 1} },
+      select: {
+        id: true,
+        email: true,
+        status: true,
+        role: { select: { name: true } },
+        staff: { select: { name: true } },
+        customer: { select: { name: true } },
+      },
+    });
+  
+  
+    return accounts.map((account) => {
+      const { id, email, status } = account;
+      const name = account.customer?.name || account.staff?.name;
+
+      return {
+        id,
+        email,
+        status,
+        name,
+        role: account.role.name
+      }
+    });
   }
 }
