@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useAppStore } from "~/stores";
 const appStore = useAppStore();
 const { app, isShowSidebar } = storeToRefs(appStore);
 

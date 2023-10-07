@@ -15,7 +15,7 @@ export default defineNuxtConfig({
   modules: ["@pinia/nuxt"],
   pinia: { autoImports: ["defineStore", "storeToRefs", "defineEmits"] },
   imports: {
-    dirs: ["stores"],
+    dirs: ["stores", "utils"],
   },
   build: {
     transpile: ["vuetify"],

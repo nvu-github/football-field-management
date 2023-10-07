@@ -1,7 +1,7 @@
 export interface AccountCreate {
   email: string;
   password: string;
-  roleId: string;
+  roleId: number | null;
 }
 
 export interface Account {
@@ -19,18 +19,14 @@ export const statuses:any = {
 
 export const useUserStore = defineStore("userStore", () => {
   const { $apis } = useNuxtApp();
-  const accountCreate = reactive<AccountCreate>({
-    email: "",
-    password: "",
-    role: "",
-  });
+  const account = ref<Account>()
   const accounts = ref<Account[]>([])
 
   function createAccount(params: AccountCreate) {
     return $apis
       .post("users/account", {
         json: {
-          params,
+          ...convertProjectObjToObj(params),
         },
       })
       .json();
@@ -43,5 +39,12 @@ export const useUserStore = defineStore("userStore", () => {
       accounts.value = allAccounts.data
   }
 
-  return { accountCreate, accounts, createAccount, getAccounts };
+  async function getAccount(id: number) {
+    const Account = await $apis
+      .get(`users/account/${id}`)
+      .json();
+      account.value = Account.data
+  }
+
+  return { accounts, account, createAccount, getAccounts, getAccount };
 });

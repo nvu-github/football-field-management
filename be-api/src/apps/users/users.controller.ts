@@ -54,7 +54,29 @@ export class UsersController {
     }
   }
 
-  @Patch('staffs/:id')
+  @Patch('account/:id')
+  async updateAccount(@Param('id') id: string, @Body() body: CreateAccountDto) {
+    const account = await this.usersService.getAccountByEmail(body.email)
+    
+    if (account)  {
+      throw new HttpException('Email này đã tồn tại trong hệ thống!', HttpStatus.NOT_FOUND)
+    }
+
+    const accountUpdated = await this.usersService.updateAccount(+id, body)
+    return accountUpdated
+  }
+
+  @Get('accounts')
+  async getAccounts() {
+    return await this.usersService.getAccounts();
+  }
+
+  @Get('account/:id')
+  async getAccount(@Param('id') id: string) {
+    return await this.usersService.getAccountById(+id);
+  }
+
+  @Patch('staff/:id')
   async updateStaffInfo(@Param('id') id: string, @Body() body: StaffDto, @Request() req) {
     const staff = await this.usersService.getStaffById(id)
     
@@ -66,12 +88,7 @@ export class UsersController {
     return staffUpdate
   }
 
-  @Get('accounts')
-  async getAccounts() {
-    return await this.usersService.getAccounts();
-  }
-
-  @Get('staffs/:id')
+  @Get('staff/:id')
   async findOne(@Param('id') id: string) {
     const staff = await this.usersService.getStaffById(id);
     

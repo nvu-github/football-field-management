@@ -10,6 +10,53 @@ import { StaffDto, CreateAccountDto } from './dto';
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
 
+  createAccount(account: CreateAccountDto): Promise<IUser> {
+    return this.prisma.account.create({
+      data: {
+        ...account
+      },
+      select: {
+        id: true,
+        email: true
+      }
+    })
+  }
+
+  updateAccount(accountId: number,params: CreateAccountDto): Promise<IUser>{
+    return this.prisma.account.update({
+      where:{
+        id: accountId
+      },
+      data: {
+        ...params
+      },
+      select: {
+        id: true,
+        email: true
+      }
+    })
+  }
+
+  async getAccountById(accountId: number): Promise<IUser> {
+    const account = await this.prisma.account.findUnique({
+      where: { id: accountId, roleId: {not: 1}, status: { not: 'DELETED'} },
+      select: {
+        id: true,
+        email: true,
+        status: true,
+        roleId: true,
+        staff: { select: { name: true } },
+        customer: { select: { name: true } },
+      },
+    });
+  
+  
+    const { id, email, roleId } = account;
+    let name = account.customer?.name || account.staff?.name;
+  
+    return { id, email, name, role: String(roleId) };
+  }
+
   getAccountByEmail(email: string) : Promise<IUser | {}> {
     return this.prisma.account.findUnique({
       where: {
@@ -18,10 +65,16 @@ export class UsersService {
     })
   }
 
-  createAccount(account: CreateAccountDto): Promise<IUser> {
-    return this.prisma.account.create({
+  deleteAccount(accountId: number): Promise<IUser> {
+    const deleteStatus = 'DELETED'
+    return this.prisma.account.update({
+      where: { id: accountId },
       data: {
-        ...account
+        status: deleteStatus
+      },
+      select: {
+        id: true,
+        email: true
       }
     })
   }
@@ -73,9 +126,9 @@ export class UsersService {
     })
   }
 
-  async getAccounts(): Promise<any> {
+  async getAccounts(): Promise<IUser[]> {
     const accounts = await this.prisma.account.findMany({
-      where: { roleId: {not: 1} },
+      where: { roleId: {not: 1}, status: { not: 'DELETED'} },
       select: {
         id: true,
         email: true,
@@ -100,4 +153,5 @@ export class UsersService {
       }
     });
   }
+  
 }

@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
 import { useAppStore } from "~/stores";
 const appStore = useAppStore();
 const { app, isShowSidebar } = storeToRefs(appStore);

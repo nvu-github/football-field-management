@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { useDialogStore } from "~/stores";
 const dialogStore = useDialogStore();
 const { dialog } = storeToRefs(dialogStore);
 </script>

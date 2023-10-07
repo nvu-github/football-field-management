@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import logo from "../../../public/logo.png";
+import logo from "~/public/logo.png";
 
 const rules = [(value) => !!value || "Vui lòng nhập thông tin tìm kiếm!"];
 </script>
