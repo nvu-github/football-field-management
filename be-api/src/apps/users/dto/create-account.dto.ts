@@ -11,7 +11,7 @@ export class CreateAccountDto {
   @IsNotEmpty()
   @IsEmail()
   @NotContains(' ')
-  readonly email: string;
+  email: string;
 
   @ApiProperty({
     example: '123456'

@@ -2,13 +2,29 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@src/prisma.service';
 
-import { IStaff } from './interfaces';
+import { getStatusAccount } from 'utils/app';
+import { IStaff, IRole } from './interfaces';
 import { IUser } from '@app/auth/interfaces';
 import { StaffDto, CreateAccountDto } from './dto';
+
 
 @Injectable()
 export class UsersService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getRoles(): Promise<IRole[]> {
+    return await this.prisma.role.findMany({
+      where: {
+        id: {
+          not: 1
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+      },
+    })
+  }
 
   createAccount(account: CreateAccountDto): Promise<IUser> {
     return this.prisma.account.create({
@@ -22,7 +38,22 @@ export class UsersService {
     })
   }
 
-  updateAccount(accountId: number,params: CreateAccountDto): Promise<IUser>{
+  updateStatusAccount(accountId: number, accountStatus: string):  Promise<IUser> {
+    return this.prisma.account.update({
+      where: {
+        id: accountId,
+      },
+      data: {
+        status: getStatusAccount(accountStatus)
+      },
+      select: {
+        id: true,
+        email: true
+      }
+    })
+  }
+
+  updateAccount(accountId: number, params: CreateAccountDto): Promise<IUser>{
     return this.prisma.account.update({
       where:{
         id: accountId
@@ -45,6 +76,7 @@ export class UsersService {
         email: true,
         status: true,
         roleId: true,
+        role: { select: { name: true } },
         staff: { select: { name: true } },
         customer: { select: { name: true } },
       },
@@ -54,7 +86,7 @@ export class UsersService {
     const { id, email, roleId } = account;
     let name = account.customer?.name || account.staff?.name;
   
-    return { id, email, name, role: String(roleId) };
+    return { id, email, name, role: String(roleId), roleName: account.role.name };
   }
 
   getAccountByEmail(email: string) : Promise<IUser | {}> {
@@ -65,18 +97,34 @@ export class UsersService {
     })
   }
 
-  deleteAccount(accountId: number): Promise<IUser> {
-    const deleteStatus = 'DELETED'
-    return this.prisma.account.update({
-      where: { id: accountId },
-      data: {
-        status: deleteStatus
-      },
+  async getAccounts(): Promise<IUser[]> {
+    const accounts = await this.prisma.account.findMany({
+      where: { roleId: {not: 1}, status: { not: 'DELETED'} },
       select: {
         id: true,
-        email: true
+        email: true,
+        status: true,
+        roleId: true,
+        role: { select: { name: true } },
+        staff: { select: { name: true } },
+        customer: { select: { name: true } },
+      },
+    });
+  
+  
+    return accounts.map((account) => {
+      const { id, email, status, roleId } = account;
+      const name = account.customer?.name || account.staff?.name;
+
+      return {
+        id,
+        email,
+        status,
+        name,
+        role: String(roleId),
+        roleName: account.role.name
       }
-    })
+    });
   }
 
   createStaff(accountId: number): Promise<IUser | {}> {
@@ -124,34 +172,6 @@ export class UsersService {
         id: +id
       }
     })
-  }
-
-  async getAccounts(): Promise<IUser[]> {
-    const accounts = await this.prisma.account.findMany({
-      where: { roleId: {not: 1}, status: { not: 'DELETED'} },
-      select: {
-        id: true,
-        email: true,
-        status: true,
-        role: { select: { name: true } },
-        staff: { select: { name: true } },
-        customer: { select: { name: true } },
-      },
-    });
-  
-  
-    return accounts.map((account) => {
-      const { id, email, status } = account;
-      const name = account.customer?.name || account.staff?.name;
-
-      return {
-        id,
-        email,
-        status,
-        name,
-        role: account.role.name
-      }
-    });
   }
   
 }

@@ -163,8 +163,8 @@ model FootballImage {
 
 model LeasingDuration {
   id        Int      @id @default(autoincrement())
-  startTime DateTime @map("start_time")
-  endTime   DateTime @map("end_time")
+  startTime String   @map("start_time") @db.VarChar(10)
+  endTime   String   @map("end_time") @db.VarChar(10)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 

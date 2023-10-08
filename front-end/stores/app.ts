@@ -12,14 +12,23 @@ export interface Dialog {
 }
 
 export const useAppStore = defineStore("appStore", () => {
+  const { $apis } = useNuxtApp();
   const app = reactive<App>({
     title: "",
   });
   const isShowSidebar = ref<boolean>(false);
+  const isLoading = ref<boolean>(false);
 
-  return { app, isShowSidebar };
+  function deleteApi(endpoint: string) {
+    return $apis
+      .delete(endpoint)
+      .json();
+  }
+
+  return { app, isShowSidebar, isLoading, deleteApi };
 });
 export const useDialogStore = defineStore('dialogStore', () => {
+  const isDelete = ref<Boolean>(false)
   const defaultDialog = { isVisible: false, isPersistent: false, data: undefined, content: '' }
   const dialog = shallowRef<Dialog>(defaultDialog)
 
@@ -35,5 +44,5 @@ export const useDialogStore = defineStore('dialogStore', () => {
     dialog.value = defaultDialog
   }
 
-  return { dialog, showDialog, showPersistentDialog, closeDialog }
+  return { dialog, isDelete, showDialog, showPersistentDialog, closeDialog }
 })

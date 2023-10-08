@@ -29,6 +29,23 @@ export default defineNuxtPlugin((nuxtApp) => {
       },
     },
     directives,
+    theme: {
+      defaultTheme: 'defaultTheme',
+      themes: {
+        defaultTheme: {
+          dark: false,
+          colors: {
+            primary: '#174E69',
+            'success-darken': '#007F5F',
+            error: '#CD2B21',
+            'on-primary': '#FFFFFF',
+            'primary-light': '#E2EAED',
+            warning: '#FCE2AC',
+            'in-warning': '#E99E00',
+          }
+        }
+      }
+    }
   });
 
   nuxtApp.vueApp.use(vuetify);

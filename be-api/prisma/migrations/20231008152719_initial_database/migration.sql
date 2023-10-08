@@ -130,8 +130,8 @@ CREATE TABLE `football_images` (
 -- CreateTable
 CREATE TABLE `leasing_durations` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `start_time` DATETIME(3) NOT NULL,
-    `end_time` DATETIME(3) NOT NULL,
+    `start_time` VARCHAR(10) NOT NULL,
+    `end_time` VARCHAR(10) NOT NULL,
     `created_at` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `updated_at` DATETIME(3) NOT NULL,
 

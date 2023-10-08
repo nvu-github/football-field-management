@@ -30,6 +30,11 @@ export class UsersController {
   private readonly CUSTOMER = 4
   constructor(private readonly usersService: UsersService) {}
 
+  @Get('roles')
+  async getRoles() {
+    return await this.usersService.getRoles()
+  }
+
   @Post('account')
   async createAccount(@Body() body: CreateAccountDto) {
     try {
@@ -54,16 +59,31 @@ export class UsersController {
     }
   }
 
-  @Patch('account/:id')
-  async updateAccount(@Param('id') id: string, @Body() body: CreateAccountDto) {
-    const account = await this.usersService.getAccountByEmail(body.email)
+  @Patch('account/:id/accept')
+  async acceptAccount(@Param('id') id: string, @Body() body: any) {
+    const account = await this.usersService.getAccountById(+id)
     
-    if (account)  {
-      throw new HttpException('Email này đã tồn tại trong hệ thống!', HttpStatus.NOT_FOUND)
+    if (!account)  {
+      throw new HttpException('Tài khỏan này không tồn tại!', HttpStatus.NOT_FOUND)
     }
 
+    return await this.usersService.updateStatusAccount(+id, body.status)
+  }
+
+  @Patch('account/:id')
+  async updateAccount(@Param('id') id: string, @Body() body: CreateAccountDto) {
+    const account = await this.usersService.getAccountById(+id)
+    if (body.roleId !== 4 && account.email === body.email) {
+      delete body.email
+    }
     const accountUpdated = await this.usersService.updateAccount(+id, body)
     return accountUpdated
+  }
+
+  @Delete('account/:id') 
+  deleteAccount(@Param('id') id: string) {
+    const deleteStatus = 'deleted'
+    return this.usersService.updateStatusAccount(+id, deleteStatus)
   }
 
   @Get('accounts')
@@ -73,7 +93,12 @@ export class UsersController {
 
   @Get('account/:id')
   async getAccount(@Param('id') id: string) {
-    return await this.usersService.getAccountById(+id);
+    const account = await this.usersService.getAccountById(+id)
+    
+    if (!account)  {
+      throw new HttpException('Tài khỏan này không tồn tại!', HttpStatus.NOT_FOUND)
+    }
+    return account;
   }
 
   @Patch('staff/:id')

@@ -26,10 +26,21 @@ useHead({
 .main {
   padding: 40px 35px;
   min-height: 600px;
+
+  :deep(.v-input__details) {
+    margin-top: 5px;
+  }
+
   :deep(.v-data-table__th) {
     background: #f2f2f2 !important;
     border-bottom: 1px solid #b3b3b3 !important;
   }
+
+  :deep(.v-data-table__td):last-child > .button {
+    min-width: 40px;
+    margin: 5px;
+  }
+
   :deep(.v-data-table-footer__pagination) > .v-btn {
     box-shadow: 0px 0px 1px 1px #999;
     border-radius: 5px;
@@ -41,6 +52,7 @@ useHead({
       display: none;
     }
   }
+
   :deep(.v-data-table-footer__items-per-page),
   :deep(.v-data-table-footer__info) {
     display: none;

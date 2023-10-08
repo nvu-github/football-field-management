@@ -1,5 +1,7 @@
 <script lang="ts" setup>
-import { useUserStore } from "~/stores";
+import { useNuxtApp } from "nuxt/app";
+import { storeToRefs } from "pinia";
+import { useUserStore, useAppStore, useDialogStore } from "~/stores";
 
 const rules = {
   email: (value: string) => {
@@ -8,48 +10,76 @@ const rules = {
     return true;
   },
   password: (value: string) => {
-    if (!value) "Vui lòng nhập mật khẩu!";
+    if (!value) return "Vui lòng nhập mật khẩu!";
     return true;
   },
   role: (value: number) => {
-    if (!value) "Vui lòng chọn quyền cho tài khoản!";
+    if (!value) return "Vui lòng chọn quyền cho tài khoản!";
     return true;
   },
 };
-const { $toast } = useNuxtApp();
+const defaultTypeBtn = "update";
+const customerRole = "4";
+const { $toast }: any = useNuxtApp();
 const userStore = useUserStore();
-const { createAccount } = userStore;
-const { account } = storeToRefs(userStore);
+const appStore = useAppStore();
+const { isLoading } = storeToRefs(appStore);
+const { roles, account } = storeToRefs(userStore);
 const { dialog, closeDialog } = useDialogStore();
-const { data } = dialog;
+const { data }: any = dialog;
 const accountCreate = ref<AccountCreate>({
   email: "",
   password: "",
   roleId: "",
 });
 
+onBeforeMount(async () => {
+  if (data.type === defaultTypeBtn) {
+    await userStore.getAccount(data.id);
+    setAccountToForm();
+  }
+});
+
 function closeDialogUserCreate() {
   closeDialog();
 }
 async function addAccount() {
+  isLoading.value = true;
   try {
-    await createAccount(accountCreate.value);
+    if (data.type === defaultTypeBtn) {
+      if (typeof accountCreate.value.roleId === "string") {
+        const roleId = roles.value.find(
+          (role) =>
+            role.name.toLowerCase() === accountCreate.value.roleId.toLowerCase()
+        )?.id;
+        accountCreate.value = { ...accountCreate.value, roleId };
+      }
+
+      await userStore.updateAccount(data.id, accountCreate.value);
+    } else {
+      await userStore.createAccount(accountCreate.value);
+    }
     await userStore.getAccounts();
-    $toast.success("Thêm tài khoản thành công");
+    $toast.success(
+      `${
+        data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
+      } tài khoản thành công`
+    );
   } catch (error) {
-    $toast.error("Thêm tài khoản thất bại");
+    $toast.error(
+      `${data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"} tài khoản thất bại`
+    );
   }
+  isLoading.value = false;
   closeDialog();
 }
 function setAccountToForm() {
-  // accountCreate.email.value = account.value.email;
-  // accountCreate.roleId.value = account.value.role;
-  console.log(account.value);
+  const { email, roleName }: any = account.value;
+  accountCreate.value.email = email;
+  accountCreate.value.roleId = roleName;
 }
-if (data.type === "update") {
-  userStore.getAccount(data.id);
-  setAccountToForm();
-}
+
+userStore.getRoles();
 </script>
 <template>
   <div class="dialog-user-create">
@@ -57,9 +87,9 @@ if (data.type === "update") {
       <v-card>
         <v-card-title>
           <span class="text-h5">{{
-            data && data.type === "create"
-              ? "Thêm tài khoản"
-              : "Cập nhật tài khoản"
+            data && data.type === defaultTypeBtn
+              ? "Cập nhật tài khoản"
+              : "Thêm tài khoản"
           }}</span>
         </v-card-title>
         <v-card-text>
@@ -71,6 +101,7 @@ if (data.type === "update") {
                   label="Email*"
                   variant="underlined"
                   :rules="[rules.email]"
+                  :disabled="account?.role === customerRole"
                   required
                 ></v-text-field>
                 <v-text-field
@@ -87,20 +118,7 @@ if (data.type === "update") {
                   item-value="id"
                   item-title="name"
                   :rules="[rules.role]"
-                  :items="[
-                    {
-                      id: 2,
-                      name: 'Nhân viên kế toán',
-                    },
-                    {
-                      id: 3,
-                      name: 'Nhân viên cho thuê và bán phụ kiện',
-                    },
-                    {
-                      id: 4,
-                      name: 'Khách hàng',
-                    },
-                  ]"
+                  :items="roles"
                   variant="underlined"
                 ></v-autocomplete>
               </v-col>
@@ -109,23 +127,27 @@ if (data.type === "update") {
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn
-            color="blue-darken-1"
-            variant="text"
-            @click="closeDialogUserCreate"
-          >
+          <v-btn class="button -default" @click="closeDialogUserCreate">
             Đóng
           </v-btn>
           <v-btn
-            v-if="data && data.type === 'create'"
-            color="blue-darken-1"
-            variant="text"
+            v-if="data && data.type !== 'update'"
+            class="button -primary"
             type="submit"
+            :loading="isLoading"
             :disabled="!accountCreate.value"
           >
             Lưu
           </v-btn>
-          <v-btn v-else color="blue-darken-1" variant="text"> Cập nhật </v-btn>
+          <v-btn
+            v-else
+            class="button -primary"
+            type="submit"
+            :loading="isLoading"
+            :disabled="!accountCreate.value"
+          >
+            Cập nhật
+          </v-btn>
         </v-card-actions>
       </v-card>
     </v-form>
@@ -134,5 +156,8 @@ if (data.type === "update") {
 <style lang="scss" scoped>
 .dialog-user-create {
   width: 500px;
+  :deep(.v-card) {
+    padding: 5px;
+  }
 }
 </style>

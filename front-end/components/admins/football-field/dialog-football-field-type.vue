@@ -1,0 +1,156 @@
+<script lang="ts" setup>
+import { useNuxtApp } from "nuxt/app";
+import { compareTime, parseTime } from "~/utils/string";
+import { storeToRefs } from "pinia";
+import {
+  useFootBallFieldTypeStore,
+  useAppStore,
+  useDialogStore,
+} from "~/stores";
+
+const rules = {
+  startTime: (value: string) => {
+    if (!value) return "Vui lòng nhập thời gian bắt đầu!";
+    return true;
+  },
+  endTime: (value: string) => {
+    const { startTime } = paramsLeasingDuration.value;
+
+    if (!value) return "Vui lòng nhập thời gian kết thúc!";
+    if (!compareTime(startTime, value))
+      return "Thời gian bắt đầu phải trước thời gian kết thúc!";
+    return true;
+  },
+};
+const defaultTypeBtn = "update";
+const footballFieldTypeStore = useFootBallFieldTypeStore();
+const appStore = useAppStore();
+const { $toast }: any = useNuxtApp();
+const { isLoading } = storeToRefs(appStore);
+const { footBallFieldType } = storeToRefs(footballFieldTypeStore);
+const { dialog, closeDialog } = useDialogStore();
+const { data }: any = dialog;
+const paramsFootballFieldType = ref<ParamsFootballFieldType>({
+  name: "",
+});
+
+onBeforeMount(async () => {
+  if (data.type === defaultTypeBtn) {
+    await footballFieldTypeStore.getFootBallFieldType(data.id);
+    setFootballFieldTypeToForm();
+  }
+});
+
+function closeDialogLeasingDuration() {
+  closeDialog();
+}
+
+async function addLeasingDuration() {
+  isLoading.value = true;
+  try {
+    if (data.type === defaultTypeBtn) {
+      await footballFieldTypeStore.updateFootBallFieldType(
+        data.id,
+        paramsFootballFieldType.value
+      );
+    } else {
+      await footballFieldTypeStore.createFootBallFieldType(
+        paramsFootballFieldType.value
+      );
+    }
+    $toast.success(
+      `${
+        data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
+      } loại sân bóng thành công`
+    );
+    await footballFieldTypeStore.getFootBallFieldTypes();
+  } catch (error) {
+    console.log(error);
+    $toast.error(
+      `${
+        data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
+      } loại sân bóng thất bại`
+    );
+  }
+  isLoading.value = false;
+  closeDialog();
+}
+
+function setFootballFieldTypeToForm() {
+  const { name }: any = footBallFieldType.value;
+  paramsFootballFieldType.value.name = name;
+}
+</script>
+<template>
+  <div class="dialog-football-field-type-create">
+    <v-form
+      v-model="paramsFootballFieldType.value"
+      @submit.prevent="addLeasingDuration"
+    >
+      <v-card>
+        <v-card-title>
+          <span class="text-h5">{{
+            data && data.type === defaultTypeBtn
+              ? "Cập nhật thời gian thuê"
+              : "Thêm thời gian thuê"
+          }}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-row>
+            <v-col class="column" cols="12">
+              <v-text-field
+                v-model.trim="paramsFootballFieldType.name"
+                label="Tên loại sân*"
+                type="text"
+                variant="underlined"
+                :rules="[rules.startTime]"
+                required
+              ></v-text-field>
+            </v-col>
+          </v-row>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="button -default" @click="closeDialogLeasingDuration">
+            Đóng
+          </v-btn>
+          <v-btn
+            v-if="data && data.type !== 'update'"
+            class="button -primary"
+            type="submit"
+            :loading="isLoading"
+            :disabled="!paramsFootballFieldType.value"
+          >
+            Lưu
+          </v-btn>
+          <v-btn
+            v-else
+            class="button -primary"
+            type="submit"
+            :loading="isLoading"
+            :disabled="!paramsFootballFieldType.value"
+          >
+            Cập nhật
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-form>
+  </div>
+</template>
+<style lang="scss" scoped>
+.dialog-football-field-type-create {
+  width: 500px;
+
+  :deep(.v-card) {
+    padding: 5px;
+  }
+
+  :deep(.column) {
+    display: flex;
+  }
+
+  :deep(.column) > .v-input {
+    margin: 0 25px;
+  }
+}
+</style>

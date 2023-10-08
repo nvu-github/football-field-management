@@ -21,7 +21,7 @@ const dialogStore = useDialogStore();
 const { isDelete } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { accounts } = storeToRefs(userStore);
-app.value.title = "Quản lý tài khoản";
+app.value.title = "Quản lý sân bóng";
 watch(isDelete, async () => {
   await userStore.getAccounts();
   isDelete.value = false;
@@ -32,24 +32,21 @@ async function openDiaglogUser(type?: string, id?: string) {
     id,
   });
 }
-function openDiaglogConfirm(id: string, type: string) {
+function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     id,
-    type,
-    endpoint:
-      type === "accept" ? `users/account/${id}/accept` : `users/account/${id}`,
-    nameObject: "tài khoản",
+    nameObject: "Tài khoản",
   });
 }
 
 userStore.getAccounts();
 </script>
 <template>
-  <div class="user-page">
+  <div class="fooball-field-page">
     <v-row class="row">
       <v-col md="12" class="column">
         <v-btn class="button -success" @click="openDiaglogUser">
-          Thêm tài khoản
+          Thêm sân bóng
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
           </template>
@@ -61,9 +58,6 @@ userStore.getAccounts();
         <v-data-table :headers="headers" :items="accounts">
           <template #[`item.Sno`]="{ item }">
             {{ item.index + 1 }}
-          </template>
-          <template #[`item.status`]="{ item }">
-            {{ statuses[item.raw.status] }}
           </template>
           <template #[`item.role`]="{ item }">
             {{ item.raw.roleName }}
@@ -78,7 +72,7 @@ userStore.getAccounts();
             <v-btn
               class="button -success"
               :disabled="item.raw.status !== 'PENDING'"
-              @click="openDiaglogConfirm(item.raw.id, 'accept')"
+              @click="openDiaglogConfirm(item.raw.id)"
             >
               <v-icon> mdi mdi-check-bold </v-icon>
             </v-btn>
@@ -95,14 +89,10 @@ userStore.getAccounts();
   </div>
 </template>
 <style lang="scss" scoped>
-.user-page {
+.fooball-field-page {
   .row > .column {
     display: flex;
     justify-content: right;
-  }
-  :deep(.v-data-table__td):last-child > .button {
-    min-width: 40px;
-    margin: 5px;
   }
 }
 </style>

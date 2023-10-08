@@ -11,9 +11,10 @@ import { AuthModule } from '@app/auth/auth.module';
 import { UsersModule } from '@app/users/users.module';
 import { GoogleAuthMiddleware } from 'middleware/google-auth.middleware';
 import { AuthController } from '@app/auth/auth.controller';
+import { FootballFieldsModule } from './apps/football-fields/football-fields.module';
 
 @Module({
-  imports: [AuthModule, UploadModule, UsersModule],
+  imports: [AuthModule, UploadModule, UsersModule, FootballFieldsModule],
   controllers: [AppController],
   providers: [
     AppService,

@@ -6,13 +6,39 @@ body {
 .button {
   border-radius: 5px;
   padding: 10px 20px;
-  box-shadow: inset 0 -3px 0 rgba(0,0,0,.2);
-  background-color: #a9ca31;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.2) !important;
   text-align: center;
   line-height: 1;
   transition-duration: 0.28s;
-  &:hover {
-    background-color: #a2c135;
+  &.-default {
+    background-color: #d4d4d4;
+    &:hover {
+      background-color: #cccccc;
+    }
+  }
+  &.-success {
+    background-color: #a9ca31;
+    &:hover {
+      background-color: #a2c135;
+    }
+  }
+  &.-primary {
+    background-color: #1ab3ca;
+    &:hover {
+      background-color: #17adc4;
+    }
+  }
+  &.-warning {
+    background-color: #ffc107;
+    &:hover {
+      background-color: #dda807;
+    }
+  }
+  &.-danger {
+    background-color: #f75061;
+    &:hover {
+      background-color: #e75362;
+    }
   }
 }
 
