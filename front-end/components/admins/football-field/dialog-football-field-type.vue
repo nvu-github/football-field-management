@@ -9,18 +9,7 @@ import {
 } from "~/stores";
 
 const rules = {
-  startTime: (value: string) => {
-    if (!value) return "Vui lòng nhập thời gian bắt đầu!";
-    return true;
-  },
-  endTime: (value: string) => {
-    const { startTime } = paramsLeasingDuration.value;
-
-    if (!value) return "Vui lòng nhập thời gian kết thúc!";
-    if (!compareTime(startTime, value))
-      return "Thời gian bắt đầu phải trước thời gian kết thúc!";
-    return true;
-  },
+  name: (value: string) => !!value || "Vui lòng nhập tên loại sân",
 };
 const defaultTypeBtn = "update";
 const footballFieldTypeStore = useFootBallFieldTypeStore();
@@ -41,11 +30,11 @@ onBeforeMount(async () => {
   }
 });
 
-function closeDialogLeasingDuration() {
+function closeDialogFootballFieldType() {
   closeDialog();
 }
 
-async function addLeasingDuration() {
+async function addFootballFieldType() {
   isLoading.value = true;
   try {
     if (data.type === defaultTypeBtn) {
@@ -85,15 +74,15 @@ function setFootballFieldTypeToForm() {
   <div class="dialog-football-field-type-create">
     <v-form
       v-model="paramsFootballFieldType.value"
-      @submit.prevent="addLeasingDuration"
+      @submit.prevent="addFootballFieldType"
     >
       <v-card>
         <v-card-title>
-          <span class="text-h5">{{
-            data && data.type === defaultTypeBtn
-              ? "Cập nhật thời gian thuê"
-              : "Thêm thời gian thuê"
-          }}</span>
+          <span class="text-h5"
+            >{{
+              data && data.type === defaultTypeBtn ? "Cập nhật " : "Thêm "
+            }}loại sân bóng</span
+          >
         </v-card-title>
         <v-card-text>
           <v-row>
@@ -103,7 +92,7 @@ function setFootballFieldTypeToForm() {
                 label="Tên loại sân*"
                 type="text"
                 variant="underlined"
-                :rules="[rules.startTime]"
+                :rules="[rules.name]"
                 required
               ></v-text-field>
             </v-col>
@@ -111,7 +100,7 @@ function setFootballFieldTypeToForm() {
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="button -default" @click="closeDialogLeasingDuration">
+          <v-btn class="button -default" @click="closeDialogFootballFieldType">
             Đóng
           </v-btn>
           <v-btn

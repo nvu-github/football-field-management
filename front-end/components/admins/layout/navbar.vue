@@ -1,11 +1,12 @@
 <script lang="ts" setup>
 import logo from "~/public/logo.png";
 import { storeToRefs } from "pinia";
+import { useRoute } from "nuxt/app";
 import { useAppStore } from "~/stores";
 
 const appStore = useAppStore();
+const route = useRoute();
 const { isShowSidebar } = storeToRefs(appStore);
-const isNotSubMenu = false;
 
 const menus = ref<Menu>([
   {
@@ -19,7 +20,7 @@ const menus = ref<Menu>([
     url: "/admin/users",
     subMenus: [
       {
-        icon: "mdi-account",
+        icon: "mdi mdi-account-box-outline",
         title: "Quản lý tài khoản",
         url: "/admin/users",
       },
@@ -30,6 +31,16 @@ const menus = ref<Menu>([
     title: "Quản lý sân bóng",
     url: "/admin/football-fields",
     subMenus: [
+      {
+        icon: "mdi mdi-soccer",
+        title: "Sân bóng",
+        url: "/admin/football-fields",
+      },
+      {
+        icon: "mdi mdi-cog",
+        title: "Giá thuê sân",
+        url: "/admin/football-fields/prices",
+      },
       {
         icon: "mdi mdi-clock-time-three-outline",
         title: "Thời gian thuê",
@@ -65,36 +76,36 @@ function closeNavbar() {
     </v-list-item>
 
     <v-list density="compact" nav>
-      <v-list-group v-for="(menu, index) in menus" :key="index">
-        <template v-slot:activator="{ props }">
-          <v-list-item
-            v-if="!!menu.subMenus === isNotSubMenu"
-            link="true"
-            :prepend-icon="menu.icon"
-            :title="menu.title"
-            :to="menu.url"
-            class="noticon"
-            :value="menu.url"
-          ></v-list-item>
-          <v-list-item
-            v-else
-            v-bind="props"
-            link="false"
-            :prepend-icon="menu.icon"
-            :title="menu.title"
-            :value="menu.url"
-          ></v-list-item>
-        </template>
+      <div v-for="(menu, index) in menus" :key="index" class="menu">
         <v-list-item
-          v-for="(subMenu, indexSub) in menu.subMenus"
-          link="false"
-          :key="indexSub"
-          :title="subMenu.title"
-          :prepend-icon="subMenu.icon"
-          :to="subMenu.url"
-          :value="subMenu.url"
+          v-if="!menu.subMenus"
+          link
+          :prepend-icon="menu.icon"
+          :title="menu.title"
+          :to="menu.url"
+          :active="route.path === menu.url"
+          :value="menu.url"
         ></v-list-item>
-      </v-list-group>
+        <v-list-group v-else>
+          <template #activator="{ props }">
+            <v-list-item
+              v-bind="props"
+              :prepend-icon="menu.icon"
+              :title="menu.title"
+              :value="menu.url"
+            ></v-list-item>
+          </template>
+          <v-list-item
+            v-for="(subMenu, indexSub) in menu.subMenus"
+            link
+            :key="indexSub"
+            :title="subMenu.title"
+            :prepend-icon="subMenu.icon"
+            :to="subMenu.url"
+            :value="subMenu.url"
+          ></v-list-item>
+        </v-list-group>
+      </div>
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -104,12 +115,19 @@ function closeNavbar() {
   :deep(.v-list-item__append) > .icon {
     display: none;
   }
+  :deep(.v-list-item__append) > .v-icon {
+    margin-inline-start: 10px;
+  }
   :deep(.v-navigation-drawer__content) > .info {
     padding: 10px;
   }
   :deep(.v-list-item__content) {
     display: flex;
     align-items: center;
+  }
+  :deep(.v-list-item__content) > .v-list-item-title {
+    font-size: 15px;
+    font-weight: bold;
   }
   :deep(.v-list-item__content) > .logo {
     margin: 0 10px;
@@ -119,8 +137,11 @@ function closeNavbar() {
     font-size: 18px;
     font-weight: bold;
   }
-  :deep(.v-list-group) > .noticon > .v-list-item__append {
-    display: none;
+  :deep(.v-list-group__items) > .v-list-item {
+    padding-left: 30px !important;
+  }
+  :deep(.v-list-item__prepend) > .v-icon {
+    margin-inline-end: 15px;
   }
 }
 </style>

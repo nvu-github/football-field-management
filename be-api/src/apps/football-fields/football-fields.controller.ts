@@ -9,6 +9,11 @@ import { ApiTags } from '@nestjs/swagger';
 export class FootballFieldsController {
   constructor(private readonly footballFieldsService: FootballFieldsService) {}
 
+  @Get()
+  getFootballFields() {
+    return this.footballFieldsService.getFootballFields();
+  }
+
   @Post('leasing-durations')
   createLeasingDuration(@Body() params: ParamLeasingDurationDto) {
     return this.footballFieldsService.createLeasingDuration(params);

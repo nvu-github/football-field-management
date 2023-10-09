@@ -19,8 +19,8 @@ export interface Role {
 }
 
 export const statuses:any = {
-  PENDING: "Chờ xác nhận",
-  APPROVED: "Xác nhận",
+  PENDING: "Chờ duyệt",
+  APPROVED: "Đã duyệt",
   DELETED: "Đã xóa"
 }
 

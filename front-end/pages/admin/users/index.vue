@@ -26,12 +26,14 @@ watch(isDelete, async () => {
   await userStore.getAccounts();
   isDelete.value = false;
 });
+
 async function openDiaglogUser(type?: string, id?: string) {
   await dialogStore.showDialog(resolveComponent("admins-users-dialog-user"), {
     type: type,
     id,
   });
 }
+
 function openDiaglogConfirm(id: string, type: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     id,
@@ -40,6 +42,19 @@ function openDiaglogConfirm(id: string, type: string) {
       type === "accept" ? `users/account/${id}/accept` : `users/account/${id}`,
     nameObject: "tài khoản",
   });
+}
+
+function getColorStatusAccount(status: string) {
+  let color = "orange";
+  switch (status) {
+    case "APPROVED":
+      color = "green";
+      break;
+    case "DELETED":
+      color = "red";
+      break;
+  }
+  return color;
 }
 
 userStore.getAccounts();
@@ -63,7 +78,12 @@ userStore.getAccounts();
             {{ item.index + 1 }}
           </template>
           <template #[`item.status`]="{ item }">
-            {{ statuses[item.raw.status] }}
+            <v-chip
+              :color="getColorStatusAccount(item.raw.status)"
+              text-color="black"
+            >
+              {{ statuses[item.raw.status] }}
+            </v-chip>
           </template>
           <template #[`item.role`]="{ item }">
             {{ item.raw.roleName }}
@@ -78,7 +98,7 @@ userStore.getAccounts();
             <v-btn
               class="button -success"
               :disabled="item.raw.status !== 'PENDING'"
-              @click="openDiaglogConfirm(item.raw.id, 'accept')"
+              @click="openDiaglogConfirm(item.raw.id, 'confirm')"
             >
               <v-icon> mdi mdi-check-bold </v-icon>
             </v-btn>
@@ -99,10 +119,6 @@ userStore.getAccounts();
   .row > .column {
     display: flex;
     justify-content: right;
-  }
-  :deep(.v-data-table__td):last-child > .button {
-    min-width: 40px;
-    margin: 5px;
   }
 }
 </style>

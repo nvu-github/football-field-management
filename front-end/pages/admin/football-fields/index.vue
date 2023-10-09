@@ -1,51 +1,76 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { useAppStore, useUserStore, useDialogStore, statuses } from "~/stores";
+import {
+  useAppStore,
+  useFootBallFieldStore,
+  useDialogStore,
+  footballFieldStatuses,
+} from "~/stores";
 
 const headers = [
   {
     title: "STT",
     align: "center",
     sortable: false,
-    key: "Sno",
+    key: "sno",
   },
-  { title: "Tên người dùng", align: "start", key: "name" },
-  { title: "Email", align: "start", key: "email" },
-  { title: "Quyền", align: "start", key: "role" },
+  { title: "Tên sân bóng", align: "start", key: "name" },
+  { title: "Mô tả", align: "start", key: "description" },
+  { title: "Loại sân", align: "start", key: "footballTypeName" },
   { title: "Trạng thái", align: "start", key: "status" },
   { title: "Tác vụ", align: "center", key: "actions", sortable: false },
 ];
 const appStore = useAppStore();
-const userStore = useUserStore();
+const footballFieldStore = useFootBallFieldStore();
 const dialogStore = useDialogStore();
 const { isDelete } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
-const { accounts } = storeToRefs(userStore);
+const { footballFields } = storeToRefs(footballFieldStore);
 app.value.title = "Quản lý sân bóng";
+
 watch(isDelete, async () => {
-  await userStore.getAccounts();
+  await footballFieldStore.getFootballFields();
   isDelete.value = false;
 });
-async function openDiaglogUser(type?: string, id?: string) {
-  await dialogStore.showDialog(resolveComponent("admins-users-dialog-user"), {
-    type: type,
-    id,
-  });
+
+async function openDiaglogFooballField(type?: string, id?: string) {
+  await dialogStore.showDialog(
+    resolveComponent("admins-football-field-dialog-football-field"),
+    {
+      type: type,
+      id,
+    }
+  );
 }
+
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     id,
-    nameObject: "Tài khoản",
+    endpoint: `football-fields/football-field-types/${id}`,
+    nameObject: "loại sân bóng",
   });
 }
 
-userStore.getAccounts();
+function getColorStatusFootballField(status: string) {
+  let color = "success";
+  switch (status) {
+    case "EMPTY":
+      color = "primary";
+      break;
+    case "NOT_EMPTY":
+      color = "orange";
+      break;
+  }
+  return color;
+}
+
+footballFieldStore.getFootballFields();
 </script>
 <template>
-  <div class="fooball-field-page">
+  <div class="football-field-page">
     <v-row class="row">
       <v-col md="12" class="column">
-        <v-btn class="button -success" @click="openDiaglogUser">
+        <v-btn class="button -success" @click="openDiaglogFooballField">
           Thêm sân bóng
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
@@ -55,26 +80,25 @@ userStore.getAccounts();
     </v-row>
     <v-row>
       <v-col md="12">
-        <v-data-table :headers="headers" :items="accounts">
-          <template #[`item.Sno`]="{ item }">
+        <v-data-table :headers="headers" :items="footballFields">
+          <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
-          <template #[`item.role`]="{ item }">
-            {{ item.raw.roleName }}
+          <template #[`item.status`]="{ item }">
+            <v-chip
+              class="ma-2"
+              :color="getColorStatusFootballField(item.raw.status)"
+              text-color="white"
+            >
+              {{ footballFieldStatuses[item.raw.status] }}
+            </v-chip>
           </template>
           <template #[`item.actions`]="{ item }">
             <v-btn
               class="button -warning"
-              @click="openDiaglogUser('update', item.raw.id)"
+              @click="openDiaglogFooballField('update', item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
-            </v-btn>
-            <v-btn
-              class="button -success"
-              :disabled="item.raw.status !== 'PENDING'"
-              @click="openDiaglogConfirm(item.raw.id)"
-            >
-              <v-icon> mdi mdi-check-bold </v-icon>
             </v-btn>
             <v-btn
               class="button -danger"
@@ -89,7 +113,7 @@ userStore.getAccounts();
   </div>
 </template>
 <style lang="scss" scoped>
-.fooball-field-page {
+.football-field-page {
   .row > .column {
     display: flex;
     justify-content: right;

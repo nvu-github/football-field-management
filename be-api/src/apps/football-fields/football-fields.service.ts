@@ -3,11 +3,35 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '@src/prisma.service';
 
 import { ParamLeasingDurationDto, ParamFootbalFieldType } from './dtos';
-import { ILeasingDuration, IFootballFieldType } from './interfaces';
+import { ILeasingDuration, IFootballFieldType, IFootballField } from './interfaces';
 
 @Injectable()
 export class FootballFieldsService {
   constructor(private readonly prisma: PrismaService) {}
+
+  async getFootballFields(): Promise<IFootballField[]> {
+   const footballFields = await this.prisma.footballPitch.findMany({
+    select: {
+      id: true,
+      name: true,
+      desciption: true,
+      status: true,
+      footballType: {
+        select: {
+          name: true
+        }
+      },
+    }
+   })
+
+   return footballFields.map((footballField) => {
+    return {
+      ...footballField,
+      description: footballField.desciption,
+      footballTypeName: footballField.footballType.name
+    }
+   })
+  }
 
   createLeasingDuration(params: ParamLeasingDurationDto): Promise<ILeasingDuration | {}>  {
     return this.prisma.leasingDuration.create({

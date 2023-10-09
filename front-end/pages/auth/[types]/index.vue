@@ -69,12 +69,12 @@ async function loginGoogle() {
               <v-row>
                 <v-col cols="12" md="6">
                   <v-card-text class="mt-12">
-                    <h1 class="text-center">Login</h1>
+                    <h1 class="text-center">ĐĂNG NHẬP</h1>
                     <v-row align="center" justify="center">
                       <v-col cols="12" sm="8">
                         <v-text-field
                           v-model="loginPayloads.email"
-                          label="Email"
+                          label="Email*"
                           outlined
                           dense
                           color="blue"
@@ -84,7 +84,7 @@ async function loginGoogle() {
                         />
                         <v-text-field
                           v-model="loginPayloads.password"
-                          label="Password"
+                          label="Mật khẩu*"
                           outlined
                           dense
                           color="blue"
@@ -95,13 +95,13 @@ async function loginGoogle() {
                           <v-col cols="12" class="mb-5">
                             <NuxtLink to="/auth/login"
                               ><span class="caption blue--text"
-                                >Forgot password</span
+                                >Quên mật khẩu</span
                               ></NuxtLink
                             >
                           </v-col>
                         </v-row>
-                        <v-btn color="blue" dark block tile @click="loginUser"
-                          >Log in</v-btn
+                        <v-btn color="blue" class="btn" block @click="loginUser"
+                          >Đăng nhập</v-btn
                         >
                         <h5 class="text-center grey--text mt-4 mb-3">Or</h5>
                         <div
@@ -120,7 +120,7 @@ async function loginGoogle() {
                               alt="logo google"
                               class="mr-2"
                             />
-                            Sign with Google
+                            Đăng nhập với Google
                           </v-btn>
                         </div>
                       </v-col>
@@ -130,16 +130,15 @@ async function loginGoogle() {
                 <v-col cols="12" md="6" class="blue rounded-bl-xl">
                   <div style="text-align: center; padding: 180px 0">
                     <v-card-text class="white--text">
-                      <h3 class="text-center">Don't Have an Account Yet?</h3>
-                      <h6 class="text-center">
-                        Let's get you all set up so you can start creating your
-                        your first<br />
-                        onboarding experience
-                      </h6>
+                      <h3 class="text-center">Bạn chưa có tài khoản?</h3>
+                      <h5 class="text-center">
+                        Vui lòng đăng ký tài khoản để có thể tiếp tục sử dụng hệ
+                        thống
+                      </h5>
                     </v-card-text>
                     <div class="text-center">
                       <v-btn tile outlined dark @click="changeRouter"
-                        >SIGN UP</v-btn
+                        >ĐĂNG KÝ</v-btn
                       >
                     </div>
                   </div>
@@ -151,67 +150,67 @@ async function loginGoogle() {
                 <v-col cols="12" md="6" class="blue rounded-br-xl">
                   <div style="text-align: center; padding: 180px 0">
                     <v-card-text class="white--text">
-                      <h3 class="text-center">Alredy Signed up?</h3>
-                      <h6 class="text-center">
-                        Log in to your account so you can continue building
-                        and<br />
-                        editing your onboarding flows
-                      </h6>
+                      <h3 class="text-center">Bạn đã có tài khoản?</h3>
+                      <h5 class="text-center">
+                        Vui lòng đăng nhập để tiếp tục sử dụng hệ thống
+                      </h5>
                     </v-card-text>
                     <div class="text-center">
                       <v-btn tile outlined dark @click="changeRouter"
-                        >Log in</v-btn
+                        >ĐĂNG NHẬP</v-btn
                       >
                     </div>
                   </div>
                 </v-col>
 
-                <v-col cols="12" md="6">
-                  <v-card-text class="mt-12">
-                    <h1 class="text-center">Sign Up</h1>
+                <v-col class="form-signup" cols="12" md="6">
+                  <v-card-text class="mt-5">
+                    <h1 class="text-center mb-10">ĐĂNG KÝ</h1>
                     <v-row align="center" justify="center">
                       <v-col cols="12" sm="8">
-                        <v-row>
-                          <v-col cols="12" sm="6">
-                            <v-text-field
-                              label="First Name"
-                              outlined
-                              dense
-                              color="blue"
-                              autocomplete="false"
-                              class="mt-4"
-                            />
-                          </v-col>
-                          <v-col cols="12" sm="6">
-                            <v-text-field
-                              label="Last Name"
-                              outlined
-                              dense
-                              color="blue"
-                              autocomplete="false"
-                              class="mt-4"
-                            />
-                          </v-col>
-                        </v-row>
                         <v-text-field
-                          label="Email"
+                          label="Email*"
                           outlined
                           dense
                           color="blue"
                           autocomplete="false"
                         />
                         <v-text-field
-                          label="Password"
+                          label="Tên người dùng*"
+                          outlined
+                          dense
+                          color="blue"
+                          autocomplete="false"
+                        />
+                        <v-text-field
+                          label="Tên đội bóng*"
+                          outlined
+                          dense
+                          color="blue"
+                          autocomplete="false"
+                        />
+                        <v-text-field
+                          label="Mật khẩu*"
                           outlined
                           dense
                           color="blue"
                           autocomplete="false"
                           type="password"
                         />
-                        <v-btn color="blue" dark block tile>Sign up</v-btn>
-                        <h5 class="text-center grey--text mt-4 mb-3">Or</h5>
+                        <v-text-field
+                          label="Nhập lại mật khẩu*"
+                          outlined
+                          dense
+                          color="blue"
+                          autocomplete="false"
+                          type="password"
+                        />
+                        <v-btn color="blue" class="btn" dark block
+                          >Đăng ký</v-btn
+                        >
+                        <h5 class="text-center grey--text mt-4 mb-3">Hoặc</h5>
                         <div
-                          class="d-flex justify-center align-center mx-20 mb-16"
+                          class="d-flex justify-center align-center mx-20 mb-6"
                         >
                           <v-btn
                             class="mr-3"
@@ -226,7 +225,7 @@ async function loginGoogle() {
                               alt="logo google"
                               class="mr-2"
                             />
-                            Sign with Google
+                            Đăng nhập với Google
                           </v-btn>
                         </div>
                       </v-col>
@@ -245,11 +244,14 @@ async function loginGoogle() {
 .login-pages {
   &:deep(.rounded-bl-xl) {
     border-bottom-left-radius: 300px !important;
-    background: #2196f3 !important;
+    background: #a9ca31 !important;
   }
   &:deep(.rounded-br-xl) {
     border-bottom-right-radius: 300px !important;
-    background: #2196f3 !important;
+    background: #a9ca31 !important;
+  }
+  :deep(.btn) {
+    background: #a9ca31 !important;
   }
 }
 </style>

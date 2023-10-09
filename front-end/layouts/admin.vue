@@ -57,6 +57,10 @@ useHead({
   :deep(.v-data-table-footer__info) {
     display: none;
   }
+
+  :deep(.v-chip) > .v-chip__content {
+    font-weight: bold;
+  }
 }
 .footer.-full {
   width: 100%;

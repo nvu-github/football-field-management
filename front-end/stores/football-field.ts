@@ -7,8 +7,74 @@ export interface ParamsFootballFieldType {
   name: string;
 }
 
-export const useFootballFieldStore = defineStore("footballFieldStore", () => {
+export interface ParamsFootballField {
+  name: string;
+  description: string;
+  status: string;
+  images: ParamsFootballFieldImage[];
+  typeId: string;
+}
 
+export interface ParamsFootballFieldImage {
+  url: string;
+  title: string;
+  footballId: number;
+}
+
+export const footballFieldStatuses:any = {
+  EMPTY: "Trống",
+  NOT_EMPTY: "Đang thuê",
+  MAINTENANCE: "Đang bảo trì"
+}
+
+export const useFootBallFieldStore = defineStore("footBallFieldStore", () => {
+  const { $apis }: any = useNuxtApp();
+  const footballFields= ref<ParamsFootballField[]>([])
+  const footballField= ref<ParamsFootballField>()
+
+  function createFootballField(params: ParamsFootballField) {
+    return $apis
+      .post("football-fields", {
+        json: {
+          ...convertProjectObjToObj(params),
+        },
+      })
+      .json();
+  }
+
+  function uploadImages(params: FormData) {
+    return $apis
+      .post("upload", {
+        body: params,
+      })
+      .json();
+  }
+
+  function updateFootballField(id: number, params: ParamsFootballField) {
+    return $apis
+      .patch(`football-fields/${id}`, {
+        json: {
+          ...convertProjectObjToObj(params),
+        },
+      })
+      .json();
+  }
+
+  async function getFootballFields() {
+    const footballFieldList = await $apis
+      .get("football-fields")
+      .json();
+      footballFields.value = footballFieldList.data
+  }
+
+  async function getFootballField(id: number) {
+    const footballFieldSingle = await $apis
+      .get(`football-fields/${id}`)
+      .json();
+      footballField.value = footballFieldSingle.data
+  }
+
+  return { footballFields, footballField, createFootballField, updateFootballField, uploadImages, getFootballFields, getFootballField }
 })
 
 export const useLeasingDurationStore = defineStore("leasingDurationStore", () => {
