@@ -29,27 +29,27 @@ const menus = ref<Menu>([
   {
     icon: "mdi mdi-soccer-field",
     title: "Quản lý sân bóng",
-    url: "/admin/football-fields",
+    url: "/admin/football-pitches",
     subMenus: [
       {
         icon: "mdi mdi-soccer",
         title: "Sân bóng",
-        url: "/admin/football-fields",
+        url: "/admin/football-pitches",
       },
       {
         icon: "mdi mdi-cog",
         title: "Giá thuê sân",
-        url: "/admin/football-fields/prices",
+        url: "/admin/football-pitches/prices",
       },
       {
         icon: "mdi mdi-clock-time-three-outline",
         title: "Thời gian thuê",
-        url: "/admin/football-fields/leasing-durations",
+        url: "/admin/football-pitches/leasing-durations",
       },
       {
         icon: "mdi mdi-format-list-bulleted-type",
         title: "Loại sân bóng",
-        url: "/admin/football-fields/football-field-types",
+        url: "/admin/football-pitches/football-pitch-types",
       },
     ],
   },

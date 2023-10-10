@@ -2,8 +2,8 @@
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import {
-  useFootBallFieldStore,
-  useFootBallFieldTypeStore,
+  useFootballPitchStore,
+  useFootballPitchTypeStore,
   useAppStore,
   useDialogStore,
 } from "~/stores";
@@ -27,13 +27,13 @@ const rules = {
   },
 };
 const defaultTypeBtn = "update";
-const footballFieldStore = useFootBallFieldStore();
-const footballFieldTypeStore = useFootBallFieldTypeStore();
+const footballFieldStore = useFootballPitchStore();
+const footballFieldTypeStore = useFootballPitchTypeStore();
 const appStore = useAppStore();
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
-const { footBallField } = storeToRefs(footballFieldStore);
-const { footBallFieldTypes } = storeToRefs(footballFieldTypeStore);
+const { footballPitch } = storeToRefs(footballFieldStore);
+const { footballPitchTypes } = storeToRefs(footballFieldTypeStore);
 const { dialog, closeDialog } = useDialogStore();
 const { data }: any = dialog;
 const paramsFootballField = ref<ParamsFootballField>({
@@ -46,8 +46,8 @@ const paramsFootballField = ref<ParamsFootballField>({
 
 onBeforeMount(async () => {
   if (data.type === defaultTypeBtn) {
-    await footballFieldStore.getFootBallField(data.id);
-    setFootballFieldTypeToForm();
+    await footballFieldStore.getFootballPitch(data.id);
+    setFootballPitchToForm();
   }
 });
 
@@ -59,19 +59,19 @@ async function addFootballField() {
   isLoading.value = true;
   try {
     if (data.type === defaultTypeBtn) {
-      await footballFieldStore.updateFootBallField(
+      await footballFieldStore.updateFootballPitch(
         data.id,
         paramsFootballField.value
       );
     } else {
-      await footballFieldStore.createFootBallField(paramsFootballField.value);
+      await footballFieldStore.createFootballPitch(paramsFootballField.value);
     }
     $toast.success(
       `${
         data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
       } loại sân bóng thành công`
     );
-    await footballFieldStore.getFootBallFields();
+    await footballFieldStore.getFootballPitchs();
   } catch (error) {
     console.log(error);
     $toast.error(
@@ -84,12 +84,16 @@ async function addFootballField() {
   closeDialog();
 }
 
-function setFootballFieldToForm() {
-  const { name }: any = footBallField.value;
+function getFileInput() {
+  console.log(1);
+}
+
+function setFootballPitchToForm() {
+  const { name }: any = footballPitch.value;
   paramsFootballField.value.name = name;
 }
 
-footballFieldTypeStore.getFootBallFieldTypes();
+footballFieldTypeStore.getFootballPitchTypes();
 </script>
 <template>
   <div class="dialog-football-field-create">
@@ -142,7 +146,7 @@ footballFieldTypeStore.getFootBallFieldTypes();
                 item-value="id"
                 item-title="name"
                 :rules="[rules.type]"
-                :items="footBallFieldTypes"
+                :items="footballPitchTypes"
                 variant="underlined"
               ></v-autocomplete>
               <v-file-input
@@ -152,6 +156,7 @@ footballFieldTypeStore.getFootBallFieldTypes();
                 variant="underlined"
                 label="Ảnh sân bóng"
                 multiple
+                @change="getFileInput"
               ></v-file-input>
             </v-col>
           </v-row>

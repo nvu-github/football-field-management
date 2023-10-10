@@ -14,8 +14,8 @@ import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
 @ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
   @Post('')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -42,8 +42,8 @@ export class UploadController {
     };
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
+  // @ApiBearerAuth()
+  // @UseGuards(JwtAuthGuard)
   @Post('/single')
   @ApiConsumes('multipart/form-data')
   @ApiBody({

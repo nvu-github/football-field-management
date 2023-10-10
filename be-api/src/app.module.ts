@@ -1,4 +1,4 @@
-import { Module, NestModule, MiddlewareConsumer  } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 
 import { AppController } from 'src/app.controller';
@@ -11,10 +11,10 @@ import { AuthModule } from '@app/auth/auth.module';
 import { UsersModule } from '@app/users/users.module';
 import { GoogleAuthMiddleware } from 'middleware/google-auth.middleware';
 import { AuthController } from '@app/auth/auth.controller';
-import { FootballFieldsModule } from './apps/football-fields/football-fields.module';
+import { FootballPitchesModule } from '@app/football-pitches/football-pitches.module';
 
 @Module({
-  imports: [AuthModule, UploadModule, UsersModule, FootballFieldsModule],
+  imports: [AuthModule, UploadModule, UsersModule, FootballPitchesModule],
   controllers: [AppController],
   providers: [
     AppService,
@@ -30,8 +30,6 @@ import { FootballFieldsModule } from './apps/football-fields/football-fields.mod
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer
-      .apply(GoogleAuthMiddleware)
-      .forRoutes(AuthController);
+    consumer.apply(GoogleAuthMiddleware).forRoutes(AuthController);
   }
 }

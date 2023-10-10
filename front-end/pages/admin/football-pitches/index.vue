@@ -2,9 +2,9 @@
 import { storeToRefs } from "pinia";
 import {
   useAppStore,
-  useFootBallFieldStore,
+  useFootballPitchStore,
   useDialogStore,
-  footballFieldStatuses,
+  footballPitchStatuses,
 } from "~/stores";
 
 const headers = [
@@ -21,21 +21,21 @@ const headers = [
   { title: "Tác vụ", align: "center", key: "actions", sortable: false },
 ];
 const appStore = useAppStore();
-const footballFieldStore = useFootBallFieldStore();
+const footballPitchStore = useFootballPitchStore();
 const dialogStore = useDialogStore();
 const { isDelete } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
-const { footballFields } = storeToRefs(footballFieldStore);
+const { footballPitches } = storeToRefs(footballPitchStore);
 app.value.title = "Quản lý sân bóng";
 
 watch(isDelete, async () => {
-  await footballFieldStore.getFootballFields();
+  await footballPitchStore.getFootballPitchs();
   isDelete.value = false;
 });
 
 async function openDiaglogFooballField(type?: string, id?: string) {
   await dialogStore.showDialog(
-    resolveComponent("admins-football-field-dialog-football-field"),
+    resolveComponent("admins-football-pitches-dialog-football-field"),
     {
       type: type,
       id,
@@ -46,12 +46,12 @@ async function openDiaglogFooballField(type?: string, id?: string) {
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     id,
-    endpoint: `football-fields/football-field-types/${id}`,
+    endpoint: `football-pitches/football-pitch/${id}`,
     nameObject: "loại sân bóng",
   });
 }
 
-function getColorStatusFootballField(status: string) {
+function getColorStatusFootballPitch(status: string) {
   let color = "success";
   switch (status) {
     case "EMPTY":
@@ -64,7 +64,7 @@ function getColorStatusFootballField(status: string) {
   return color;
 }
 
-footballFieldStore.getFootballFields();
+footballPitchStore.getFootballPitchs();
 </script>
 <template>
   <div class="football-field-page">
@@ -80,17 +80,17 @@ footballFieldStore.getFootballFields();
     </v-row>
     <v-row>
       <v-col md="12">
-        <v-data-table :headers="headers" :items="footballFields">
+        <v-data-table :headers="headers" :items="footballPitches">
           <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
           <template #[`item.status`]="{ item }">
             <v-chip
               class="ma-2"
-              :color="getColorStatusFootballField(item.raw.status)"
+              :color="getColorStatusFootballPitch(item.raw.status)"
               text-color="white"
             >
-              {{ footballFieldStatuses[item.raw.status] }}
+              {{ footballPitchStatuses[item.raw.status] }}
             </v-chip>
           </template>
           <template #[`item.actions`]="{ item }">

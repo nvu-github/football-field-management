@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia";
 import {
   useAppStore,
-  useFootBallFieldTypeStore,
+  useFootballPitchTypeStore,
   useDialogStore,
 } from "~/stores";
 
@@ -17,21 +17,21 @@ const headers = [
   { title: "Tác vụ", align: "center", key: "actions", sortable: false },
 ];
 const appStore = useAppStore();
-const footballTypeStore = useFootBallFieldTypeStore();
+const footballTypeStore = useFootballPitchTypeStore();
 const dialogStore = useDialogStore();
 const { isDelete } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
-const { footBallFieldTypes } = storeToRefs(footballTypeStore);
+const { footballPitchTypes } = storeToRefs(footballTypeStore);
 app.value.title = "Quản lý loại sân bóng";
 
 watch(isDelete, async () => {
-  await footballTypeStore.getFootBallFieldTypes();
+  await footballTypeStore.getFootballPitchTypes();
   isDelete.value = false;
 });
 
 async function openDiaglogLeasingDuration(type?: string, id?: string) {
   await dialogStore.showDialog(
-    resolveComponent("admins-football-field-dialog-football-field-type"),
+    resolveComponent("admins-football-pitches-dialog-football-pitch-type"),
     {
       type: type,
       id,
@@ -42,15 +42,15 @@ async function openDiaglogLeasingDuration(type?: string, id?: string) {
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     id,
-    endpoint: `football-fields/football-field-types/${id}`,
+    endpoint: `football-pitches/football-pitch-types/${id}`,
     nameObject: "loại sân bóng",
   });
 }
 
-footballTypeStore.getFootBallFieldTypes();
+footballTypeStore.getFootballPitchTypes();
 </script>
 <template>
-  <div class="football-field-type-page">
+  <div class="football-pitch-type-page">
     <v-row class="row">
       <v-col md="12" class="column">
         <v-btn class="button -success" @click="openDiaglogLeasingDuration">
@@ -63,7 +63,7 @@ footballTypeStore.getFootBallFieldTypes();
     </v-row>
     <v-row>
       <v-col md="12">
-        <v-data-table :headers="headers" :items="footBallFieldTypes">
+        <v-data-table :headers="headers" :items="footballPitchTypes">
           <template #[`item.Sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
@@ -87,7 +87,7 @@ footballTypeStore.getFootBallFieldTypes();
   </div>
 </template>
 <style lang="scss" scoped>
-.football-field-type-page {
+.football-pitch-type-page {
   .row > .column {
     display: flex;
     justify-content: right;
