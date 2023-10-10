@@ -2,18 +2,33 @@ import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@src/prisma.service';
 
-import { ParamLeasingDurationDto, ParamFootballPitchType } from './dtos';
+import {
+  ParamLeasingDurationDto,
+  ParamFootballPitchType,
+  ParamFootballPitchDto,
+} from './dtos';
 import {
   ILeasingDuration,
-  IFootballFieldType,
-  IFootballField,
+  IFootballPitchType,
+  IFootballPitch,
 } from './interfaces';
 
 @Injectable()
 export class FootballPitchesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getFootballPitches(): Promise<IFootballField[]> {
+  createFootballPitch(
+    params: ParamFootballPitchDto,
+  ): Promise<IFootballPitch | any> {
+    return this.prisma.footballPitch.create({
+      data: {
+        ...params,
+        footballTypeId: params.typeId,
+      },
+    });
+  }
+
+  async getFootballPitches(): Promise<IFootballPitch[]> {
     const footballFields = await this.prisma.footballPitch.findMany({
       select: {
         id: true,
@@ -109,9 +124,9 @@ export class FootballPitchesService {
     });
   }
 
-  createFootballFieldType(
+  createFootballPitchType(
     params: ParamFootballPitchType,
-  ): Promise<IFootballFieldType> {
+  ): Promise<IFootballPitchType> {
     return this.prisma.footbalType.create({
       data: {
         ...params,
@@ -123,10 +138,10 @@ export class FootballPitchesService {
     });
   }
 
-  updateFootballFieldType(
+  updateFootballPitchType(
     id: number,
     params: ParamFootballPitchType,
-  ): Promise<IFootballFieldType> {
+  ): Promise<IFootballPitchType> {
     return this.prisma.footbalType.update({
       where: {
         id,
@@ -141,7 +156,7 @@ export class FootballPitchesService {
     });
   }
 
-  deleteFootballFieldType(id: number): Promise<IFootballFieldType> {
+  deleteFootballPitchType(id: number): Promise<IFootballPitchType> {
     return this.prisma.footbalType.delete({
       where: {
         id,
@@ -153,7 +168,7 @@ export class FootballPitchesService {
     });
   }
 
-  getFootballFieldTypes(): Promise<IFootballFieldType[]> {
+  getFootballPitchTypes(): Promise<IFootballPitchType[]> {
     return this.prisma.footbalType.findMany({
       select: {
         id: true,
@@ -162,7 +177,7 @@ export class FootballPitchesService {
     });
   }
 
-  getFootballFieldType(id: number): Promise<IFootballFieldType> {
+  getFootballPitchType(id: number): Promise<IFootballPitchType> {
     return this.prisma.footbalType.findUnique({
       where: {
         id,

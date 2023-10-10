@@ -1,5 +1,8 @@
 <script lang="ts" setup>
+import { storeToRefs } from 'pinia'
+import { useRoute, useRouter, useCookie } from "nuxt/app";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+import { useAuthStore } from '~/stores'
 
 definePageMeta({
   layout: "blank",

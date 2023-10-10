@@ -29,13 +29,13 @@ const { footballPitches } = storeToRefs(footballPitchStore);
 app.value.title = "Quản lý sân bóng";
 
 watch(isDelete, async () => {
-  await footballPitchStore.getFootballPitchs();
+  await footballPitchStore.getFootballPitches();
   isDelete.value = false;
 });
 
 async function openDiaglogFooballField(type?: string, id?: string) {
   await dialogStore.showDialog(
-    resolveComponent("admins-football-pitches-dialog-football-field"),
+    resolveComponent("admins-football-pitches-dialog-football-pitch"),
     {
       type: type,
       id,
@@ -64,7 +64,7 @@ function getColorStatusFootballPitch(status: string) {
   return color;
 }
 
-footballPitchStore.getFootballPitchs();
+footballPitchStore.getFootballPitches();
 </script>
 <template>
   <div class="football-field-page">

@@ -27,16 +27,16 @@ const rules = {
   },
 };
 const defaultTypeBtn = "update";
-const footballFieldStore = useFootballPitchStore();
-const footballFieldTypeStore = useFootballPitchTypeStore();
+const footballPitchStore = useFootballPitchStore();
+const footballPitchTypeStore = useFootballPitchTypeStore();
 const appStore = useAppStore();
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
-const { footballPitch } = storeToRefs(footballFieldStore);
-const { footballPitchTypes } = storeToRefs(footballFieldTypeStore);
+const { footballPitch } = storeToRefs(footballPitchStore);
+const { footballPitchTypes } = storeToRefs(footballPitchTypeStore);
 const { dialog, closeDialog } = useDialogStore();
 const { data }: any = dialog;
-const paramsFootballField = ref<ParamsFootballField>({
+const paramsFootballPitch = ref<ParamsFootballPitch>({
   name: "",
   description: "",
   status: "",
@@ -46,32 +46,33 @@ const paramsFootballField = ref<ParamsFootballField>({
 
 onBeforeMount(async () => {
   if (data.type === defaultTypeBtn) {
-    await footballFieldStore.getFootballPitch(data.id);
+    await footballPitchStore.getFootballPitch(data.id);
     setFootballPitchToForm();
   }
 });
 
-function closeDialogFootballField() {
+function closeDialogFootballPitch() {
   closeDialog();
 }
 
-async function addFootballField() {
+async function addFootballPitch() {
   isLoading.value = true;
   try {
     if (data.type === defaultTypeBtn) {
-      await footballFieldStore.updateFootballPitch(
+      await footballPitchStore.updateFootballPitch(
         data.id,
-        paramsFootballField.value
+        paramsFootballPitch.value
       );
     } else {
-      await footballFieldStore.createFootballPitch(paramsFootballField.value);
+      await footballPitchStore.createFootballPitch(paramsFootballPitch.value);
     }
+
     $toast.success(
       `${
         data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
       } loại sân bóng thành công`
     );
-    await footballFieldStore.getFootballPitchs();
+    await footballPitchStore.getFootballPitches();
   } catch (error) {
     console.log(error);
     $toast.error(
@@ -85,21 +86,27 @@ async function addFootballField() {
 }
 
 function getFileInput() {
-  console.log(1);
+  // const imageData = new FormData();
+  // const { images } = paramsFootballPitch.value;
+  // images.forEach((image: File) => {
+  //   imageData.append(`images`, image);
+  // });
+  // const imagesList = await footballPitchStore.uploadImages(imageData);
+  // console.log(imagesList);
 }
 
 function setFootballPitchToForm() {
   const { name }: any = footballPitch.value;
-  paramsFootballField.value.name = name;
+  paramsFootballPitch.value.name = name;
 }
 
-footballFieldTypeStore.getFootballPitchTypes();
+footballPitchTypeStore.getFootballPitchTypes();
 </script>
 <template>
-  <div class="dialog-football-field-create">
+  <div class="dialog-football-pitch-create">
     <v-form
-      v-model="paramsFootballField.value"
-      @submit.prevent="addFootballField"
+      v-model="paramsFootballPitch.value"
+      @submit.prevent="addFootballPitch"
     >
       <v-card>
         <v-card-title>
@@ -113,7 +120,7 @@ footballFieldTypeStore.getFootballPitchTypes();
           <v-row>
             <v-col cols="12">
               <v-text-field
-                v-model.trim="paramsFootballField.name"
+                v-model.trim="paramsFootballPitch.name"
                 label="Tên loại sân*"
                 type="text"
                 variant="underlined"
@@ -121,14 +128,14 @@ footballFieldTypeStore.getFootballPitchTypes();
                 required
               ></v-text-field>
               <v-textarea
-                v-model.trim="paramsFootballField.desciption"
+                v-model.trim="paramsFootballPitch.desciption"
                 label="Mô tả"
                 type="text"
                 variant="underlined"
                 required
               ></v-textarea>
               <v-autocomplete
-                v-model="paramsFootballField.status"
+                v-model="paramsFootballPitch.status"
                 label="Trạng thái*"
                 item-value="id"
                 item-title="name"
@@ -141,7 +148,7 @@ footballFieldTypeStore.getFootballPitchTypes();
                 variant="underlined"
               ></v-autocomplete>
               <v-autocomplete
-                v-model="paramsFootballField.typeId"
+                v-model="paramsFootballPitch.typeId"
                 label="Loại sân bóng*"
                 item-value="id"
                 item-title="name"
@@ -150,7 +157,7 @@ footballFieldTypeStore.getFootballPitchTypes();
                 variant="underlined"
               ></v-autocomplete>
               <v-file-input
-                :rules="paramsFootballField.images"
+                v-model="paramsFootballPitch.images"
                 accept="image/png, image/jpeg"
                 prepend-icon="mdi-camera"
                 variant="underlined"
@@ -163,7 +170,7 @@ footballFieldTypeStore.getFootballPitchTypes();
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="button -default" @click="closeDialogFootballField">
+          <v-btn class="button -default" @click="closeDialogFootballPitch">
             Đóng
           </v-btn>
           <v-btn
@@ -171,7 +178,7 @@ footballFieldTypeStore.getFootballPitchTypes();
             class="button -primary"
             type="submit"
             :loading="isLoading"
-            :disabled="!paramsFootballField.value"
+            :disabled="!paramsFootballPitch.value"
           >
             Lưu
           </v-btn>
@@ -180,7 +187,7 @@ footballFieldTypeStore.getFootballPitchTypes();
             class="button -primary"
             type="submit"
             :loading="isLoading"
-            :disabled="!paramsFootballField.value"
+            :disabled="!paramsFootballPitch.value"
           >
             Cập nhật
           </v-btn>
@@ -190,7 +197,7 @@ footballFieldTypeStore.getFootballPitchTypes();
   </div>
 </template>
 <style lang="scss" scoped>
-.dialog-football-field-create {
+.dialog-football-pitch-create {
   width: 500px;
 
   :deep(.v-card) {

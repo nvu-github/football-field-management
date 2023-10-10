@@ -13,6 +13,19 @@ const createInstance = (apiUrl: string) => {
   });
 };
 
+const createdInstanceUpload = (apiUrl: string) => {
+  return ky.create({
+    prefixUrl: apiUrl,
+    headers: {
+      "Content-Type": "multipart/form-data;",
+    },
+    // credentials: "include",
+    hooks: {
+      beforeRequest: [setTokenHeader],
+    },
+  });
+};
+
 const setTokenHeader = (req: any) => {
   req.headers.set("Authorization", `Bearer `);
 };
@@ -23,6 +36,7 @@ export default defineNuxtPlugin(() => {
   return {
     provide: {
       apis: createInstance(runtimeConfig.public.API_URL),
+      apiUploads: createdInstanceUpload(runtimeConfig.public.API_URL),
     },
   };
 });

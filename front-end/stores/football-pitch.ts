@@ -28,7 +28,7 @@ export const footballPitchStatuses: any = {
 };
 
 export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
-  const { $apis }: any = useNuxtApp();
+  const { $apis, $apiUploads }: any = useNuxtApp();
   const footballPitches = ref<ParamsFootballPitch[]>([]);
   const footballPitch = ref<ParamsFootballPitch>();
 
@@ -43,7 +43,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
   }
 
   function uploadImages(params: FormData) {
-    return $apis
+    return $apiUploads
       .post("upload", {
         body: params,
       })
@@ -60,7 +60,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
       .json();
   }
 
-  async function getFootballPitchs() {
+  async function getFootballPitches() {
     const footballPitchList = await $apis.get("football-pitches").json();
     footballPitches.value = footballPitchList.data;
   }
@@ -78,7 +78,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     createFootballPitch,
     updateFootballPitch,
     uploadImages,
-    getFootballPitchs,
+    getFootballPitches,
     getFootballPitch,
   };
 });

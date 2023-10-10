@@ -9,8 +9,8 @@ import { AllExceptionsFilter } from 'helpers/exception.filter';
 import { UploadModule } from 'common/upload/upload.module';
 import { AuthModule } from '@app/auth/auth.module';
 import { UsersModule } from '@app/users/users.module';
-import { GoogleAuthMiddleware } from 'middleware/google-auth.middleware';
-import { AuthController } from '@app/auth/auth.controller';
+// import { GoogleAuthMiddleware } from 'middleware/google-auth.middleware';
+// import { AuthController } from '@app/auth/auth.controller';
 import { FootballPitchesModule } from '@app/football-pitches/football-pitches.module';
 
 @Module({
@@ -28,8 +28,9 @@ import { FootballPitchesModule } from '@app/football-pitches/football-pitches.mo
     },
   ],
 })
-export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(GoogleAuthMiddleware).forRoutes(AuthController);
-  }
-}
+export class AppModule {}
+// implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer.apply(GoogleAuthMiddleware).forRoutes();
+//   }
+// }
