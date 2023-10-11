@@ -6,14 +6,17 @@ import configuration from 'config/configuration';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt-auth.strategy';
+import { GoogleStrategy } from './google-auth.strategy';
 
 @Module({
-  controllers: [AuthController, ],
-  imports: [JwtModule.register({
-    global: true,
-    secret: configuration().jwt.secret,
-    signOptions: { expiresIn: configuration().jwt.expires },
-  })],
-  providers: [AuthService, PrismaService, JwtStrategy],
+  controllers: [AuthController],
+  imports: [
+    JwtModule.register({
+      global: true,
+      secret: configuration().jwt.secret,
+      signOptions: { expiresIn: configuration().jwt.expires },
+    }),
+  ],
+  providers: [AuthService, PrismaService, JwtStrategy, GoogleStrategy],
 })
 export class AuthModule {}

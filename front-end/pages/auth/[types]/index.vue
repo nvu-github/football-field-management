@@ -1,28 +1,43 @@
 <script lang="ts" setup>
-import { storeToRefs } from 'pinia'
+import { storeToRefs } from "pinia";
 import { useRoute, useRouter, useCookie } from "nuxt/app";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { useAuthStore } from '~/stores'
+import { useAuthStore } from "~/stores";
 
 definePageMeta({
   layout: "blank",
   middleware: ["auth"],
 });
 
+const CUSTOMER_ROLE = 4;
+
 const rules = {
-  isRequired: (value: string) => !value || "Field is required",
+  email: (value: string) => {
+    if (!value) return "Vui lòng nhập email!";
+    if (!/.+@.+\..+/.test(value)) return "Email không đúng định dạng!";
+    return true;
+  },
+  password: (value: string) => {
+    if (!value) return "Vui lòng nhập mật khẩu!";
+    return true;
+  },
+  name: (value: string) => {
+    if (!value) return "Vui lòng nhập tên khác hàng";
+  },
+  teamName: (value: string) => {
+    if (!value) return "Vui lòng nhập tên khác hàng";
+  },
 };
 
 const router = useRouter();
 const route = useRoute();
-
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 const step = ref(route.params.types);
 const cookie = useCookie("accessToken", {
   maxAge: 1000 * 60 * 15,
 });
-const loginPayloads = reactive<UserLogin>({
+const loginPayloads = ref<Login>({
   email: "",
   password: "",
 });
@@ -36,15 +51,22 @@ function changeRouter() {
 }
 
 async function loginUser() {
-  const { email, password } = loginPayloads;
+  const { email, password } = loginPayloads.value;
   const userLogin = await authStore.signIn({ email, password });
 
-  const { username } = userLogin;
-  user.value = { email, username, loggedIn: true };
+  let { name, roleId } = userLogin.data;
+  name = name ? name : email;
+  user.value = { email, name, loggedIn: true };
   localStorage.setItem(
     "userLogin",
-    JSON.stringify({ username, email, loggedIn: true })
+    JSON.stringify({ name, email, roleId, loggedIn: true })
   );
+
+  if (roleId === CUSTOMER_ROLE) {
+    return router.push("/");
+  }
+
+  return router.push("/admin");
 }
 
 async function loginGoogle() {
@@ -72,62 +94,74 @@ async function loginGoogle() {
               <v-row>
                 <v-col cols="12" md="6">
                   <v-card-text class="mt-12">
-                    <h1 class="text-center">ĐĂNG NHẬP</h1>
-                    <v-row align="center" justify="center">
-                      <v-col cols="12" sm="8">
-                        <v-text-field
-                          v-model="loginPayloads.email"
-                          label="Email*"
-                          outlined
-                          dense
-                          color="blue"
-                          autocomplete="false"
-                          class="mt-16"
-                          :rules="[rules.isRequired]"
-                        />
-                        <v-text-field
-                          v-model="loginPayloads.password"
-                          label="Mật khẩu*"
-                          outlined
-                          dense
-                          color="blue"
-                          autocomplete="false"
-                          type="password"
-                        />
-                        <v-row>
-                          <v-col cols="12" class="mb-5">
-                            <NuxtLink to="/auth/login"
-                              ><span class="caption blue--text"
-                                >Quên mật khẩu</span
-                              ></NuxtLink
-                            >
-                          </v-col>
-                        </v-row>
-                        <v-btn color="blue" class="btn" block @click="loginUser"
-                          >Đăng nhập</v-btn
-                        >
-                        <h5 class="text-center grey--text mt-4 mb-3">Or</h5>
-                        <div
-                          class="d-flex justify-center align-center mx-20 mb-16"
-                        >
-                          <v-btn
-                            class="mr-3"
-                            depressed
+                    <v-form
+                      v-model="loginPayloads.value"
+                      @submit.prevent="loginUser"
+                    >
+                      <h1 class="text-center">ĐĂNG NHẬP</h1>
+                      <v-row align="center" justify="center">
+                        <v-col cols="12" sm="8">
+                          <v-text-field
+                            v-model="loginPayloads.email"
+                            label="Email*"
                             outlined
-                            @click="loginGoogle"
+                            dense
+                            color="blue"
+                            autocomplete="false"
+                            class="mt-16"
+                            :rules="[rules.email]"
+                          />
+                          <v-text-field
+                            v-model="loginPayloads.password"
+                            label="Mật khẩu*"
+                            outlined
+                            dense
+                            color="blue"
+                            autocomplete="false"
+                            type="password"
+                            class="mt-2 mb-1"
+                            :rules="[rules.password]"
+                          />
+                          <v-row>
+                            <v-col cols="12" class="mb-5">
+                              <NuxtLink to="/auth/login"
+                                ><span class="caption blue--text"
+                                  >Quên mật khẩu</span
+                                ></NuxtLink
+                              >
+                            </v-col>
+                          </v-row>
+                          <v-btn
+                            color="blue"
+                            class="btn"
+                            block
+                            type="submit"
+                            :disabled="!loginPayloads.value"
+                            >Đăng nhập</v-btn
                           >
-                            <img
-                              src="../../../public/google-logo.svg"
-                              width="20"
-                              height="20"
-                              alt="logo google"
-                              class="mr-2"
-                            />
-                            Đăng nhập với Google
-                          </v-btn>
-                        </div>
-                      </v-col>
-                    </v-row>
+                          <h5 class="text-center grey--text mt-4 mb-3">Or</h5>
+                          <div
+                            class="d-flex justify-center align-center mx-20 mb-16"
+                          >
+                            <v-btn
+                              class="mr-3"
+                              depressed
+                              outlined
+                              @click="loginGoogle"
+                            >
+                              <img
+                                src="../../../public/google-logo.svg"
+                                width="20"
+                                height="20"
+                                alt="logo google"
+                                class="mr-2"
+                              />
+                              Đăng nhập với Google
+                            </v-btn>
+                          </div>
+                        </v-col>
+                      </v-row>
+                    </v-form>
                   </v-card-text>
                 </v-col>
                 <v-col cols="12" md="6" class="blue rounded-bl-xl">
@@ -177,6 +211,7 @@ async function loginGoogle() {
                           dense
                           color="blue"
                           autocomplete="false"
+                          :rules="rules.email"
                         />
                         <v-text-field
                           label="Tên người dùng*"
@@ -184,6 +219,7 @@ async function loginGoogle() {
                           dense
                           color="blue"
                           autocomplete="false"
+                          :rules="rules.name"
                         />
                         <v-text-field
                           label="Tên đội bóng*"
@@ -191,6 +227,7 @@ async function loginGoogle() {
                           dense
                           color="blue"
                           autocomplete="false"
+                          :rules="rules.teamName"
                         />
                         <v-text-field
                           label="Mật khẩu*"
@@ -199,6 +236,7 @@ async function loginGoogle() {
                           color="blue"
                           autocomplete="false"
                           type="password"
+                          :rules="rules.password"
                         />
                         <v-text-field
                           label="Nhập lại mật khẩu*"
@@ -207,6 +245,7 @@ async function loginGoogle() {
                           color="blue"
                           autocomplete="false"
                           type="password"
+                          :rules="rules.password"
                         />
                         <v-btn color="blue" class="btn" dark block
                           >Đăng ký</v-btn

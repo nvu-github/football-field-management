@@ -1,21 +1,21 @@
 export interface User {
-  username: string | null;
+  name: string | null;
   email: string | null;
   loggedIn: boolean;
 }
 
-export interface loginPayload {
+export interface Login {
   email: string;
   password: string;
 }
 
 export const useAuthStore = defineStore("authStore", () => {
-  const { $apis } = useNuxtApp();
-  const user = reactive<User>({});
+  const { $apis }: any = useNuxtApp();
+  const user = ref<User>();
 
-  function signIn(params: UserLogin) {
+  function signIn(params: Login) {
     return $apis
-      .post("auth/login", {
+      .post("auth/signin", {
         json: params,
       })
       .json();
@@ -24,10 +24,7 @@ export const useAuthStore = defineStore("authStore", () => {
   function setUserToLocalStorage() {
     const userLoggedIn = localStorage.getItem("userLogin");
     if (userLoggedIn) {
-      const { username, email, loggedIn } = JSON.parse(userLoggedIn);
-      user.username = username;
-      user.email = email;
-      user.loggedIn = loggedIn;
+      user.value = JSON.parse(userLoggedIn);
     }
   }
 

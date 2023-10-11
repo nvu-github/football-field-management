@@ -4,5 +4,6 @@ export interface IUser {
   password?: string;
   readonly name?: string;
   readonly role?: string;
+  readonly roleId?: number;
   readonly roleName?: string;
 }

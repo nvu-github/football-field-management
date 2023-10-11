@@ -9,13 +9,13 @@ import { SignUpDto } from './dto';
 export class AuthService {
   constructor(private prisma: PrismaService) {}
 
-  async signUp(payloads:SignUpDto): Promise<IUser | undefined> {
-    const { name, teamName, email, phoneNumber, password } = payloads
+  async signUp(payloads: SignUpDto): Promise<IUser | undefined> {
+    const { name, teamName, email, phoneNumber, password } = payloads;
     const account = await this.prisma.account.create({
       data: {
-        email, 
+        email,
         password,
-        roleId: 1
+        roleId: 1,
       },
       select: {
         id: true,
@@ -23,25 +23,29 @@ export class AuthService {
         role: {
           select: {
             name: true,
-          }
-        }
-      }
-    })
+          },
+        },
+      },
+    });
 
     const customer = await this.prisma.customer.create({
       data: {
         name,
         teamName,
-        phoneNumber, 
-        accountId: account.id
+        phoneNumber,
+        accountId: account.id,
       },
       select: {
-        name: true
-      }
-    })
+        name: true,
+      },
+    });
 
-
-    return { id: account.id, email: account.email, name: customer.name, role: account.role.name }
+    return {
+      id: account.id,
+      email: account.email,
+      name: customer.name,
+      role: account.role.name,
+    };
   }
 
   async getUser(emailUser: string): Promise<IUser | undefined> {
@@ -51,16 +55,29 @@ export class AuthService {
         id: true,
         email: true,
         password: true,
+        roleId: true,
         role: { select: { name: true } },
         staff: { select: { name: true } },
         customer: { select: { name: true } },
       },
     });
-  
-    const { id, email, password } = account;
+
+    if (!account) {
+      return undefined;
+    }
+
+    const { id, email, password, roleId } = account;
     const name = account.customer?.name || account.staff?.name;
-  
-    return { id, email, password, name, role: account.role.name };
+
+    return { id, email, password, name, role: account.role.name, roleId };
+  }
+
+  async getAccountByEmail(emailUser: string): Promise<IUser | undefined> {
+    return this.prisma.account.findFirst({
+      where: {
+        email: emailUser,
+      },
+    });
   }
 
   async getUserById(idUser: number): Promise<IUser | undefined> {
@@ -75,14 +92,13 @@ export class AuthService {
         customer: { select: { name: true } },
       },
     });
-  
+
     const { id, email, password } = account;
     let name = account.customer?.name || account.staff?.name;
-    if (!name && account.role.name === "ADMIN") {
-      name = "admin"
+    if (!name && account.role.name === 'ADMIN') {
+      name = 'admin';
     }
-  
+
     return { id, email, password, name, role: account.role.name };
   }
-  
 }

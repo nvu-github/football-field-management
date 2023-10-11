@@ -38,7 +38,10 @@ export class AuthController {
   }
 
   @Post('signin')
-  async signin(@Body() params: SigninDto, @Response() res) {
+  async signin(
+    @Body() params: SigninDto,
+    @Response({ passthrough: true }) res: any,
+  ) {
     const { email, password } = params;
     const account = await this.authService.getUser(email);
     if (!account) {
@@ -65,15 +68,16 @@ export class AuthController {
       httpOnly: true,
     });
 
-    return {
-      ...account,
-    };
+    return account;
   }
 
   @Post('signup')
-  async signup(@Body() params: SignUpDto) {
+  async signup(
+    @Body() params: SignUpDto,
+    @Response({ passthrough: true }) res: any,
+  ) {
     const { email, password } = params;
-    const account = await this.authService.getUser(email);
+    const account = await this.authService.getAccountByEmail(email);
 
     if (account) {
       throw new HttpException('Email đã tồn tại!', HttpStatus.NOT_FOUND);
@@ -81,7 +85,7 @@ export class AuthController {
 
     const user = await this.authService.signUp({
       ...params,
-      password: bcrypt.hashSync(password, configuration().salt),
+      password: bcrypt.hashSync(password, +configuration().salt),
     });
 
     const jwtPayloads = {
@@ -90,11 +94,16 @@ export class AuthController {
       name: user.name,
       role: user.role,
     };
-    return {
-      ...user,
-      accessToken: await this.jwtService.signAsync(jwtPayloads, {
-        secret: configuration().jwt.secret,
-      }),
-    };
+
+    const accessToken = await this.jwtService.signAsync(jwtPayloads, {
+      secret: configuration().jwt.secret,
+    });
+
+    res.cookie('accessToken', accessToken, {
+      maxAge: 1000 * 60 * 15,
+      httpOnly: true,
+    });
+
+    return user;
   }
 }
