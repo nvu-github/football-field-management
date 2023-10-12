@@ -66,6 +66,7 @@ export class AuthController {
     res.cookie('accessToken', accessToken, {
       maxAge: 1000 * 60 * 15,
       httpOnly: true,
+      sameSite: 'strict',
     });
 
     return account;

@@ -3,9 +3,9 @@ export default defineNuxtConfig({
   ssr: false,
   app: {
     head: {
-      charset: 'utf-8',
-      viewport: 'width=device-width, initial-scale=1',
-    }
+      charset: "utf-8",
+      viewport: "width=device-width, initial-scale=1",
+    },
   },
   css: [
     "vuetify/lib/styles/main.sass",

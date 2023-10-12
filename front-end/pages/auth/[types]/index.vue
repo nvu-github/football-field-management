@@ -34,9 +34,9 @@ const route = useRoute();
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 const step = ref(route.params.types);
-const cookie = useCookie("accessToken", {
-  maxAge: 1000 * 60 * 15,
-});
+// const cookie = useCookie("accessToken", {
+//   maxAge: 1000 * 60 * 15,
+// });
 const loginPayloads = ref<Login>({
   email: "",
   password: "",
@@ -62,26 +62,28 @@ async function loginUser() {
     JSON.stringify({ name, email, roleId, loggedIn: true })
   );
 
-  if (roleId === CUSTOMER_ROLE) {
-    return router.push("/");
-  }
+  // if (roleId === CUSTOMER_ROLE) {
+  //   return router.push("/");
+  // }
 
-  return router.push("/admin");
+  // return router.push("/admin");
 }
 
 async function loginGoogle() {
-  const { $firebaseAuth } = useNuxtApp();
-  const provider = new GoogleAuthProvider();
-  const result = await signInWithPopup($firebaseAuth, provider);
+  const auth = await authStore.signInGoogle();
+  console.log(auth);
+  // const { $firebaseAuth } = useNuxtApp();
+  // const provider = new GoogleAuthProvider();
+  // const result = await signInWithPopup($firebaseAuth, provider);
 
-  const credential = GoogleAuthProvider.credentialFromResult(result);
-  cookie.value = credential?.idToken;
-  const { displayName, email } = result.user;
-  user.value = { email, username: displayName, loggedIn: true };
-  localStorage.setItem(
-    "userLogin",
-    JSON.stringify({ username: displayName, email, loggedIn: true })
-  );
+  // const credential = GoogleAuthProvider.credentialFromResult(result);
+  // cookie.value = credential?.idToken;
+  // const { displayName, email } = result.user;
+  // user.value = { email, username: displayName, loggedIn: true };
+  // localStorage.setItem(
+  //   "userLogin",
+  //   JSON.stringify({ username: displayName, email, loggedIn: true })
+  // );
 }
 </script>
 <template>

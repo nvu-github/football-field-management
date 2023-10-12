@@ -9,7 +9,7 @@ import {
   UseGuards,
   Request,
   HttpException,
-  HttpStatus
+  HttpStatus,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -21,69 +21,84 @@ import { UsersService } from './users.service';
 import { StaffDto, CreateAccountDto } from './dto';
 
 @ApiTags('Users')
-// @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard)
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard)
 @Controller('users')
 export class UsersController {
-  private readonly ACCOUNTANT = 2
-  private readonly RENTAL_AND_SALE = 3
-  private readonly CUSTOMER = 4
+  private readonly ACCOUNTANT = 2;
+  private readonly RENTAL_AND_SALE = 3;
+  private readonly CUSTOMER = 4;
   constructor(private readonly usersService: UsersService) {}
 
   @Get('roles')
   async getRoles() {
-    return await this.usersService.getRoles()
+    return await this.usersService.getRoles();
   }
 
   @Post('account')
   async createAccount(@Body() body: CreateAccountDto) {
     try {
-      const account = await this.usersService.getAccountByEmail(body.email) 
+      const account = await this.usersService.getAccountByEmail(body.email);
       if (account) {
-        throw new HttpException('Email này đã tồn tại!', HttpStatus.BAD_REQUEST)
+        throw new HttpException(
+          'Email này đã tồn tại!',
+          HttpStatus.BAD_REQUEST,
+        );
       }
 
-      const accountCreated = await this.usersService.createAccount({...body, password: bcrypt.hashSync(body.password, +configuration().salt)})
-      if (body.roleId === this.ACCOUNTANT || body.roleId === this.RENTAL_AND_SALE) {
-        await this.usersService.createStaff(accountCreated.id)
+      const accountCreated = await this.usersService.createAccount({
+        ...body,
+        password: bcrypt.hashSync(body.password, +configuration().salt),
+      });
+      if (
+        body.roleId === this.ACCOUNTANT ||
+        body.roleId === this.RENTAL_AND_SALE
+      ) {
+        await this.usersService.createStaff(accountCreated.id);
       }
       if (body.roleId === this.CUSTOMER) {
-        await this.usersService.createCustomer(accountCreated.id)
+        await this.usersService.createCustomer(accountCreated.id);
       }
-      
-      delete accountCreated.password
-      return accountCreated
+
+      delete accountCreated.password;
+      return accountCreated;
     } catch (err) {
-      console.error(err)
-      throw new HttpException('Tạo tài khoản thất bại!', HttpStatus.BAD_REQUEST)
+      console.error(err);
+      throw new HttpException(
+        'Tạo tài khoản thất bại!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 
   @Patch('account/:id/accept')
   async acceptAccount(@Param('id') id: string, @Body() body: any) {
-    const account = await this.usersService.getAccountById(+id)
-    
-    if (!account)  {
-      throw new HttpException('Tài khỏan này không tồn tại!', HttpStatus.NOT_FOUND)
+    const account = await this.usersService.getAccountById(+id);
+
+    if (!account) {
+      throw new HttpException(
+        'Tài khỏan này không tồn tại!',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    return await this.usersService.updateStatusAccount(+id, body.status)
+    return await this.usersService.updateStatusAccount(+id, body.status);
   }
 
   @Patch('account/:id')
   async updateAccount(@Param('id') id: string, @Body() body: CreateAccountDto) {
-    const account = await this.usersService.getAccountById(+id)
+    const account = await this.usersService.getAccountById(+id);
     if (body.roleId !== 4 && account.email === body.email) {
-      delete body.email
+      delete body.email;
     }
-    const accountUpdated = await this.usersService.updateAccount(+id, body)
-    return accountUpdated
+    const accountUpdated = await this.usersService.updateAccount(+id, body);
+    return accountUpdated;
   }
 
-  @Delete('account/:id') 
+  @Delete('account/:id')
   deleteAccount(@Param('id') id: string) {
-    const deleteStatus = 'deleted'
-    return this.usersService.updateStatusAccount(+id, deleteStatus)
+    const deleteStatus = 'deleted';
+    return this.usersService.updateStatusAccount(+id, deleteStatus);
   }
 
   @Get('accounts')
@@ -93,34 +108,47 @@ export class UsersController {
 
   @Get('account/:id')
   async getAccount(@Param('id') id: string) {
-    const account = await this.usersService.getAccountById(+id)
-    
-    if (!account)  {
-      throw new HttpException('Tài khỏan này không tồn tại!', HttpStatus.NOT_FOUND)
+    const account = await this.usersService.getAccountById(+id);
+
+    if (!account) {
+      throw new HttpException(
+        'Tài khỏan này không tồn tại!',
+        HttpStatus.NOT_FOUND,
+      );
     }
     return account;
   }
 
   @Patch('staff/:id')
-  async updateStaffInfo(@Param('id') id: string, @Body() body: StaffDto, @Request() req) {
-    const staff = await this.usersService.getStaffById(id)
-    
-    if (!staff)  {
-      throw new HttpException('Nhân viên này không tồn tại!', HttpStatus.NOT_FOUND)
+  async updateStaffInfo(
+    @Param('id') id: string,
+    @Body() body: StaffDto,
+    @Request() req,
+  ) {
+    const staff = await this.usersService.getStaffById(id);
+
+    if (!staff) {
+      throw new HttpException(
+        'Nhân viên này không tồn tại!',
+        HttpStatus.NOT_FOUND,
+      );
     }
 
-    const staffUpdate = await this.usersService.updateStaffInfo(id, body)
-    return staffUpdate
+    const staffUpdate = await this.usersService.updateStaffInfo(id, body);
+    return staffUpdate;
   }
 
   @Get('staff/:id')
   async findOne(@Param('id') id: string) {
     const staff = await this.usersService.getStaffById(id);
-    
-    if (!staff)  {
-      throw new HttpException('Nhân viên này không tồn tại', HttpStatus.NOT_FOUND)
+
+    if (!staff) {
+      throw new HttpException(
+        'Nhân viên này không tồn tại',
+        HttpStatus.NOT_FOUND,
+      );
     }
-    
-    return staff
+
+    return staff;
   }
 }

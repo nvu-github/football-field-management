@@ -4,6 +4,8 @@ const createInstance = (apiUrl: string) => {
   return ky.create({
     prefixUrl: apiUrl,
     headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "*",
       "Content-Type": "application/json",
     },
     // credentials: "include",

@@ -10,15 +10,22 @@ export interface Login {
 }
 
 export const useAuthStore = defineStore("authStore", () => {
-  const { $apis }: any = useNuxtApp();
+  const { $apis, $axios }: any = useNuxtApp();
   const user = ref<User>();
 
   function signIn(params: Login) {
-    return $apis
-      .post("auth/signin", {
-        json: params,
-      })
-      .json();
+    // return $apis
+    //   .post("auth/signin", {
+    //     json: params,
+    //   })
+    //   .json();
+    return $axios.post("auth/signin", {
+      ...params,
+    });
+  }
+
+  function signInGoogle() {
+    return $apis.get("auth/google").json();
   }
 
   function setUserToLocalStorage() {
@@ -28,5 +35,5 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   }
 
-  return { user, setUserToLocalStorage, signIn };
+  return { user, setUserToLocalStorage, signIn, signInGoogle };
 });
