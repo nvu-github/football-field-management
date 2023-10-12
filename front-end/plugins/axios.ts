@@ -1,12 +1,20 @@
 import axios from "axios";
 
 const createInstance = (apiUrl: string) => {
+  const userLoggedIn = localStorage.getItem("userLogin");
+  let token = ""
+  if (userLoggedIn) {
+    token = JSON.parse(userLoggedIn)?.accessToken
+    console.log(token)
+  }
+
   return axios.create({
     baseURL: apiUrl,
     headers: {
       "Access-Control-Allow-Origin": "*",
       "Access-Control-Allow-Headers": "*",
       "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
     },
   });
 };
@@ -24,16 +32,12 @@ const createInstance = (apiUrl: string) => {
 //   });
 // };
 
-const setTokenHeader = (token: string) => {
-  return `Bearer ${token}`;
-};
-
 export default defineNuxtPlugin(() => {
   const runtimeConfig = useRuntimeConfig();
 
   return {
     provide: {
-      axios: createInstance(runtimeConfig.public.API_URL),
+      apis: createInstance(runtimeConfig.public.API_URL),
     },
   };
 });

@@ -52,21 +52,20 @@ function changeRouter() {
 
 async function loginUser() {
   const { email, password } = loginPayloads.value;
-  const userLogin = await authStore.signIn({ email, password });
-
-  let { name, roleId } = userLogin.data;
+  const { data: userLogin } = await authStore.signIn({ email, password });
+  let { name, roleId, accessToken } = userLogin.data;
   name = name ? name : email;
   user.value = { email, name, loggedIn: true };
   localStorage.setItem(
     "userLogin",
-    JSON.stringify({ name, email, roleId, loggedIn: true })
+    JSON.stringify({ name, email, roleId, loggedIn: true, accessToken })
   );
 
-  // if (roleId === CUSTOMER_ROLE) {
-  //   return router.push("/");
-  // }
+  if (roleId === CUSTOMER_ROLE) {
+    return router.push("/");
+  }
 
-  // return router.push("/admin");
+  return router.push("/admin");
 }
 
 async function loginGoogle() {
