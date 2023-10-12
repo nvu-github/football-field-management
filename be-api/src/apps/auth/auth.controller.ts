@@ -12,10 +12,10 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { AuthGuard } from '@nestjs/passport';
 
 import configuration from 'config/configuration';
 import { AuthService } from './auth.service';
+import { GoogleOAuthGuard } from './google-auth.guard';
 
 import { SigninDto, SignUpDto } from './dto';
 
@@ -27,18 +27,18 @@ export class AuthController {
     private readonly jwtService: JwtService,
   ) {}
 
-  @Get('gogle')
-  @UseGuards(AuthGuard('google'))
-  async signinGoogle(@Request() req) {}
+  @Get('google')
+  @UseGuards(GoogleOAuthGuard)
+  async signInGoogle(@Request() req) {}
 
   @Get('/google/callback')
-  @UseGuards(AuthGuard('google'))
+  @UseGuards(GoogleOAuthGuard)
   async googleCallback(@Request() req) {
-    return req;
+    return this.authService.googleLogin(req);
   }
 
   @Post('signin')
-  async signin(
+  async signIn(
     @Body() params: SigninDto,
     @Response({ passthrough: true }) res: any,
   ) {
