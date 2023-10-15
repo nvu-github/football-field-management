@@ -1,10 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, NotContains } from 'class-validator';
 
-
-export class ParamLeasingDurationDto {
+export class PayloadLeasingDurationDto {
   @ApiProperty({
-    example: '10:00'
+    example: '10:00',
   })
   @IsString()
   @IsNotEmpty()
@@ -12,7 +11,7 @@ export class ParamLeasingDurationDto {
   readonly startTime: string;
 
   @ApiProperty({
-    example: '11:30'
+    example: '11:30',
   })
   @IsString()
   @IsNotEmpty()

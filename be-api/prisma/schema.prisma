@@ -90,7 +90,7 @@ model AccessoryType {
 model Accessory {
   id              Int             @id @default(autoincrement())
   name            String          @db.VarChar(255)
-  desciption      String?         @db.Text
+  description     String?         @db.Text
   amount          Int
   price           Decimal         @db.Decimal(12, 0)
   status          StatusAccessory @default(AVAILABLE)
@@ -133,7 +133,7 @@ model FootbalType {
 model FootballPitch {
   id             Int            @id @default(autoincrement())
   name           String         @db.VarChar(255)
-  desciption     String?        @db.Text
+  description    String?        @db.Text
   status         StatusFootball @default(EMPTY)
   staffId        Int            @map("staff_id")
   footballTypeId Int            @map("football_type_id")
@@ -219,11 +219,14 @@ model Notification {
 }
 
 model CustomerFootballPitchRental {
-  id                             Int      @id @default(autoincrement())
-  customerId                     Int      @map("customer_id")
-  footballPitchLeasingDurationId Int      @map("football_pitch_lease_duration_id")
-  createdAt                      DateTime @default(now()) @map("created_at")
-  updatedAt                      DateTime @updatedAt @map("updated_at")
+  id                             Int                               @id @default(autoincrement())
+  customerId                     Int                               @map("customer_id")
+  footballPitchLeasingDurationId Int                               @map("football_pitch_lease_duration_id")
+  rentalDate                     DateTime                          @map("rental_date")
+  note                           String
+  status                         StatusCustomerFootballPitchRental @default(PENDING)
+  createdAt                      DateTime                          @default(now()) @map("created_at")
+  updatedAt                      DateTime                          @updatedAt @map("updated_at")
 
   invoice                      Invoice[]
   accessoryRentalCustomer      AccessoryRentalCustomer[]
@@ -318,6 +321,14 @@ enum StatusFootball {
   MAINTENANCE
 
   @@map("status_footballs")
+}
+
+enum StatusCustomerFootballPitchRental {
+  ACCEPT
+  REJECT
+  PENDING
+
+  @@map("status_customer_football_pitch_rental")
 }
 
 enum InvoiceStatus {

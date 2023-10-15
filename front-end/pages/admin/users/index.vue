@@ -7,7 +7,7 @@ const headers = [
     title: "STT",
     align: "center",
     sortable: false,
-    key: "Sno",
+    key: "sno",
   },
   { title: "Tên người dùng", align: "start", key: "name" },
   { title: "Email", align: "start", key: "email" },
@@ -74,7 +74,7 @@ userStore.getAccounts();
     <v-row>
       <v-col md="12">
         <v-data-table :headers="headers" :items="accounts">
-          <template #[`item.Sno`]="{ item }">
+          <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
           <template #[`item.status`]="{ item }">

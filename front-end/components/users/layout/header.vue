@@ -1,7 +1,9 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "~/stores";
 import logo from "~/public/logo.png";
-
-const rules = [(value) => !!value || "Vui lòng nhập thông tin tìm kiếm!"];
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 </script>
 <template>
   <div class="header">
@@ -12,8 +14,7 @@ const rules = [(value) => !!value || "Vui lòng nhập thông tin tìm kiếm!"]
     </div>
     <div class="searchform">
       <common-input
-        :rules="rules"
-        placeholder="Tìm kiếm..."
+        placeholder="Tìm kiếm thông tin phụ kiện"
         hide-details="auto"
         slot="append"
         required
@@ -22,6 +23,10 @@ const rules = [(value) => !!value || "Vui lòng nhập thông tin tìm kiếm!"]
           <v-icon> mdi mdi-magnify </v-icon>
         </v-btn>
       </common-input>
+      <nuxt-link v-if="!user" class="user" to="/auth/login">
+        <v-icon class="icon">mdi mdi-account-circle</v-icon>
+      </nuxt-link>
+      <common-user-info v-else class="userinfo" />
     </div>
   </div>
 </template>
@@ -29,22 +34,54 @@ const rules = [(value) => !!value || "Vui lòng nhập thông tin tìm kiếm!"]
 .header {
   display: flex;
   align-items: center;
+
   > .logo {
     width: 120px;
     margin-right: 20px;
   }
+
   > .title {
     flex: 1;
   }
+
   > .searchform {
-    width: 350px;
+    display: flex;
+    align-items: center;
+    width: 380px;
   }
+
+  > .searchform > .user {
+    display: block;
+    margin-left: 5px;
+    padding: 10px;
+    color: #000;
+  }
+
+  > .searchform > :deep(.icon) {
+    margin-top: 0;
+    color: #000;
+  }
+
+  > .searchform > :deep(.icon) > .v-icon {
+    font-size: 35px;
+  }
+
+  > .searchform > :deep(.icon)::after {
+    content: none;
+  }
+
+  > .searchform > .user > .icon {
+    font-size: 35px;
+  }
+
   :deep(.v-field__field) > .v-field__input {
     border-radius: 5px 0 0 5px;
   }
+
   :deep(.input) > .v-input__append {
     margin: 0;
   }
+
   :deep(.input) > .v-input__append > .button {
     border-radius: 0 5px 5px 0;
     box-shadow: none;

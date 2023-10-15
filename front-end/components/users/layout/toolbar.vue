@@ -1,23 +1,15 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import logo from "../../../public/logo.png";
+import logo from "~/public/logo.png";
 
-const headerMenu = [
+const menus = [
   {
-    title: "About Me",
-    href: "/about-me",
+    title: "Đặt sân",
+    url: "/football-pitches/rental",
   },
   {
-    title: "Work",
-    href: "/work",
-  },
-  {
-    title: "Contact",
-    href: "/contact",
-  },
-  {
-    title: "Freebies",
-    href: "/freebies",
+    title: "Phụ kiện",
+    url: "/accessories",
   },
 ];
 
@@ -28,13 +20,13 @@ const drawer = ref(false);
     <div class="navbar">
       <div class="menu">
         <nuxt-link class="navitem -home" to="/">
-          <v-icon> mdi mdi-home-circle-outline </v-icon>
+          <v-icon> mdi mdi-home </v-icon>
         </nuxt-link>
         <nuxt-link
           class="navitem"
-          v-for="(menu, index) in headerMenu"
+          v-for="(menu, index) in menus"
           :key="index"
-          :to="menu.href"
+          :to="menu.url"
         >
           {{ menu.title }}
         </nuxt-link>
@@ -61,9 +53,9 @@ const drawer = ref(false);
         </nuxt-link>
         <nuxt-link
           class="sideitem"
-          v-for="(menu, index) in headerMenu"
+          v-for="(menu, index) in menus"
           :key="index"
-          :href="menu.href"
+          :href="menu.url"
         >
           {{ menu.title }}
         </nuxt-link>
@@ -87,16 +79,15 @@ const drawer = ref(false);
   > .navbar > .menu > .navitem {
     display: block;
     transition: 0.2s linear;
-    padding: 20px 25px;
+    padding: 15px 25px;
     color: #000;
     text-decoration: none;
     &.-home {
       padding: 8px 15px;
-      font-size: 30px;
+      font-size: 25px;
     }
     &:hover {
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) inset;
-      // background: #89a428;
     }
   }
   > .navbar > .sidebaricon,

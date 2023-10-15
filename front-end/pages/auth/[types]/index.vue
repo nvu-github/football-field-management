@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { useRoute, useRouter, useCookie } from "nuxt/app";
+import { useNuxtApp, useRoute, useRouter } from "nuxt/app";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { useAuthStore } from "~/stores";
 
@@ -31,12 +31,10 @@ const rules = {
 
 const router = useRouter();
 const route = useRoute();
+const { $toast }: any = useNuxtApp();
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 const step = ref(route.params.types);
-// const cookie = useCookie("accessToken", {
-//   maxAge: 1000 * 60 * 15,
-// });
 const loginPayloads = ref<Login>({
   email: "",
   password: "",
@@ -51,38 +49,55 @@ function changeRouter() {
 }
 
 async function loginUser() {
-  const { email, password } = loginPayloads.value;
-  const { data: userLogin } = await authStore.signIn({ email, password });
-  let { name, roleId, accessToken } = userLogin.data;
-  name = name ? name : email;
-  user.value = { email, name, loggedIn: true };
-  localStorage.setItem(
-    "userLogin",
-    JSON.stringify({ name, email, roleId, loggedIn: true, accessToken })
-  );
+  try {
+    const { email, password } = loginPayloads.value;
+    const userLogin = await authStore.signIn({ email, password });
+    const { name, roleId, accessToken } = userLogin.data;
+    user.value = {
+      name: name || email,
+      email,
+      roleId,
+      loggedIn: true,
+    };
+    localStorage.setItem(
+      "userLogin",
+      JSON.stringify({ name, email, roleId, loggedIn: true, accessToken })
+    );
 
-  if (roleId === CUSTOMER_ROLE) {
-    return router.push("/");
+    $toast.success("Đăng nhập thành công");
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    const destination = roleId === CUSTOMER_ROLE ? "/" : "/admin";
+    router.push(destination);
+  } catch (error) {
+    console.log(error);
+    $toast.error("Thông tin email hoặc mật khẩu không chính xác");
   }
-
-  return router.push("/admin");
 }
 
 async function loginGoogle() {
-  const auth = await authStore.signInGoogle();
-  console.log(auth);
-  // const { $firebaseAuth } = useNuxtApp();
-  // const provider = new GoogleAuthProvider();
-  // const result = await signInWithPopup($firebaseAuth, provider);
+  try {
+    const { $firebaseAuth } = useNuxtApp();
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup($firebaseAuth, provider);
 
-  // const credential = GoogleAuthProvider.credentialFromResult(result);
-  // cookie.value = credential?.idToken;
-  // const { displayName, email } = result.user;
-  // user.value = { email, username: displayName, loggedIn: true };
-  // localStorage.setItem(
-  //   "userLogin",
-  //   JSON.stringify({ username: displayName, email, loggedIn: true })
-  // );
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const idToken = credential?.idToken || "";
+    const userLoginGoogle = await authStore.signInGoogle(idToken);
+    const { email, roleId, accessToken } = userLoginGoogle.data;
+    const name = result.user.displayName || email;
+    user.value = { name, email, roleId, loggedIn: true };
+
+    localStorage.setItem(
+      "userLogin",
+      JSON.stringify({ name, email, roleId, loggedIn: true, accessToken })
+    );
+    $toast.error("Đăng nhập thành công");
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    router.push("/");
+  } catch (error) {
+    console.log(error);
+    $toast.error("Thông tin email hoặc mật khẩu không chính xác");
+  }
 }
 </script>
 <template>
@@ -140,7 +155,13 @@ async function loginGoogle() {
                             :disabled="!loginPayloads.value"
                             >Đăng nhập</v-btn
                           >
-                          <h5 class="text-center grey--text mt-4 mb-3">Or</h5>
+                          <p class="link-auth mt-3">
+                            Bạn chưa có tài khoản?
+                            <nuxt-link to="/auth/signup"
+                              >đăng ký ngay.</nuxt-link
+                            >
+                          </p>
+                          <h5 class="text-center grey--text mt-4 mb-3">Hoặc</h5>
                           <div
                             class="d-flex justify-center align-center mx-20 mb-16"
                           >
@@ -165,7 +186,7 @@ async function loginGoogle() {
                     </v-form>
                   </v-card-text>
                 </v-col>
-                <v-col cols="12" md="6" class="blue rounded-bl-xl">
+                <v-col cols="12" md="6" class="blue rounded-bl-xl detail-auth">
                   <div style="text-align: center; padding: 180px 0">
                     <v-card-text class="white--text">
                       <h3 class="text-center">Bạn chưa có tài khoản?</h3>
@@ -185,7 +206,7 @@ async function loginGoogle() {
             </v-window-item>
             <v-window-item value="signup">
               <v-row>
-                <v-col cols="12" md="6" class="blue rounded-br-xl">
+                <v-col cols="12" md="6" class="blue rounded-br-xl detail-auth">
                   <div style="text-align: center; padding: 180px 0">
                     <v-card-text class="white--text">
                       <h3 class="text-center">Bạn đã có tài khoản?</h3>
@@ -251,6 +272,10 @@ async function loginGoogle() {
                         <v-btn color="blue" class="btn" dark block
                           >Đăng ký</v-btn
                         >
+                        <p class="link-auth mt-3">
+                          Bạn đã có tài khoản?
+                          <nuxt-link to="/auth/login">đăng nhập.</nuxt-link>
+                        </p>
                         <h5 class="text-center grey--text mt-4 mb-3">Hoặc</h5>
                         <div
                           class="d-flex justify-center align-center mx-20 mb-6"

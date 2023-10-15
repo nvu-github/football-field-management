@@ -1,9 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 import { EFootballPitchStatus } from '../enum';
 
-export class ParamFootballPitchDto {
+interface Image {
+  url: string;
+}
+
+export class PayloadFootballPitchDto {
   @ApiProperty({
     example: 'Sân bóng số 1',
   })
@@ -15,7 +25,7 @@ export class ParamFootballPitchDto {
     example: 'Mô tả sân bóng',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   readonly description: string;
 
   @ApiProperty({
@@ -26,18 +36,18 @@ export class ParamFootballPitchDto {
   readonly status: EFootballPitchStatus;
 
   @ApiProperty({
-    example: ['image1', 'image2'],
+    example: [{ url: 'upload/image1.png' }, { url: 'upload/image2.png' }],
   })
-  @IsString()
-  @IsNotEmpty()
-  images: string[];
+  @IsArray()
+  @IsOptional()
+  images: Array<Image>[];
 
   @ApiProperty({
     example: 1,
   })
   @IsNumber()
   @IsNotEmpty()
-  readonly typeId: number;
+  readonly footballTypeId: number;
 
   @IsString()
   @IsNotEmpty()

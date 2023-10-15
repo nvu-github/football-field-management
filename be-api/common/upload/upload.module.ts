@@ -13,9 +13,11 @@ import { UploadService } from './upload.service';
     MulterModule.register({
       storage: multer.diskStorage({
         destination: function (req, file, cb) {
+          const { type } = req.body;
+
           if (
             file.mimetype.match(
-              /image\/png|image\/jpeg|image\/jpg|imagesvg\+xml|image\/gif|image\/svg\+xml/
+              /image\/png|image\/jpeg|image\/jpg|imagesvg\+xml|image\/gif|image\/svg\+xml/,
             )
           ) {
             const pathDir = path.join(
@@ -25,6 +27,7 @@ import { UploadService } from './upload.service';
               '..',
               'public',
               'uploads',
+              type,
             );
             if (!fs.existsSync(pathDir)) {
               fs.mkdirSync(pathDir);
@@ -34,23 +37,24 @@ import { UploadService } from './upload.service';
             cb(
               new HttpException(
                 `Unsupported file type ${path.extname(file.originalname)}`,
-                HttpStatus.BAD_REQUEST
+                HttpStatus.BAD_REQUEST,
               ),
-              null
+              null,
             );
           }
         },
         filename: function (req, file, cb) {
+          const timestamp = new Date().getTime();
           const fileExtname = path.extname(file.originalname);
           const fileName = file.originalname.replace(fileExtname, '');
-          const uniqueSuffix = `${Math.round(Math.random() * 1e6)}`;
+          const uniqueSuffix = `${timestamp}${Math.round(Math.random() * 1e6)}`;
           cb(null, `${slug(fileName)}-${uniqueSuffix}${fileExtname}`);
         },
       }),
       fileFilter: (req: any, file: any, cb: any) => {
         if (
           file.mimetype.match(
-            /image\/png|image\/jpeg|image\/jpg|imagesvg\+xml|image\/gif|image\/svg\+xml/
+            /image\/png|image\/jpeg|image\/jpg|imagesvg\+xml|image\/gif|image\/svg\+xml/,
           )
         ) {
           cb(null, true);
@@ -58,9 +62,9 @@ import { UploadService } from './upload.service';
           cb(
             new HttpException(
               `Unsupported file type ${path.extname(file.originalname)}`,
-              HttpStatus.BAD_REQUEST
+              HttpStatus.BAD_REQUEST,
             ),
-            false
+            false,
           );
         }
       },

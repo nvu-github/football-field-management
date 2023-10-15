@@ -13,6 +13,7 @@ const menus = ref<Menu>([
     icon: "mdi-home",
     title: "Trang chủ",
     url: "/admin/",
+    roleId: null,
   },
   {
     icon: "mdi-account",
@@ -25,6 +26,7 @@ const menus = ref<Menu>([
         url: "/admin/users",
       },
     ],
+    roleId: 1,
   },
   {
     icon: "mdi mdi-soccer-field",
@@ -49,9 +51,15 @@ const menus = ref<Menu>([
       {
         icon: "mdi mdi-format-list-bulleted-type",
         title: "Loại sân bóng",
-        url: "/admin/football-pitches/football-pitch-types",
+        url: "/admin/football-pitches/types",
+      },
+      {
+        icon: "mdi mdi-check-all",
+        title: "Xác nhận đặt sân",
+        url: "/admin/football-pitches/confirm",
       },
     ],
+    roleId: 1,
   },
 ]);
 function closeNavbar() {

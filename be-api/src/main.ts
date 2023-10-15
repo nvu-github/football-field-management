@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
+import { static as expressStatic } from 'express';
+import { join } from 'path';
 
 import 'module-alias/register';
 
@@ -40,6 +42,8 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe());
   app.use(cookieParser());
+
+  app.use('/public', expressStatic(join(__dirname, '../..', 'public')));
 
   await app.listen(configuration().port || 8085);
 }

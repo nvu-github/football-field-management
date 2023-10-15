@@ -8,8 +8,9 @@ const { dialog } = storeToRefs(dialogStore);
 <template>
   <v-dialog
     v-model="dialog.isVisible"
-    width="auto"
+    width="100%"
     :persistent="dialog.isPersistent"
+    scrollable
   >
     <!-- eslint-disable vue/no-v-html -->
     <div

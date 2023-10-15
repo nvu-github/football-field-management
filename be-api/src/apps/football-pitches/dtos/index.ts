@@ -1,3 +1,4 @@
-export * from './param-leasing-duration.dto';
-export * from './param-football-pitch-type.dto';
-export * from './params-football-pitch.dto';
+export * from './payload-leasing-duration.dto';
+export * from './payload-football-pitch-type.dto';
+export * from './payload-football-pitch.dto';
+export * from './payload-football-pitch-price.dto';

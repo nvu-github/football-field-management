@@ -7,7 +7,7 @@ const headers = [
     title: "STT",
     align: "center",
     sortable: false,
-    key: "Sno",
+    key: "sno",
   },
   { title: "Thời gian bắt đầu", align: "center", key: "startTime" },
   { title: "Thời gian kết thúc", align: "center", key: "endTime" },
@@ -28,7 +28,7 @@ watch(isDelete, async () => {
 
 async function openDiaglogLeasingDuration(type?: string, id?: string) {
   await dialogStore.showDialog(
-    resolveComponent("admins-football-field-dialog-leasing-duration"),
+    resolveComponent("admins-football-pitches-dialog-leasing-duration"),
     {
       type: type,
       id,
@@ -39,7 +39,7 @@ async function openDiaglogLeasingDuration(type?: string, id?: string) {
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     id,
-    endpoint: `football-fields/leasing-durations/${id}`,
+    endpoint: `football-pitches/leasing-durations/${id}`,
     nameObject: "thời gian thuê",
   });
 }
@@ -61,7 +61,7 @@ leasingDurationStore.getLeasingDurations();
     <v-row>
       <v-col md="12">
         <v-data-table :headers="headers" :items="leasingDurations">
-          <template #[`item.Sno`]="{ item }">
+          <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
           <template #[`item.actions`]="{ item }">

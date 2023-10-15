@@ -9,58 +9,212 @@ import {
   Delete,
   Get,
   Request,
+  UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 import { FootballPitchesService } from './football-pitches.service';
+import { UploadService } from 'common/upload/upload.service';
+import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
 
 import {
-  ParamFootballPitchType,
-  ParamLeasingDurationDto,
-  ParamFootballPitchDto,
+  PayloadFootballPitchTypeDto,
+  PayloadLeasingDurationDto,
+  PayloadFootballPitchDto,
+  PayloadFootballPitchPriceDto,
 } from './dtos';
 import { ApiTags } from '@nestjs/swagger';
 
 @ApiTags('FootballPitch')
 @Controller('football-pitches')
 export class FootballPitchesController {
-  constructor(private readonly footballPitchService: FootballPitchesService) {}
+  constructor(
+    private readonly footballPitchService: FootballPitchesService,
+    private readonly uploadService: UploadService,
+  ) {}
 
-  @Post()
-  async createFootballPitch(
-    @Body() body: ParamFootballPitchDto,
-    @Request() req,
+  @Get('rentals')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getFootballPitchRenal(): Promise<any> {
+    return await this.footballPitchService.getFootballPitchRental();
+  }
+
+  @Post('types')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  createFootballPitchType(@Body() payloads: PayloadFootballPitchTypeDto) {
+    return this.footballPitchService.createFootballPitchType(payloads);
+  }
+
+  @Patch('types/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async updateFootballPitchType(
+    @Param('id') id: string,
+    @Body() payloads: PayloadFootballPitchTypeDto,
   ) {
-    const { typeId } = body;
-    const { id } = req.user;
     const footballPitchType =
-      await this.footballPitchService.getFootballPitchType(+typeId);
+      await this.footballPitchService.getFootballPitchType(+id);
+
     if (!footballPitchType) {
       throw new HttpException(
-        'Loại sân bóng không hợp lệ!',
-        HttpStatus.BAD_REQUEST,
+        'Loại sân bóng này không tồn tại',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return this.footballPitchService.updateFootballPitchType(+id, payloads);
+  }
+
+  @Delete('types/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async deleteFootballPitchType(@Param('id') id: string) {
+    const footballPitchType =
+      await this.footballPitchService.getFootballPitchType(+id);
+
+    if (!footballPitchType) {
+      throw new HttpException(
+        'Loại sân bóng này không tồn tại',
+        HttpStatus.NOT_FOUND,
       );
     }
 
-    delete body.images;
-    return this.footballPitchService.createFootballPitch({
-      ...body,
-      staffId: id,
-    });
+    return this.footballPitchService.deleteFootballPitchType(+id);
   }
 
-  @Get()
-  getFootballPitches() {
-    return this.footballPitchService.getFootballPitches();
+  @Get('types')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  getFootballPitchTypes() {
+    return this.footballPitchService.getFootballPitchTypes();
+  }
+
+  @Get('types/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getFootballPitchType(@Param('id') id: string) {
+    const footballPitchType =
+      await this.footballPitchService.getFootballPitchType(+id);
+
+    if (!footballPitchType) {
+      throw new HttpException(
+        'Loại sân bóng này không tồn tại',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return footballPitchType;
+  }
+
+  @Post('prices')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async createFootballPitchPrice(
+    @Body() payloads: PayloadFootballPitchPriceDto,
+  ) {
+    const { footballPitchId, leasingDurationId } = payloads;
+
+    const footballPitchFound = await this.footballPitchService.getFootballPitch(
+      +footballPitchId,
+    );
+    if (!footballPitchFound)
+      throw new HttpException('Sân bóng không hợp lệ', HttpStatus.BAD_REQUEST);
+
+    const leasingDurationFound =
+      await this.footballPitchService.getLeasingDuration(+leasingDurationId);
+    if (!leasingDurationFound)
+      throw new HttpException(
+        'Khung thời gian không hợp lệ',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    return this.footballPitchService.createFootballPitchPrice(payloads);
+  }
+
+  @Patch('prices/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async updateFootballPitchPrice(
+    @Param('id') id: string,
+    @Body() payloads: PayloadFootballPitchPriceDto,
+  ) {
+    const { footballPitchId, leasingDurationId } = payloads;
+
+    const footballPitchPrice =
+      await this.footballPitchService.getFootballPitchPrice(+id);
+
+    if (!footballPitchPrice)
+      throw new HttpException(
+        'Giá thuê sân bóng không hợp lệ',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    const footballPitchFound = await this.footballPitchService.getFootballPitch(
+      +footballPitchId,
+    );
+    if (!footballPitchFound)
+      throw new HttpException('Sân bóng không hợp lệ', HttpStatus.BAD_REQUEST);
+
+    const leasingDurationFound =
+      await this.footballPitchService.getLeasingDuration(+leasingDurationId);
+    if (!leasingDurationFound)
+      throw new HttpException(
+        'Khung thời gian không hợp lệ',
+        HttpStatus.BAD_REQUEST,
+      );
+
+    return this.footballPitchService.updateFootballPitchPrice(+id, payloads);
+  }
+
+  @Delete('prices/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async deleteFootballPitchPrice(@Param('id') id: string) {
+    const footballPitchPrice =
+      await this.footballPitchService.getFootballPitchPrice(+id);
+
+    if (!footballPitchPrice)
+      throw new HttpException(
+        'Giá thuê sân bóng không hợp lệ',
+        HttpStatus.BAD_REQUEST,
+      );
+    return this.footballPitchService.deleteFootballPitchPrice(+id);
+  }
+
+  @Get('prices/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getFootballPitchPrice(@Param('id') id: string) {
+    const footballPitchPrice =
+      await this.footballPitchService.getFootballPitchPrice(+id);
+
+    if (!footballPitchPrice)
+      throw new HttpException(
+        'Giá thuê sân bóng không hợp lệ',
+        HttpStatus.BAD_REQUEST,
+      );
+    return footballPitchPrice;
+  }
+
+  @Get('prices')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  getFootballPitchPrices() {
+    return this.footballPitchService.getFootballPitchPrices();
   }
 
   @Post('leasing-durations')
-  createLeasingDuration(@Body() params: ParamLeasingDurationDto) {
-    return this.footballPitchService.createLeasingDuration(params);
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  createLeasingDuration(@Body() payloads: PayloadLeasingDurationDto) {
+    return this.footballPitchService.createLeasingDuration(payloads);
   }
 
   @Patch('leasing-durations/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   async updateLeasingDuration(
     @Param('id') id: string,
-    @Body() params: ParamLeasingDurationDto,
+    @Body() payloads: PayloadLeasingDurationDto,
   ) {
     const leasingDuration = await this.footballPitchService.getLeasingDuration(
       +id,
@@ -73,10 +227,12 @@ export class FootballPitchesController {
       );
     }
 
-    return this.footballPitchService.updateLeasingDuration(+id, params);
+    return this.footballPitchService.updateLeasingDuration(+id, payloads);
   }
 
   @Delete('leasing-durations/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   async deleteLeasingDuration(@Param('id') id: string) {
     const leasingDuration = await this.footballPitchService.getLeasingDuration(
       +id,
@@ -93,11 +249,15 @@ export class FootballPitchesController {
   }
 
   @Get('leasing-durations')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   getLeasingDurations() {
     return this.footballPitchService.getLeasingDurations();
   }
 
   @Get('leasing-durations/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   async getLeasingDuration(@Param('id') id: string) {
     const leasingDuration = await this.footballPitchService.getLeasingDuration(
       +id,
@@ -112,59 +272,160 @@ export class FootballPitchesController {
     return leasingDuration;
   }
 
-  @Post('football-pitch-types')
-  createFootballPitchType(@Body() params: ParamFootballPitchType) {
-    return this.footballPitchService.createFootballPitchType(params);
-  }
-
-  @Patch('football-pitch-types/:id')
-  async updateFootballPitchType(
-    @Param('id') id: string,
-    @Body() params: ParamFootballPitchType,
+  @Post()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async createFootballPitch(
+    @Body() body: PayloadFootballPitchDto,
+    @Request() req,
   ) {
-    const footballPitchType =
-      await this.footballPitchService.getFootballPitchType(+id);
+    try {
+      const { footballTypeId, images } = body;
+      const { id } = req.user;
+      const footballPitchType =
+        await this.footballPitchService.getFootballPitchType(+footballTypeId);
+      if (!footballPitchType) {
+        throw new HttpException(
+          'Loại sân bóng không hợp lệ!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
 
-    if (!footballPitchType) {
+      delete body.images;
+      const footballPitchCreated =
+        await this.footballPitchService.createFootballPitch({
+          ...body,
+          staffId: id,
+        });
+
+      if (images) {
+        const payloadImages = images.map((image) => ({
+          ...image,
+          footballPitchId: footballPitchCreated.id,
+        }));
+        await this.footballPitchService.createImageFootballPitch(payloadImages);
+      }
+
+      return footballPitchCreated;
+    } catch (error) {
+      console.log(error);
       throw new HttpException(
-        'Loại sân bóng này không tồn tại',
-        HttpStatus.NOT_FOUND,
+        'Thêm sân bóng thất bại!',
+        HttpStatus.BAD_REQUEST,
       );
     }
-    return this.footballPitchService.updateFootballPitchType(+id, params);
   }
 
-  @Delete('football-pitch-types/:id')
-  async deleteFootballPitchType(@Param('id') id: string) {
-    const footballPitchType =
-      await this.footballPitchService.getFootballPitchType(+id);
+  @Patch('/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async updateFootballPitch(
+    @Param('id') id: string,
+    @Body() body: PayloadFootballPitchDto,
+    @Request() req,
+  ) {
+    try {
+      const { footballTypeId, images } = body;
+      const { id: idUser } = req.user;
 
-    if (!footballPitchType) {
+      const footballPitch = await this.footballPitchService.getFootballPitch(
+        +id,
+      );
+      if (!footballPitch) {
+        throw new HttpException(
+          'Sân bóng không hợp lệ!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const footballPitchType =
+        await this.footballPitchService.getFootballPitchType(+footballTypeId);
+      if (!footballPitchType) {
+        throw new HttpException(
+          'Loại sân bóng không hợp lệ!',
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      delete body.images;
+      const footballPitchCreated =
+        await this.footballPitchService.updateFootballPitch(+id, {
+          ...body,
+          staffId: idUser,
+        });
+
+      if (images) {
+        const payloadImages = images.map((image) => ({
+          ...image,
+          footballPitchId: footballPitchCreated.id,
+        }));
+        await this.footballPitchService.createImageFootballPitch(payloadImages);
+      }
+
+      return footballPitchCreated;
+    } catch (error) {
+      console.log(error);
       throw new HttpException(
-        'Loại sân bóng này không tồn tại',
-        HttpStatus.NOT_FOUND,
+        'Thêm sân bóng thất bại!',
+        HttpStatus.BAD_REQUEST,
       );
     }
-
-    return this.footballPitchService.deleteFootballPitchType(+id);
   }
 
-  @Get('football-pitch-types')
-  getFootballPitchTypes() {
-    return this.footballPitchService.getFootballPitchTypes();
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async deleteFootballPitch(@Param('id') id: string) {
+    try {
+      const footballPitchImages =
+        await this.footballPitchService.getFootballPitchImages(+id);
+      if (footballPitchImages) {
+        await footballPitchImages.map(async (image) => {
+          await this.uploadService.deleteFile(image.url.replace('\\', '/'));
+        });
+
+        await this.footballPitchService.deleteFootballPitchImages(+id);
+      }
+
+      return await this.footballPitchService.deleteFootballPitch(+id);
+    } catch (error) {
+      console.log(error);
+      throw new HttpException('Xóa sân bóng thất bại!', HttpStatus.BAD_REQUEST);
+    }
   }
 
-  @Get('football-pitch-types/:id')
-  async getFootballPitchType(@Param('id') id: string) {
-    const footballPitchType =
-      await this.footballPitchService.getFootballPitchType(+id);
+  @Delete('images/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async deleteFootballPitchImage(@Param('id') id: string) {
+    const footballPitchFile =
+      await this.footballPitchService.getFootballPitchImage(+id);
+    await this.uploadService.deleteFile(
+      footballPitchFile.url.replace('\\', '/'),
+    );
 
-    if (!footballPitchType) {
+    return await this.footballPitchService.deleteFootballPitchImage(+id);
+  }
+
+  @Get('/:id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getFootballPitch(@Param('id') id: string) {
+    const footballPitch = await this.footballPitchService.getFootballPitch(+id);
+
+    if (!footballPitch) {
       throw new HttpException(
-        'Loại sân bóng này không tồn tại',
-        HttpStatus.NOT_FOUND,
+        'Không tìm thấy thông tin sân bóng',
+        HttpStatus.BAD_REQUEST,
       );
     }
-    return footballPitchType;
+    return footballPitch;
+  }
+
+  @Get()
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  getFootballPitches() {
+    return this.footballPitchService.getFootballPitches();
   }
 }

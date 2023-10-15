@@ -42,7 +42,19 @@ body {
   }
 }
 
+.link-auth {
+  display: none;
+}
+
 @media (max-width: 768px) {
+  /* Auth */
+  .detail-auth {
+    display: none;
+  }
+  .link-auth {
+    display: block;
+  }
+
   /* User */
   .header {
     display: none !important;

@@ -34,34 +34,32 @@ function closeDialogFootballFieldType() {
 }
 
 async function addFootballFieldType() {
-  isLoading.value = true;
+  const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
   try {
+    isLoading.value = true;
+
     if (data.type === defaultTypeBtn) {
-      await footballFieldTypeStore.updateFootballPitchType(
+      const action = footballFieldTypeStore.updateFootballPitchType(
         data.id,
         paramsFootballFieldType.value
       );
+      await action;
     } else {
-      await footballFieldTypeStore.createFootballPitchType(
+      const action = footballFieldTypeStore.createFootballPitchType(
         paramsFootballFieldType.value
       );
+      await action;
     }
-    $toast.success(
-      `${
-        data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
-      } loại sân bóng thành công`
-    );
+
+    $toast.success(`${message} loại sân bóng thành công`);
     await footballFieldTypeStore.getFootballPitchTypes();
   } catch (error) {
     console.log(error);
-    $toast.error(
-      `${
-        data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
-      } loại sân bóng thất bại`
-    );
+    $toast.error(`${message} loại sân bóng thất bại`);
+  } finally {
+    isLoading.value = false;
+    closeDialog();
   }
-  isLoading.value = false;
-  closeDialog();
 }
 
 function setFootballFieldTypeToForm() {

@@ -6,7 +6,6 @@ import configuration from 'config/configuration';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt-auth.strategy';
-import { GoogleStrategy } from './google-auth.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -17,6 +16,6 @@ import { GoogleStrategy } from './google-auth.strategy';
       signOptions: { expiresIn: configuration().jwt.expires },
     }),
   ],
-  providers: [AuthService, PrismaService, JwtStrategy, GoogleStrategy],
+  providers: [AuthService, PrismaService, JwtStrategy],
 })
 export class AuthModule {}

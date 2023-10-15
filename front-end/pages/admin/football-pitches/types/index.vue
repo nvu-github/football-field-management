@@ -11,7 +11,7 @@ const headers = [
     title: "STT",
     align: "center",
     sortable: false,
-    key: "Sno",
+    key: "sno",
   },
   { title: "Tên loại sân bóng", width: "70%", align: "start", key: "name" },
   { title: "Tác vụ", align: "center", key: "actions", sortable: false },
@@ -29,9 +29,9 @@ watch(isDelete, async () => {
   isDelete.value = false;
 });
 
-async function openDiaglogLeasingDuration(type?: string, id?: string) {
+async function openDiaglogFootballPitchType(type?: string, id?: string) {
   await dialogStore.showDialog(
-    resolveComponent("admins-football-pitches-dialog-football-pitch-type"),
+    resolveComponent("admins-football-pitches-dialog-type"),
     {
       type: type,
       id,
@@ -42,7 +42,7 @@ async function openDiaglogLeasingDuration(type?: string, id?: string) {
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     id,
-    endpoint: `football-pitches/football-pitch-types/${id}`,
+    endpoint: `football-pitches/types/${id}`,
     nameObject: "loại sân bóng",
   });
 }
@@ -53,7 +53,7 @@ footballTypeStore.getFootballPitchTypes();
   <div class="football-pitch-type-page">
     <v-row class="row">
       <v-col md="12" class="column">
-        <v-btn class="button -success" @click="openDiaglogLeasingDuration">
+        <v-btn class="button -success" @click="openDiaglogFootballPitchType">
           Thêm loại sân
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
@@ -64,13 +64,13 @@ footballTypeStore.getFootballPitchTypes();
     <v-row>
       <v-col md="12">
         <v-data-table :headers="headers" :items="footballPitchTypes">
-          <template #[`item.Sno`]="{ item }">
+          <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
           <template #[`item.actions`]="{ item }">
             <v-btn
               class="button -warning"
-              @click="openDiaglogLeasingDuration('update', item.raw.id)"
+              @click="openDiaglogFootballPitchType('update', item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
             </v-btn>

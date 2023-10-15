@@ -18,7 +18,7 @@ function handleShowMenu() {
     </div>
     <div class="action">
       <common-notification class="notification" />
-      <common-user class="user" />
+      <common-user-info class="user" />
     </div>
   </v-app-bar>
 </template>

@@ -15,6 +15,12 @@ export interface SubMenu {
   url: string;
 }
 
+export interface BreadCrumb {
+  title: string;
+  disabled: boolean;
+  href: string;
+}
+
 type DialogContent = Component | string;
 
 export interface Dialog {
@@ -25,18 +31,19 @@ export interface Dialog {
 }
 
 export const useAppStore = defineStore("appStore", () => {
-  const { $apis } = useNuxtApp();
+  const { $apis }: any = useNuxtApp();
   const app = reactive<App>({
     title: "",
   });
   const isShowSidebar = ref<boolean>(false);
   const isLoading = ref<boolean>(false);
+  const breadCrumbs = ref<BreadCrumb>();
 
   function deleteApi(endpoint: string) {
-    return $apis.delete(endpoint).json();
+    return $apis.delete(endpoint);
   }
 
-  return { app, isShowSidebar, isLoading, deleteApi };
+  return { app, isShowSidebar, isLoading, breadCrumbs, deleteApi };
 });
 export const useDialogStore = defineStore("dialogStore", () => {
   const isDelete = ref<Boolean>(false);

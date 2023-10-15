@@ -1,6 +1,7 @@
 export interface User {
   name: string | null;
   email: string | null;
+  roleId: number | null;
   loggedIn: boolean;
 }
 
@@ -14,13 +15,15 @@ export const useAuthStore = defineStore("authStore", () => {
   const user = ref<User>();
 
   function signIn(params: Login) {
-    return $apis.post("auth/signin", {
+    return $apis.post("auth/login", {
       ...params,
     });
   }
 
-  function signInGoogle() {
-    return $apis.get("auth/google");
+  function signInGoogle(idToken: string) {
+    return $apis.post("auth/login-google", {
+      idToken,
+    });
   }
 
   function setUserToLocalStorage() {
@@ -30,5 +33,12 @@ export const useAuthStore = defineStore("authStore", () => {
     }
   }
 
-  return { user, setUserToLocalStorage, signIn, signInGoogle };
+  function signOut() {
+    return new Promise((resolve, reject) => {
+      localStorage.removeItem("userLogin");
+      resolve();
+    });
+  }
+
+  return { user, setUserToLocalStorage, signIn, signInGoogle, signOut };
 });

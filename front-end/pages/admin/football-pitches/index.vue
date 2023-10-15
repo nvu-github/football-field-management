@@ -1,11 +1,6 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import {
-  useAppStore,
-  useFootballPitchStore,
-  useDialogStore,
-  footballPitchStatuses,
-} from "~/stores";
+import { useAppStore, useFootballPitchStore, useDialogStore } from "~/stores";
 
 const headers = [
   {
@@ -14,11 +9,17 @@ const headers = [
     sortable: false,
     key: "sno",
   },
-  { title: "Tên sân bóng", align: "start", key: "name" },
-  { title: "Mô tả", align: "start", key: "description" },
-  { title: "Loại sân", align: "start", key: "footballTypeName" },
-  { title: "Trạng thái", align: "start", key: "status" },
-  { title: "Tác vụ", align: "center", key: "actions", sortable: false },
+  { title: "Tên sân bóng", width: "30%", align: "start", key: "name" },
+  { title: "Mô tả", width: "25%", align: "start", key: "description" },
+  { title: "Loại sân", width: "15%", align: "start", key: "footballTypeName" },
+  { title: "Trạng thái", width: "15%", align: "center", key: "status" },
+  {
+    title: "Tác vụ",
+    width: "15%",
+    align: "center",
+    key: "actions",
+    sortable: false,
+  },
 ];
 const appStore = useAppStore();
 const footballPitchStore = useFootballPitchStore();
@@ -46,8 +47,8 @@ async function openDiaglogFooballField(type?: string, id?: string) {
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     id,
-    endpoint: `football-pitches/football-pitch/${id}`,
-    nameObject: "loại sân bóng",
+    endpoint: `football-pitches/${id}`,
+    nameObject: "sân bóng",
   });
 }
 
@@ -67,7 +68,7 @@ function getColorStatusFootballPitch(status: string) {
 footballPitchStore.getFootballPitches();
 </script>
 <template>
-  <div class="football-field-page">
+  <div class="football-pitch-page">
     <v-row class="row">
       <v-col md="12" class="column">
         <v-btn class="button -success" @click="openDiaglogFooballField">
@@ -84,13 +85,16 @@ footballPitchStore.getFootballPitches();
           <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
+          <template #[`item.description`]="{ item }">
+            <span v-html="item.raw.description"></span>
+          </template>
           <template #[`item.status`]="{ item }">
             <v-chip
               class="ma-2"
               :color="getColorStatusFootballPitch(item.raw.status)"
               text-color="white"
             >
-              {{ footballPitchStatuses[item.raw.status] }}
+              {{ footballPitchStore.getStatusFootballPitch(item.raw.status) }}
             </v-chip>
           </template>
           <template #[`item.actions`]="{ item }">
@@ -113,7 +117,7 @@ footballPitchStore.getFootballPitches();
   </div>
 </template>
 <style lang="scss" scoped>
-.football-field-page {
+.football-pitch-page {
   .row > .column {
     display: flex;
     justify-content: right;

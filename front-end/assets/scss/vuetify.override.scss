@@ -1,0 +1,17 @@
+.v-overlay > .v-overlay__content {
+  align-items: center;
+
+  > .v-list {
+    align-items: left;
+    width: 100%;
+  }
+}
+
+.v-overlay > .v-overlay__content > div {
+  overflow-y: scroll;
+  border-radius: 4px;
+
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}

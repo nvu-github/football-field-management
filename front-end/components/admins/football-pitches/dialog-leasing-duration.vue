@@ -43,38 +43,34 @@ function closeDialogLeasingDuration() {
 }
 
 async function addLeasingDuration() {
-  isLoading.value = true;
+  const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
   try {
+    isLoading.value = true;
     if (isValidTime()) {
       return $toast.error(`Khoảng thời gian thuê này đã tồn tại`);
     }
 
-    if (data.type === defaultTypeBtn) {
-      await leasingDurationStore.updateLeasingDuration(
-        data.id,
-        paramsLeasingDuration.value
-      );
-    } else {
-      await leasingDurationStore.createLeasingDuration(
-        paramsLeasingDuration.value
-      );
-    }
-    $toast.success(
-      `${
-        data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
-      } thời gian thuê thành công`
-    );
+    const action =
+      data.type === defaultTypeBtn
+        ? leasingDurationStore.updateLeasingDuration(
+            data.id,
+            paramsLeasingDuration.value
+          )
+        : leasingDurationStore.createLeasingDuration(
+            paramsLeasingDuration.value
+          );
+
+    await action;
+
+    $toast.success(`${message} thời gian thuê thành công`);
     await leasingDurationStore.getLeasingDurations();
   } catch (error) {
     console.log(error);
-    $toast.error(
-      `${
-        data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
-      } thời gian thuê thất bại`
-    );
+    $toast.error(`${message} thời gian thuê thất bại`);
+  } finally {
+    isLoading.value = false;
+    closeDialog();
   }
-  isLoading.value = false;
-  closeDialog();
 }
 
 function isValidTime() {

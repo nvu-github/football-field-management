@@ -10,6 +10,8 @@
     "start": "nuxt start"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^40.0.0",
+    "@ckeditor/ckeditor5-vue": "^5.1.0",
     "@mdi/font": "^7.2.96",
     "@pinia/nuxt": "^0.4.11",
     "@vuelidate/core": "^2.0.3",

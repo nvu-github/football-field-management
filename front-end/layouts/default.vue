@@ -1,3 +1,9 @@
+<script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { useAppStore } from "~/stores";
+const appStore = useAppStore();
+const { breadCrumbs } = storeToRefs(appStore);
+</script>
 <template>
   <v-app class="layout-default">
     <div class="layout-header">
@@ -7,6 +13,7 @@
       <users-layout-toolbar class="toolbar" />
     </div>
     <div class="main">
+      <v-breadcrumbs v-if="breadCrumbs" :items="breadCrumbs" />
       <slot />
     </div>
     <users-layout-footer class="footer" />
@@ -36,7 +43,6 @@
 }
 
 .main {
-  margin: 0 auto;
   padding: 10px 20px;
   max-width: 1200px;
   min-height: 500px;
@@ -44,7 +50,7 @@
 
 .footer {
   margin: 0 auto;
-  padding: 10px 20px;
+  padding: 10px 20px 5px;
   width: 100%;
   background-color: #a9ca31;
 }

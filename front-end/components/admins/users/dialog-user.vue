@@ -44,35 +44,39 @@ function closeDialogUserCreate() {
   closeDialog();
 }
 async function addAccount() {
-  isLoading.value = true;
+  const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
   try {
-    if (data.type === defaultTypeBtn) {
-      if (typeof accountCreate.value.roleId === "string") {
-        const roleId = roles.value.find(
-          (role) =>
-            role.name.toLowerCase() === accountCreate.value.roleId.toLowerCase()
-        )?.id;
-        accountCreate.value = { ...accountCreate.value, roleId };
-      }
+    isLoading.value = true;
+    const { type, id } = data;
+    const { roleId } = accountCreate.value;
 
-      await userStore.updateAccount(data.id, accountCreate.value);
-    } else {
-      await userStore.createAccount(accountCreate.value);
+    if (type === defaultTypeBtn && typeof roleId === "string") {
+      const foundRole = roles.value.find(
+        (role) => role.name.toLowerCase() === roleId.toLowerCase()
+      );
+
+      if (foundRole) {
+        accountCreate.value = { ...accountCreate.value, roleId: foundRole.id };
+      }
     }
+
+    const action =
+      type === defaultTypeBtn
+        ? userStore.updateAccount(id, accountCreate.value)
+        : userStore.createAccount(accountCreate.value);
+
+    await action;
+
+    $toast.success(`${message} tài khoản thành công`);
     await userStore.getAccounts();
-    $toast.success(
-      `${
-        data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"
-      } tài khoản thành công`
-    );
   } catch (error) {
-    $toast.error(
-      `${data.type === defaultTypeBtn ? "Cập nhật" : "Thêm"} tài khoản thất bại`
-    );
+    $toast.error(`${message} tài khoản thất bại`);
+  } finally {
+    isLoading.value = false;
+    closeDialog();
   }
-  isLoading.value = false;
-  closeDialog();
 }
+
 function setAccountToForm() {
   const { email, roleName }: any = account.value;
   accountCreate.value.email = email;

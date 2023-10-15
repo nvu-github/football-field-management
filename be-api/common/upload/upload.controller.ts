@@ -14,14 +14,17 @@ import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
 @ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
-  // @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post('')
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
       properties: {
+        type: {
+          type: 'string',
+        },
         files: {
           type: 'array',
           items: {
@@ -30,20 +33,18 @@ export class UploadController {
           },
         },
       },
-      required: ['files'],
+      required: ['type', 'files'],
     },
   })
   @UseInterceptors(FilesInterceptor('files', 100))
   async uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
-    return {
-      data: files.map((file) => ({
-        uri: `${file.destination.split('\\public\\')[1]}/${file.filename}`,
-      })),
-    };
+    return files.map((file) => ({
+      url: `${file.destination.split('\\public\\')[1]}/${file.filename}`,
+    }));
   }
 
-  // @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post('/single')
   @ApiConsumes('multipart/form-data')
   @ApiBody({

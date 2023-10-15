@@ -1,5 +1,30 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "~/stores";
+import { useRouter, useNuxtApp } from "nuxt/app";
+const router = useRouter();
+const { $toast }: any = useNuxtApp();
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const menu = ref(false);
+
+async function logout() {
+  try {
+    user.value = {
+      name: "",
+      email: "",
+      roleId: null,
+      loggedIn: false,
+    };
+    authStore.signOut();
+    $toast.success("Đăng xuất tài khoản thành công");
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    return router.push("/auth/login");
+  } catch (error) {
+    console.log(error);
+    $toast.error("Đăng xuất tài khoản thất bại");
+  }
+}
 </script>
 <template>
   <v-menu v-model="menu" :close-on-content-click="false">
@@ -22,8 +47,8 @@ const menu = ref(false);
       <v-list>
         <v-list-item
           prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
-          title="John Leider"
-          subtitle="Founder of Vuetify"
+          :title="user?.name"
+          :subtitle="user?.email"
         >
         </v-list-item>
       </v-list>
@@ -32,12 +57,15 @@ const menu = ref(false);
 
       <v-list>
         <v-list-item
+          to="/users/info"
           prepend-icon="mdi mdi-folder-account"
           title="Thông tin cá nhân"
+          link
         ></v-list-item>
         <v-list-item
           prepend-icon="mdi mdi-logout"
           title="Đăng xuất"
+          @click="logout"
         ></v-list-item>
       </v-list>
     </v-card>
