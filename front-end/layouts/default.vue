@@ -13,7 +13,7 @@ const { breadCrumbs } = storeToRefs(appStore);
       <users-layout-toolbar class="toolbar" />
     </div>
     <div class="main">
-      <v-breadcrumbs v-if="breadCrumbs" :items="breadCrumbs" />
+      <v-breadcrumbs v-if="breadCrumbs.length > 0" :items="breadCrumbs" />
       <slot />
     </div>
     <users-layout-footer class="footer" />

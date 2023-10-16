@@ -1,4 +1,10 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { useAppStore } from "~/stores";
+const appStore = useAppStore();
+const { breadCrumbs } = storeToRefs(appStore);
+breadCrumbs.value = [];
+</script>
 <template>
   <div class="home-page">
     <h1 class="h1">this is my home</h1>
