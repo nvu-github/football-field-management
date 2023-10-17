@@ -6,17 +6,20 @@ const { breadCrumbs } = storeToRefs(appStore);
 </script>
 <template>
   <v-app class="layout-default">
-    <!-- <div class="layout-header">
+    <div class="layout-header">
       <users-layout-header class="header" />
     </div>
     <div class="layout-toolbar">
       <users-layout-toolbar class="toolbar" />
-    </div> -->
+    </div>
     <div class="main">
-      <!-- <v-breadcrumbs v-if="breadCrumbs && breadCrumbs.length > 0" :items="breadCrumbs" /> -->
+      <v-breadcrumbs
+        v-if="breadCrumbs && breadCrumbs.length > 0"
+        :items="breadCrumbs"
+      />
       <slot />
     </div>
-    <!-- <users-layout-footer class="footer" /> -->
+    <users-layout-footer class="footer" />
   </v-app>
 </template>
 <style lang="scss" scoped>
@@ -43,13 +46,14 @@ const { breadCrumbs } = storeToRefs(appStore);
 }
 
 .main {
+  margin: 0 auto;
   padding: 10px 20px;
-  max-width: 1200px;
+  width: 1200px;
   min-height: 500px;
 }
 
 .footer {
-  margin: 0 auto;
+  margin: 30px 0 0 auto;
   padding: 10px 20px 5px;
   width: 100%;
   background-color: #a9ca31;

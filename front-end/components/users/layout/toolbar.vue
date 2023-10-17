@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { ref } from "vue";
+import { useRoute } from "nuxt/app";
 import logo from "~/public/logo.png";
+const route = useRoute();
 
 const menus = [
   {
@@ -23,7 +25,12 @@ const drawer = ref(false);
           <v-icon> mdi mdi-home </v-icon>
         </nuxt-link>
         <nuxt-link
-          class="navitem"
+          :class="[
+            'navitem',
+            {
+              '-active': route.path === menu.url,
+            },
+          ]"
           v-for="(menu, index) in menus"
           :key="index"
           :to="menu.url"
@@ -87,6 +94,9 @@ const drawer = ref(false);
       font-size: 25px;
     }
     &:hover {
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) inset;
+    }
+    &.-active {
       box-shadow: 0 0 10px rgba(0, 0, 0, 0.3) inset;
     }
   }

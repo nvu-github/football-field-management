@@ -9,6 +9,7 @@ import {
   useFootballPitchStore,
 } from "~/stores";
 import { formatPrice } from "~/utils/string";
+import { formattedLeasingDuration } from "~/utils/object";
 
 const rules = {
   footballPitch: (value: string) => !!value || "Vui lòng chọn sân bóng",
@@ -148,13 +149,6 @@ function setFootballPitchPriceToForm() {
   paramsFootballPitchPrice.value.footballPitchId = footballPitchName;
   paramsFootballPitchPrice.value.leasingDurationId = leasingDurationName;
   paramsFootballPitchPrice.value.price = price;
-}
-
-function formattedLeasingDuration(leasingDurationList: any) {
-  return leasingDurationList.map((leasingDuration: any) => ({
-    ...leasingDuration,
-    name: `${leasingDuration.startTime} - ${leasingDuration.endTime}`,
-  }));
 }
 
 leasingDurationStore.getLeasingDurations();
