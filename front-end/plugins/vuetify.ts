@@ -6,6 +6,7 @@ import { VAutocomplete } from "vuetify/components";
 import * as components from "vuetify/components";
 import * as directives from "vuetify/directives";
 
+import '@vuepic/vue-datepicker/dist/main.css'
 import "@/assets/scss/main.scss";
 
 export default defineNuxtPlugin((nuxtApp) => {

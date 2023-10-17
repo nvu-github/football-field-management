@@ -17,5 +17,14 @@ breadCrumbs.value = [
 ];
 </script>
 <template>
-  <h1>đặt sân</h1>
+  <div class="football-pitches-rental-page">
+    <!-- <h1>đặt sân</h1> -->
+    <v-row>
+      <v-col md="8"> <users-football-pitches-rental-form /> </v-col>
+      <v-col md="4"> 
+        <div class="title">
+          Title
+        </div> </v-col>
+    </v-row>
+  </div>
 </template>

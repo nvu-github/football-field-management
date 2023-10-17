@@ -19,7 +19,7 @@ export default defineNuxtConfig({
     dirs: ["stores", "utils"],
   },
   build: {
-    transpile: ["vuetify"],
+    transpile: ["vuetify", '@vuepic/vue-datepicker'],
   },
   runtimeConfig: {
     public: {

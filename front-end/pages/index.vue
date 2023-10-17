@@ -7,7 +7,27 @@ breadCrumbs.value = [];
 </script>
 <template>
   <div class="home-page">
-    <h1 class="h1">this is my home</h1>
+    <h1 class="h1 mb-3">this is my home</h1>
+    <v-row>
+        <v-col md="6">
+          <common-card-info />
+        </v-col>
+        <v-col md="6">
+          <common-card-info />
+        </v-col>
+        <v-col md="6">
+          <common-card-info />
+        </v-col>
+        <v-col md="6">
+          <common-card-info />
+        </v-col>
+        <v-col md="6">
+          <common-card-info />
+        </v-col>
+        <v-col md="6">
+          <common-card-info />
+        </v-col>
+    </v-row>
   </div>
 </template>
 <style lang="scss" scoped>
