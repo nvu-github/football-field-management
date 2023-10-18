@@ -9,4 +9,7 @@ export default () => ({
   },
   salt: process.env.SALT,
   whitelistOrigins: [],
+  stripe: {
+    secretKey: process.env.STRIPE_SECRET_KEY
+  }
 });

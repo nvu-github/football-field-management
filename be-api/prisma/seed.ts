@@ -11,6 +11,7 @@ async function main() {
     await prisma.staff.deleteMany({})
     await prisma.account.deleteMany({})
     await prisma.role.deleteMany({})
+    await prisma.accessoryType.deleteMany({})
 
     // Seed roles
     await prisma.role.createMany({
@@ -107,6 +108,18 @@ async function main() {
           teamName: 'Team B',
           phoneNumber: '7777777777',
           accountId: 5
+        },
+      ],
+    });
+
+    // Seed accessory type
+    await prisma.accessoryType.createMany({
+      data: [
+        {
+          name: 'Phụ kiện thuê',
+        },
+        {
+          name: 'Phụ kiện bán',
         },
       ],
     });
