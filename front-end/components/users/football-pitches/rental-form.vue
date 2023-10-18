@@ -57,7 +57,11 @@ leasingDurationStore.getLeasingDurations();
         item-title="name"
         variant="underlined"
         class="mt-2"
-        :items="formattedLeasingDuration(leasingDurations)"
+        :items="
+          paramFootballPitchRental.footballPitchId
+            ? formattedLeasingDuration(leasingDurations)
+            : []
+        "
       ></v-autocomplete>
       <v-textarea
         v-model="paramFootballPitchRental.note"
@@ -67,24 +71,21 @@ leasingDurationStore.getLeasingDurations();
         required
         rows="5"
       ></v-textarea>
-      <div class="action">
-        <v-btn class="button -success"> Đặt sân </v-btn>
-      </div>
     </v-form>
   </div>
 </template>
 <style lang="scss" scoped>
 .rental-form {
-  > .form {
-    display: flex;
-    flex-direction: column;
-  }
-  > .form > .action {
-    display: flex;
-    justify-content: center;
-  }
-  > .form > .action > .button {
-    width: 50%;
-  }
+  // > .form {
+  //   display: flex;
+  //   flex-direction: column;
+  // }
+  // > .form > .action {
+  //   display: flex;
+  //   justify-content: center;
+  // }
+  // > .form > .action > .button {
+  //   width: 50%;
+  // }
 }
 </style>

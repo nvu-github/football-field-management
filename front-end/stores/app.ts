@@ -58,7 +58,14 @@ export const useAppStore = defineStore("appStore", () => {
     return $apis.delete(endpoint);
   }
 
-  return { app, isShowSidebar, isLoading, breadCrumbs, uploadImages, deleteApi };
+  return {
+    app,
+    isShowSidebar,
+    isLoading,
+    breadCrumbs,
+    uploadImages,
+    deleteApi,
+  };
 });
 export const useDialogStore = defineStore("dialogStore", () => {
   const isDelete = ref<Boolean>(false);

@@ -53,7 +53,7 @@ const { breadCrumbs } = storeToRefs(appStore);
 }
 
 .footer {
-  margin: 30px 0 0 auto;
+  margin: 50px 0 0 auto;
   padding: 10px 20px 5px;
   width: 100%;
   background-color: #a9ca31;

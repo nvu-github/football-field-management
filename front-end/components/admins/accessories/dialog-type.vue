@@ -1,11 +1,7 @@
 <script lang="ts" setup>
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
-import {
-  useAccessoryTypeStore,
-  useAppStore,
-  useDialogStore,
-} from "~/stores";
+import { useAccessoryTypeStore, useAppStore, useDialogStore } from "~/stores";
 
 const rules = {
   name: (value: string) => !!value || "Vui lòng nhập tên loại phụ kiện",
@@ -15,7 +11,7 @@ const accessoryTypeStore = useAccessoryTypeStore();
 const appStore = useAppStore();
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
-const { AccessoryType } = storeToRefs(accessoryTypeStore);
+const { accessoryType } = storeToRefs(accessoryTypeStore);
 const { dialog, closeDialog } = useDialogStore();
 const { data }: any = dialog;
 const paramsAccessoryType = ref<paramsAccessoryType>({
@@ -51,11 +47,11 @@ async function addAccessoryType() {
       await action;
     }
 
-    $toast.success(`${message} loại sân bóng thành công`);
+    $toast.success(`${message} loại phụ kiện thành công`);
     await accessoryTypeStore.getAccessoryTypes();
   } catch (error) {
     console.log(error);
-    $toast.error(`${message} loại sân bóng thất bại`);
+    $toast.error(`${message} loại phụ kiện thất bại`);
   } finally {
     isLoading.value = false;
     closeDialog();
@@ -63,7 +59,7 @@ async function addAccessoryType() {
 }
 
 function setAccessoryTypeToForm() {
-  const { name }: any = AccessoryType.value;
+  const { name }: any = accessoryType.value;
   paramsAccessoryType.value.name = name;
 }
 </script>
@@ -78,7 +74,7 @@ function setAccessoryTypeToForm() {
           <span class="text-h5"
             >{{
               data && data.type === defaultTypeBtn ? "Cập nhật " : "Thêm "
-            }}loại sân bóng</span
+            }}loại phụ kiện</span
           >
         </v-card-title>
         <v-card-text>
