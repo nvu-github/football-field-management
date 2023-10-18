@@ -1,110 +1,127 @@
 <script lang="ts" setup>
+import { ref } from "vue";
 import { useNuxtApp, useRuntimeConfig } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import {
-  useFootballPitchStore,
-  useFootballPitchTypeStore,
+  useAccessoryStore,
+  useAccessoryTypeStore,
   useAppStore,
   useDialogStore,
-  footballPitchStatuses,
 } from "~/stores";
-import { generateId } from "~/utils/string";
+import { generateId, formatPrice } from "~/utils/string";
 
 const rules = {
   name: (value: string) => {
-    if (!value) return "Vui lòng nhập tên sân bóng!";
+    if (!value) return "Vui lòng thêm tên phụ kiện!";
     return true;
   },
-  status: (value: string) => {
-    if (!value) return "Vui lòng chọn trạng thái!";
+  amount: (value: number) => {
+    if (!value) return "Vui lòng thêm số lượng!";
+    if (Number(value) < 0) return "Vui lòng không nhập số âm!";
+    if (!Number.isInteger(Number(value))) return "Vui lòng chỉ nhập số nguyên!";
     return true;
   },
-  type: (value: string) => {
-    if (!value) return "Vui lòng chọn loại sân bóng!";
+  price: (value: number) => {
+    if (!value) return "Vui lòng thêm giá phụ kiện!";
+    if (Number(value) < 0) return "Vui lòng không nhập số âm!";
+    if (!Number.isFinite(Number(value))) return "Vui lòng chỉ nhập số!";
     return true;
   },
   images: (value: string) => {
-    if (!value) return "Vui lòng chọn ảnh sân bóng!";
+    if (!value) return "Vui lòng chọn ảnh phụ kiện!";
+    return true;
+  },
+  type: (value: string) => {
+    if (!value) return "Vui lòng chọn loại phụ kiện!";
     return true;
   },
 };
 const defaultTypeBtn = "update";
-const footballPitchStore = useFootballPitchStore();
-const footballPitchTypeStore = useFootballPitchTypeStore();
+const accessoryStore = useAccessoryStore();
+const accessoryTypeStore = useAccessoryTypeStore();
 const appStore = useAppStore();
 const runtimeConfig = useRuntimeConfig();
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
-const { footballPitch } = storeToRefs(footballPitchStore);
-const { footballPitchTypes } = storeToRefs(footballPitchTypeStore);
+const { accessory } = storeToRefs(accessoryStore);
+const { accessoryTypes } = storeToRefs(accessoryTypeStore);
 const { dialog, closeDialog } = useDialogStore();
 const { data }: any = dialog;
-const paramsFootballPitch = ref<ParamsFootballPitch>({
+const paramsAccessory = ref<ParamsAccessory>({
   name: "",
   description: "",
-  status: "",
+  amount: null,
+  price: null,
   images: [],
-  footballTypeId: "",
+  accessoryTypeId: null,
 });
+
 const imagePreviews = ref<ImagePreview[]>([]);
+const formattedPrice = computed({
+  get: () => {
+    if (paramsAccessory.value.price) {
+      return formatPrice(paramsAccessory.value.price);
+    }
+    return null;
+  },
+  set: (value) => {
+    if (value) {
+      paramsAccessory.value.price = parseInt(
+        value.replace(/\./g, ""),
+        10
+      );
+    }
+  },
+});
 
 onBeforeMount(async () => {
   if (data.type === defaultTypeBtn) {
-    await footballPitchStore.getFootballPitch(data.id);
-    setFootballPitchToForm();
+    await accessoryStore.getAccessory(data.id);
+    setAccessoryToForm();
   }
 });
 
-function closeDialogFootballPitch() {
+function closeDialogAccessory() {
   closeDialog();
 }
 
-async function addFootballPitch() {
+async function addAccessory() {
   const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
   try {
     isLoading.value = true;
 
     const images = await uploadFile();
 
-    let paramsFootballPitchFormatted = {
-      ...paramsFootballPitch.value,
+    let paramsAccessoryFormatted = {
+      ...paramsAccessory.value,
       images: images.data,
     };
-    const { footballTypeId, status } = paramsFootballPitch.value;
+    const { accessoryTypeId } = paramsAccessory.value;
 
     if (data.type === defaultTypeBtn) {
-      const foundFootballType = footballPitchTypes.value.find(
+      const foundAccessoryType = accessoryTypes.value.find(
         (type) =>
-          type.name.toLowerCase() === footballTypeId.toString().toLowerCase()
+          type.name.toLowerCase() === accessoryTypeId.toString().toLowerCase()
       )?.id;
-      const foundFootballStatus = footballPitchStatuses.find(
-        (fooballStatus: any) => {
-          return fooballStatus.name.toLowerCase() === status.toLowerCase();
-        }
-      )?.key;
 
-      paramsFootballPitchFormatted = {
-        ...paramsFootballPitchFormatted,
-        status: foundFootballStatus || status,
-        footballTypeId: foundFootballType || footballTypeId,
+      paramsAccessoryFormatted = {
+        ...paramsAccessoryFormatted,
+        accessoryTypeId: foundAccessoryType || accessoryTypeId,
       };
     }
 
     const action =
       data.type === defaultTypeBtn
-        ? footballPitchStore.updateFootballPitch(
-            data.id,
-            paramsFootballPitchFormatted
-          )
-        : footballPitchStore.createFootballPitch(paramsFootballPitchFormatted);
+        ? accessoryStore.updateAccessory(data.id, paramsAccessoryFormatted)
+        : accessoryStore.createAccessory(paramsAccessoryFormatted);
 
     await action;
 
-    $toast.success(`${message} sân bóng thành công`);
-    await footballPitchStore.getFootballPitches();
+    $toast.success(`${message} phụ kiện thành công`);
+    await accessoryStore.getAccessories();
   } catch (error) {
     console.log(error);
-    $toast.error(`${message} sân bóng thất bại`);
+    $toast.error(`${message} phụ kiện thất bại`);
   } finally {
     isLoading.value = false;
     closeDialog();
@@ -124,7 +141,7 @@ async function getFileInput(e: any) {
 
 function deleteImage(id: string) {
   if (typeof id === "number") {
-    footballPitchStore.deleteImage(id);
+    accessoryStore.deleteImage(id);
   }
   imagePreviews.value = imagePreviews.value.filter(
     (image: any) => image.id !== id
@@ -133,7 +150,7 @@ function deleteImage(id: string) {
 
 async function uploadFile() {
   const formData = new FormData();
-  formData.append("type", "football-pitches");
+  formData.append("type", "accessories");
   imagePreviews.value.forEach((image) => {
     if (typeof image.id !== "number") {
       formData.append(`files`, image.file);
@@ -142,42 +159,39 @@ async function uploadFile() {
   return await appStore.uploadImages(formData);
 }
 
-function setFootballPitchToForm() {
-  const { name, description, status, images, footballTypeName }: any =
-    footballPitch.value;
-  paramsFootballPitch.value.name = name;
-  paramsFootballPitch.value.description = description || "";
-  paramsFootballPitch.value.footballTypeId = footballTypeName;
-  paramsFootballPitch.value.status =
-    footballPitchStore.getStatusFootballPitch(status);
+function setAccessoryToForm() {
+  const { name, description, images, amount, price, accessoryName }: any =
+    accessory.value;
+  paramsAccessory.value.name = name;
+  paramsAccessory.value.description = description || "";
+  paramsAccessory.value.accessoryTypeId = accessoryName;
+  paramsAccessory.value.amount = amount;
+  paramsAccessory.value.price = price;
   imagePreviews.value = images.map((image: any) => ({
     ...image,
     url: `${runtimeConfig.public.API_URL}public/${image.url}`,
   }));
 }
 
-footballPitchTypeStore.getFootballPitchTypes();
+accessoryTypeStore.getAccessoryTypes();
 </script>
 <template>
-  <div class="dialog-football-pitch-create">
-    <v-form
-      v-model="paramsFootballPitch.value"
-      @submit.prevent="addFootballPitch"
-    >
+  <div class="dialog-accessory-create">
+    <v-form v-model="paramsAccessory.value" @submit.prevent="addAccessory">
       <v-card>
         <v-card-title>
           <span class="text-h5"
             >{{
               data && data.type === defaultTypeBtn ? "Cập nhật " : "Thêm "
-            }}sân bóng</span
+            }}phụ kiện</span
           >
         </v-card-title>
         <v-card-text>
           <v-row>
             <v-col cols="12">
               <v-text-field
-                v-model.trim="paramsFootballPitch.name"
-                label="Tên sân bóng*"
+                v-model.trim="paramsAccessory.name"
+                label="Tên phụ kiện*"
                 type="text"
                 variant="underlined"
                 :rules="[rules.name]"
@@ -185,34 +199,47 @@ footballPitchTypeStore.getFootballPitchTypes();
               ></v-text-field>
               <common-text-editor
                 class="mt-2 mb-3"
-                v-model="paramsFootballPitch.description"
+                v-model="paramsAccessory.description"
                 placeholder="Mô tả"
               ></common-text-editor>
+              <v-row>
+                <v-col md="6">
+                  <v-text-field
+                    v-model.trim="paramsAccessory.amount"
+                    label="Số lượng*"
+                    type="number"
+                    variant="underlined"
+                    :rules="[rules.amount]"
+                    required
+                  ></v-text-field>
+                </v-col>
+                <v-col md="6">
+                  <v-text-field
+                    v-model.trim="formattedPrice"
+                    label="Giá phụ kiện (VNĐ)*"
+                    type="text"
+                    variant="underlined"
+                    :rules="[rules.price]"
+                    required
+                  ></v-text-field>
+                </v-col>
+              </v-row>
               <v-autocomplete
-                v-model="paramsFootballPitch.status"
-                label="Trạng thái*"
-                item-value="key"
-                item-title="name"
-                :rules="[rules.status]"
-                :items="footballPitchStatuses"
-                variant="underlined"
-              ></v-autocomplete>
-              <v-autocomplete
-                v-model="paramsFootballPitch.footballTypeId"
-                label="Loại sân bóng*"
+                v-model="paramsAccessory.accessoryTypeId"
+                label="Loại phụ kiện*"
                 item-value="id"
                 item-title="name"
                 :rules="[rules.type]"
-                :items="footballPitchTypes"
+                :items="accessoryTypes"
                 variant="underlined"
               ></v-autocomplete>
               <v-file-input
-                v-model="paramsFootballPitch.images"
+                v-model="paramsAccessory.images"
                 accept="image/*"
                 type="file"
                 prepend-icon="mdi-camera"
                 variant="underlined"
-                label="Ảnh sân bóng"
+                label="Ảnh phụ kiện"
                 multiple
                 @change="getFileInput"
               ></v-file-input>
@@ -235,7 +262,7 @@ footballPitchTypeStore.getFootballPitchTypes();
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="button -default" @click="closeDialogFootballPitch">
+          <v-btn class="button -default" @click="closeDialogAccessory">
             Đóng
           </v-btn>
           <v-btn
@@ -243,7 +270,7 @@ footballPitchTypeStore.getFootballPitchTypes();
             class="button -primary"
             type="submit"
             :loading="isLoading"
-            :disabled="!paramsFootballPitch.value"
+            :disabled="!paramsAccessory.value"
           >
             Lưu
           </v-btn>
@@ -252,7 +279,7 @@ footballPitchTypeStore.getFootballPitchTypes();
             class="button -primary"
             type="submit"
             :loading="isLoading"
-            :disabled="!paramsFootballPitch.value"
+            :disabled="!paramsAccessory.value"
           >
             Cập nhật
           </v-btn>
@@ -262,7 +289,7 @@ footballPitchTypeStore.getFootballPitchTypes();
   </div>
 </template>
 <style lang="scss" scoped>
-.dialog-football-pitch-create {
+.dialog-accessory-create {
   width: 700px;
 
   :deep(.v-card) {

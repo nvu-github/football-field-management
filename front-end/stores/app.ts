@@ -30,6 +30,12 @@ export interface Dialog {
   content: DialogContent;
 }
 
+export interface ImagePreview {
+  id: number;
+  file: any;
+  url: string;
+}
+
 export const useAppStore = defineStore("appStore", () => {
   const { $apis }: any = useNuxtApp();
   const app = reactive<App>({
@@ -39,11 +45,20 @@ export const useAppStore = defineStore("appStore", () => {
   const isLoading = ref<boolean>(false);
   const breadCrumbs = ref<BreadCrumb>();
 
+  function uploadImages(formData: FormData) {
+    return $apis.post("upload", formData, {
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+
   function deleteApi(endpoint: string) {
     return $apis.delete(endpoint);
   }
 
-  return { app, isShowSidebar, isLoading, breadCrumbs, deleteApi };
+  return { app, isShowSidebar, isLoading, breadCrumbs, uploadImages, deleteApi };
 });
 export const useDialogStore = defineStore("dialogStore", () => {
   const isDelete = ref<Boolean>(false);

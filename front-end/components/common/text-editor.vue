@@ -28,7 +28,7 @@ const vModel = computed({
 </script>
 
 <template>
-  <div class="field">
+  <div class="ck-editor">
     <CKEditor.component
       v-model="vModel"
       :editor="ClassicEditor"
@@ -37,3 +37,16 @@ const vModel = computed({
     />
   </div>
 </template>
+<style lang="scss" scoped>
+.ck-editor {
+  :deep(.ck.ck-toolbar) {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+  :deep(.ck-rounded-corners) {
+    border-left: none;
+    border-right: none;
+  }
+}
+</style>

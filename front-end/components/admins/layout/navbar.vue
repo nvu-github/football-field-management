@@ -61,6 +61,24 @@ const menus = ref<Menu>([
     ],
     roleId: 1,
   },
+  {
+    icon: "mdi mdi-cog",
+    title: "Quản lý phụ kiện",
+    url: "/admin/accessories",
+    subMenus: [
+      { 
+        icon: "mdi mdi-receipt-text-edit-outline",
+        title: "Loại phụ kiện",
+        url: "/admin/accessories/types",
+      },
+      {
+        icon: "mdi mdi-briefcase-edit-outline",
+        title: "Phụ kiện",
+        url: "/admin/accessories",
+      },
+    ],
+    roleId: 1,
+  },
 ]);
 function closeNavbar() {
   // drawer.value = false;
