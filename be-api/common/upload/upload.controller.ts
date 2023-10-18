@@ -39,7 +39,7 @@ export class UploadController {
   @UseInterceptors(FilesInterceptor('files', 100))
   async uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
     return files.map((file) => ({
-      url: `${file.destination.split('\\public\\')[1]}/${file.filename}`,
+      url: `${file.destination.split('/public/')[1]}/${file.filename}`,
     }));
   }
 

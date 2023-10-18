@@ -37,12 +37,6 @@ export interface FootballPitchPrice {
   price: number;
 }
 
-export interface ImagePreview {
-  id: number;
-  file: any;
-  url: string;
-}
-
 export interface FootballPitchRental {
   id: number;
   customerId?: number;
@@ -84,15 +78,6 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     });
   }
 
-  function uploadImages(formData: FormData) {
-    return $apis.post("upload", formData, {
-      headers: {
-        Accept: "*/*",
-        "Content-Type": "multipart/form-data",
-      },
-    });
-  }
-
   function deleteImage(id: number) {
     return $apis.delete(`football-pitches/images/${id}`);
   }
@@ -130,7 +115,6 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     footballPitchRentals,
     createFootballPitch,
     updateFootballPitch,
-    uploadImages,
     getFootballPitches,
     getFootballPitch,
     getStatusFootballPitch,

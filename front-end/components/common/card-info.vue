@@ -81,7 +81,7 @@
   }
   > .action {
     display: flex;
-    justify-content: end;
+    justify-content: flex-end;
   }
   > .action > .button {
     padding: 0;
