@@ -27,14 +27,14 @@ watch(isDelete, async () => {
   isDelete.value = false;
 });
 
-async function openDiaglogUser(type?: string, id?: string) {
-  await dialogStore.showDialog(resolveComponent("admins-users-dialog-user"), {
+async function openDialogUser(type?: string, id?: string) {
+  await dialogStore.showDialog(resolveComponent("admin-user-dialog-user"), {
     type: type,
     id,
   });
 }
 
-function openDiaglogConfirm(id: string, type: string) {
+function openDialogConfirm(id: string, type: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     id,
     type,
@@ -63,7 +63,7 @@ userStore.getAccounts();
   <div class="user-page">
     <v-row class="row">
       <v-col md="12" class="column">
-        <v-btn class="button -success" @click="openDiaglogUser">
+        <v-btn class="button -success" @click="openDialogUser">
           Thêm tài khoản
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
@@ -91,20 +91,20 @@ userStore.getAccounts();
           <template #[`item.actions`]="{ item }">
             <v-btn
               class="button -warning"
-              @click="openDiaglogUser('update', item.raw.id)"
+              @click="openDialogUser('update', item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
             </v-btn>
             <v-btn
               class="button -success"
               :disabled="item.raw.status !== 'PENDING'"
-              @click="openDiaglogConfirm(item.raw.id, 'confirm')"
+              @click="openDialogConfirm(item.raw.id, 'confirm')"
             >
               <v-icon> mdi mdi-check-bold </v-icon>
             </v-btn>
             <v-btn
               class="button -danger"
-              @click="openDiaglogConfirm(item.raw.id)"
+              @click="openDialogConfirm(item.raw.id)"
             >
               <v-icon> mdi-delete </v-icon>
             </v-btn>

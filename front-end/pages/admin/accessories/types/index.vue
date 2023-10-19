@@ -31,7 +31,7 @@ watch(isDelete, async () => {
 
 async function openDialogAccessoryType(type?: string, id?: string) {
   await dialogStore.showDialog(
-    resolveComponent("admins-accessories-dialog-type"),
+    resolveComponent("admin-accessory-dialog-type"),
     {
       type: type,
       id,

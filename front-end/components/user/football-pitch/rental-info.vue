@@ -1,5 +1,5 @@
-import { error } from 'console';
 <script lang="ts" setup>
+import { resolveComponent } from 'vue';
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import { useCustomerStore, useAccessoryStore, useDialogStore } from "~/stores";
@@ -89,7 +89,7 @@ async function getAccessoryDetail(id: string) {
   }
 
   await dialogStore.showDialog(
-    resolveComponent("users-accessories-dialog-detail"),
+    resolveComponent("user-accessory-dialog-detail"),
     {
       id: accessoryFound.accessoriesId,
     }
@@ -204,11 +204,11 @@ accessoryStore.getAccessories();
 }
 .table {
   :deep(.v-field) {
-    height: 42px;
+    height: 35px;
     font-size: 15px;
   }
   :deep(.v-field) > .v-field__field > .v-field__input {
-    padding: 10px 10px;
+    padding: 6px 10px;
     min-height: 0;
   }
   :deep(.v-field) > .v-field__append-inner {

@@ -36,7 +36,7 @@ watch(isDelete, async () => {
 
 async function openDiaglogFooballField(type?: string, id?: string) {
   await dialogStore.showDialog(
-    resolveComponent("admins-football-pitches-dialog-football-pitch"),
+    resolveComponent("admins-football-pitch-dialog-football-pitch"),
     {
       type: type,
       id,

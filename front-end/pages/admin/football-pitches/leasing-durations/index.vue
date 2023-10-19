@@ -28,7 +28,7 @@ watch(isDelete, async () => {
 
 async function openDiaglogLeasingDuration(type?: string, id?: string) {
   await dialogStore.showDialog(
-    resolveComponent("admins-football-pitches-dialog-leasing-duration"),
+    resolveComponent("admin-football-pitch-dialog-leasing-duration"),
     {
       type: type,
       id,

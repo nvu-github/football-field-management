@@ -21,10 +21,10 @@ breadCrumbs.value = [
   <div class="football-pitches-rental-page">
     <v-row class="row">
       <v-col :md="4" class="form">
-        <users-football-pitches-rental-form />
+        <user-football-pitch-rental-form />
       </v-col>
       <v-col md="7" class="info">
-        <users-football-pitches-rental-info />
+        <user-football-pitch-rental-info />
       </v-col>
       <div class="action">
         <v-btn class="button -success"> Đặt sân </v-btn>
