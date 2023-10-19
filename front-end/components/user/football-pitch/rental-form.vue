@@ -3,7 +3,7 @@ import { storeToRefs } from "pinia";
 import {
   useCustomerStore,
   useFootballPitchStore,
-  useLeasingDurationStore,
+  useFootballPitchPriceStore,
 } from "~/stores";
 import { formattedLeasingDuration } from "~/utils/object";
 const rules = {
@@ -16,12 +16,22 @@ const rules = {
 };
 const customerStore = useCustomerStore();
 const footballPitchStore = useFootballPitchStore();
-const leasingDurationStore = useLeasingDurationStore();
-const { leasingDurations } = storeToRefs(leasingDurationStore);
+const footballPitchPriceStore = useFootballPitchPriceStore();
+const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
 const { footballPitches } = storeToRefs(footballPitchStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
+const leasingDurationFound = ref<any>([]);
+watchEffect(async () => {
+  const { footballPitchId } = paramFootballPitchRental.value;
 
-const date = ref();
+  if (footballPitchId) {
+    await footballPitchPriceStore.getFootballPitchPrices();
+    leasingDurationFound.value = footballPitchPrices.value.filter(
+      (leasingDuration) => leasingDuration.footballPitchId === footballPitchId
+    );
+  }
+});
+
 const format = (date: any): string => {
   const day = date.getDate();
   const month = date.getMonth() + 1;
@@ -30,48 +40,43 @@ const format = (date: any): string => {
   return `${day}/${month}/${year}`;
 };
 footballPitchStore.getFootballPitches();
-leasingDurationStore.getLeasingDurations();
 </script>
 <template>
   <div class="rental-form">
-    <v-form class="form">
-      <v-autocomplete
-        v-model="paramFootballPitchRental.footballPitchId"
-        label="Chọn sân bóng*"
-        item-value="id"
-        item-title="name"
-        variant="underlined"
-        :rules="[rules.footballPitch]"
-        :items="footballPitches"
-      ></v-autocomplete>
-      <common-date-picker
-        v-model="paramFootballPitchRental.dateRental"
-        :format="format"
-        message-error="Vui lòng chọn thời than thuê"
-        placeholder="Chọn thời gian thuê"
-      />
-      <v-autocomplete
-        v-model="paramFootballPitchRental.leasingDurationId"
-        label="Chọn khung giờ*"
-        item-value="id"
-        item-title="name"
-        variant="underlined"
-        class="mt-2"
-        :items="
-          paramFootballPitchRental.footballPitchId
-            ? formattedLeasingDuration(leasingDurations)
-            : []
-        "
-      ></v-autocomplete>
-      <v-textarea
-        v-model="paramFootballPitchRental.note"
-        label="Ghi chú"
-        type="text"
-        variant="underlined"
-        required
-        rows="5"
-      ></v-textarea>
-    </v-form>
+    <v-autocomplete
+      v-model="paramFootballPitchRental.footballPitchId"
+      label="Chọn sân bóng*"
+      item-value="id"
+      item-title="name"
+      variant="underlined"
+      :rules="[rules.footballPitch]"
+      :items="footballPitches"
+    ></v-autocomplete>
+    <common-date-picker
+      v-model="paramFootballPitchRental.dateRental"
+      :format="format"
+      message-error="Vui lòng chọn thời than thuê"
+      placeholder="Chọn thời gian thuê"
+    />
+    <v-autocomplete
+      v-model="paramFootballPitchRental.leasingDurationId"
+      label="Chọn khung giờ*"
+      item-value="leasingDurationId"
+      item-title="leasingDurationName"
+      variant="underlined"
+      class="mt-2"
+      :items="
+        paramFootballPitchRental.footballPitchId ? leasingDurationFound : []
+      "
+    ></v-autocomplete>
+    <v-textarea
+      v-model="paramFootballPitchRental.note"
+      label="Ghi chú"
+      type="text"
+      variant="underlined"
+      required
+      rows="5"
+    ></v-textarea>
   </div>
 </template>
 <style lang="scss" scoped>

@@ -16,7 +16,14 @@ import { FootballPitchesModule } from '@app/football-pitches/football-pitches.mo
 import { AccessoriesModule } from './apps/accessories/accessories.module';
 
 @Module({
-  imports: [AuthModule, UploadModule, PaymentModule, UsersModule, FootballPitchesModule, AccessoriesModule],
+  imports: [
+    AuthModule,
+    UploadModule,
+    PaymentModule,
+    UsersModule,
+    FootballPitchesModule,
+    AccessoriesModule,
+  ],
   controllers: [AppController],
   providers: [
     AppService,

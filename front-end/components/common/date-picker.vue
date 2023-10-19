@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { isBefore, format } from "date-fns";
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
@@ -32,9 +33,17 @@ const vModel = computed({
 });
 
 const isValid = ref<boolean>(false);
+const messageBefore = ref<string>("");
 
 watch(vModel, function (newVal) {
   if (newVal) isValid.value = false;
+  const isBeforeDate = isBefore(
+    new Date(format(new Date(newVal), "dd/MM/yyyy")),
+    new Date()
+  );
+
+  if (isBeforeDate)
+    messageBefore.value = "Thời gian bạn chọn phải sau ngày hiện tại!";
 });
 
 function validDate() {
@@ -54,7 +63,7 @@ function validDate() {
       @blur="validDate"
     />
     <span v-if="isValid && messageError" class="message"
-      >{{ messageError }}
+      >{{ messageError || messageBefore }} {{ messageBefore }}
     </span>
   </div>
 </template>

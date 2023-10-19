@@ -98,7 +98,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     footballPitch.value = footballPitchSingle.data;
   }
 
-  async function getFootballPitchRental() {
+  async function getFootballPitchRentals() {
     const footballPitchRentalList = await $apis.get(`football-pitches/rentals`);
     footballPitchRentals.value = footballPitchRentalList.data;
   }
@@ -119,7 +119,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     getFootballPitch,
     getStatusFootballPitch,
     deleteImage,
-    getFootballPitchRental,
+    getFootballPitchRentals,
   };
 });
 

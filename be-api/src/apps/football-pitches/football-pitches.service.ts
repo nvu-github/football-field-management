@@ -398,7 +398,7 @@ export class FootballPitchesService {
     };
   }
 
-  async getFootballPitchRental(): Promise<IFootballPitchRenal[]> {
+  async getFootballPitchRentals(): Promise<IFootballPitchRenal[]> {
     const footballPitchRentals =
       await this.prisma.customerFootballPitchRental.findMany({
         select: {
@@ -468,5 +468,79 @@ export class FootballPitchesService {
         price,
       };
     });
+  }
+
+  async getFootballPitchRentalInfo(
+    fooballPitchId: number,
+  ): Promise<IFootballPitchRenal> {
+    const footballPitchRental = await this.prisma.footballPitch.findFirst({
+      where: {
+        id: fooballPitchId,
+      },
+      select: {
+        id: true,
+        note: true,
+        status: true,
+        rentalDate: true,
+        customer: {
+          select: {
+            name: true,
+            teamName: true,
+          },
+        },
+        footballPitchLeasingDuration: {
+          select: {
+            id: true,
+            price: true,
+            footballPitch: {
+              select: {
+                name: true,
+              },
+            },
+            leasingDuration: {
+              select: {
+                startTime: true,
+                endTime: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (footballPitchRental) {
+      const {
+        id,
+        note,
+        status,
+        rentalDate,
+        customer,
+        footballPitchLeasingDuration,
+      } = footballPitchRental;
+
+      const customerName = customer.name || '';
+      const startTime =
+        footballPitchLeasingDuration.leasingDuration.startTime || '';
+      const endTime =
+        footballPitchLeasingDuration.leasingDuration.endTime || '';
+      const footballPitchName =
+        footballPitchLeasingDuration.footballPitch.name || '';
+      const price = Number(footballPitchLeasingDuration.price) || 0;
+
+      return {
+        id,
+        footballPitchLeasingDurationId,
+        customerId,
+        note,
+        status,
+        rentalDate,
+        customerName,
+        startTime,
+        endTime,
+        footballPitchName,
+        price,
+      };
+    }
+    return null;
   }
 }

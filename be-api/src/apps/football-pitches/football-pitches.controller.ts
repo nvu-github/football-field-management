@@ -32,11 +32,11 @@ export class FootballPitchesController {
     private readonly uploadService: UploadService,
   ) {}
 
-  @Get('rentals')
+  @Get('rental')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getFootballPitchRenal(): Promise<any> {
-    return await this.footballPitchService.getFootballPitchRental();
+  async getFootballPitchRenals(): Promise<any> {
+    return await this.footballPitchService.getFootballPitchRentals();
   }
 
   @Post('types')

@@ -1,9 +1,18 @@
 <script lang="ts" setup>
-import { resolveComponent } from 'vue';
+import { format } from "date-fns";
+import { resolveComponent } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
-import { useCustomerStore, useAccessoryStore, useDialogStore } from "~/stores";
+import {
+  useCustomerStore,
+  useAccessoryStore,
+  useDialogStore,
+  useFootballPitchStore,
+  useFootballPitchPriceStore,
+  useAuthStore,
+} from "~/stores";
 import { generateId } from "~/utils/string";
+import { formatPrice } from "~/utils/string";
 
 const rules = {
   accessoryId: (value: number) => {
@@ -57,9 +66,35 @@ const headers = [
 const { $toast } = useNuxtApp();
 const customerStore = useCustomerStore();
 const accessoryStore = useAccessoryStore();
+const footballPitchStore = useFootballPitchStore();
+const footballPitchPriceStore = useFootballPitchPriceStore();
+const authStore = useAuthStore();
+const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
+const { footballPitch } = storeToRefs(footballPitchStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
 const { accessories } = storeToRefs(accessoryStore);
+const { user } = storeToRefs(authStore);
 const dialogStore = useDialogStore();
+let footballPitchPriceFound = {};
+
+watchEffect(async () => {
+  const { footballPitchId, leasingDurationId } = paramFootballPitchRental.value;
+  if (footballPitchId) {
+    await footballPitchStore.getFootballPitch(
+      paramFootballPitchRental.value.footballPitchId
+    );
+  }
+
+  if (leasingDurationId) {
+    await footballPitchPriceStore.getFootballPitchPrices();
+    console.log(footballPitchPrices.value);
+    footballPitchPriceFound = footballPitchPrices.value.find(
+      (footballPitchPrice) =>
+        footballPitchPrice.id === leasingDurationId &&
+        footballPitchPrice.footballPitchId === footballPitchId
+    );
+  }
+});
 
 function addAccessoryRental() {
   const accessory = {
@@ -103,13 +138,47 @@ accessoryStore.getAccessories();
     <div class="title">Thông tin đặt sân</div>
     <div class="content">
       <div class="fooballpitch">
-        <p class="name field"><b class="label">Tên sân bóng:</b></p>
-        <p class="description field"><b class="label">Mô tả:</b></p>
-        <p class="duration field"><b class="label">Khung giờ thuê:</b></p>
-        <p class="date field"><b class="label">Ngày thuê:</b></p>
-        <p class="price field"><b class="label">Giá thuê:</b></p>
+        <p class="name field">
+          <b class="label">Tên sân bóng:</b>
+          {{ footballPitch ? footballPitch.name : "" }}
+        </p>
+        <p class="description field">
+          <b class="label">Mô tả: </b>
+          <span
+            class="ml-2"
+            v-if="footballPitch"
+            v-html="footballPitch.description"
+          />
+        </p>
+        <p class="duration field">
+          <b class="label">Khung giờ thuê: </b
+          >{{
+            footballPitchPriceFound.leasingDurationName
+              ? footballPitchPriceFound.leasingDurationName
+              : ""
+          }}
+        </p>
+        <p class="date field">
+          <b class="label">Ngày thuê: </b>
+          {{
+            paramFootballPitchRental.dateRental
+              ? format(
+                  new Date(paramFootballPitchRental.dateRental),
+                  "dd/MM/yyyy"
+                )
+              : ""
+          }}
+        </p>
+        <p class="price field">
+          <b class="label">Giá thuê: </b
+          >{{
+            footballPitchPriceFound.price
+              ? `${formatPrice(footballPitchPriceFound.price)} VNĐ`
+              : ""
+          }}
+        </p>
         <p class="customername field">
-          <b class="label">Tên khách hàng:</b>
+          <b class="label">Tên khách hàng: </b>{{ user.name }}
         </p>
       </div>
       <div class="accessory-rental">
@@ -183,6 +252,17 @@ accessoryStore.getAccessories();
     text-align: center;
     font-size: 20px;
     font-weight: bold;
+  }
+  > .content > .fooballpitch > .description {
+    display: flex;
+  }
+  > .content > .fooballpitch > .price {
+    color: rgb(209, 32, 32);
+    font-weight: bold;
+  }
+  > .content > .fooballpitch > .price > .label {
+    color: #000;
+    font-weight: 600;
   }
   > .content > .fooballpitch > .field {
     margin-top: 10px;
