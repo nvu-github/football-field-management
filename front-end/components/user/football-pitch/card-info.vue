@@ -1,4 +1,23 @@
-<script lang="ts" setup></script>
+<script lang="ts" setup>
+const props = defineProps({
+  name: {
+    type: String,
+    required: true,
+  },
+  durationTime: {
+    type: String,
+    required: true,
+  },
+  dateRental: {
+    type: String,
+    required: true,
+  },
+  avatar: {
+    type: String,
+    required: true,
+  }
+})
+</script>
 <template>
   <v-card class="card-info">
     <v-img

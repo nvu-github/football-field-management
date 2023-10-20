@@ -5,7 +5,7 @@ import {
   useFootballPitchStore,
   useFootballPitchPriceStore,
 } from "~/stores";
-import { formattedLeasingDuration } from "~/utils/object";
+
 const rules = {
   footballPitch: (value: number) => {
     if (!value) return "Vui lòng chọn thông tin sân bóng";
@@ -14,6 +14,7 @@ const rules = {
     if (!value) return "Vui lòng chọn thông tin khung giờ";
   },
 };
+
 const customerStore = useCustomerStore();
 const footballPitchStore = useFootballPitchStore();
 const footballPitchPriceStore = useFootballPitchPriceStore();
@@ -21,6 +22,7 @@ const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
 const { footballPitches } = storeToRefs(footballPitchStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
 const leasingDurationFound = ref<any>([]);
+
 watchEffect(async () => {
   const { footballPitchId } = paramFootballPitchRental.value;
 

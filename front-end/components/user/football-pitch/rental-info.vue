@@ -11,8 +11,8 @@ import {
   useFootballPitchPriceStore,
   useAuthStore,
 } from "~/stores";
-import { generateId } from "~/utils/string";
-import { formatPrice } from "~/utils/string";
+import { generateId, formatPrice } from "~/utils/string";
+import { convertProxyObjToObj } from "~/utils/object";
 
 const rules = {
   accessoryId: (value: number) => {
@@ -35,14 +35,14 @@ const headers = [
   },
   {
     title: "Tên phụ kiện",
-    width: "26%",
+    width: "23%",
     align: "start",
     sortable: false,
     key: "accessory",
   },
   {
     title: "Giá thuê",
-    width: "15%",
+    width: "20%",
     sortable: false,
     align: "start",
     key: "price",
@@ -75,7 +75,9 @@ const { paramFootballPitchRental } = storeToRefs(customerStore);
 const { accessories } = storeToRefs(accessoryStore);
 const { user } = storeToRefs(authStore);
 const dialogStore = useDialogStore();
-let footballPitchPriceFound = {};
+const footballPitchPriceFound = ref<Object>({});
+const priceAccessories = ref<any>({});
+const formattedAccessories = ref<any>([]);
 
 watchEffect(async () => {
   const { footballPitchId, leasingDurationId } = paramFootballPitchRental.value;
@@ -87,19 +89,45 @@ watchEffect(async () => {
 
   if (leasingDurationId) {
     await footballPitchPriceStore.getFootballPitchPrices();
-    console.log(footballPitchPrices.value);
-    footballPitchPriceFound = footballPitchPrices.value.find(
+    footballPitchPriceFound.value = footballPitchPrices.value.find(
       (footballPitchPrice) =>
-        footballPitchPrice.id === leasingDurationId &&
+        footballPitchPrice.leasingDurationId === leasingDurationId &&
         footballPitchPrice.footballPitchId === footballPitchId
     );
   }
 });
 
+watch(
+  () =>
+    paramFootballPitchRental.value.customerAccessoryRentals?.map(
+      (customerAccessoryRental) => customerAccessoryRental.accessoryId
+    ),
+  (accessoriesValues) => {
+    accessoriesValues?.map((id) => {
+      if (id) {
+        const accessoryFound = accessories.value.find(
+          (accessory) => id === accessory.id
+        );
+        const { id: accessoryId, price }: any = accessoryFound;
+        priceAccessories.value = {
+          ...priceAccessories.value,
+          [accessoryId]: { price },
+        };
+      }
+    });
+    formattedAccessories.value = accessories.value
+      // .filter((accessory) => !accessoriesValues?.includes(accessory.id))
+      // .map((accessory) => convertProxyObjToObj(accessory))
+  },
+  {
+    deep: true,
+  }
+);
+
 function addAccessoryRental() {
   const accessory = {
     id: generateId(),
-    accessoriesId: null,
+    accessoryId: null,
     amount: null,
   };
   paramFootballPitchRental.value.customerAccessoryRentals.push(accessory);
@@ -119,14 +147,14 @@ async function getAccessoryDetail(id: string) {
     (accessoryRental) => accessoryRental.id === id
   );
 
-  if (!accessoryFound.accessoriesId) {
+  if (!accessoryFound.accessoryId) {
     return $toast.error("Vui lòng chọn phụ kiện!");
   }
 
   await dialogStore.showDialog(
     resolveComponent("user-accessory-dialog-detail"),
     {
-      id: accessoryFound.accessoriesId,
+      id: accessoryFound.accessoryId,
     }
   );
 }
@@ -138,48 +166,55 @@ accessoryStore.getAccessories();
     <div class="title">Thông tin đặt sân</div>
     <div class="content">
       <div class="fooballpitch">
-        <p class="name field">
-          <b class="label">Tên sân bóng:</b>
-          {{ footballPitch ? footballPitch.name : "" }}
-        </p>
-        <p class="description field">
-          <b class="label">Mô tả: </b>
-          <span
-            class="ml-2"
-            v-if="footballPitch"
-            v-html="footballPitch.description"
-          />
-        </p>
-        <p class="duration field">
-          <b class="label">Khung giờ thuê: </b
-          >{{
-            footballPitchPriceFound.leasingDurationName
-              ? footballPitchPriceFound.leasingDurationName
-              : ""
-          }}
-        </p>
-        <p class="date field">
-          <b class="label">Ngày thuê: </b>
-          {{
-            paramFootballPitchRental.dateRental
-              ? format(
-                  new Date(paramFootballPitchRental.dateRental),
-                  "dd/MM/yyyy"
-                )
-              : ""
-          }}
-        </p>
-        <p class="price field">
-          <b class="label">Giá thuê: </b
-          >{{
-            footballPitchPriceFound.price
-              ? `${formatPrice(footballPitchPriceFound.price)} VNĐ`
-              : ""
-          }}
-        </p>
-        <p class="customername field">
-          <b class="label">Tên khách hàng: </b>{{ user.name }}
-        </p>
+        <v-row class="row">
+          <v-col v-if="footballPitch && footballPitch.images.length > 0" class="col" md="6">
+            <common-carousel class="carousel" :images="footballPitch.images" />
+          </v-col>
+          <v-col class="col" :md="footballPitch && footballPitch.images.length > 0 ? 6 : 12">
+            <p class="name field">
+            <b class="label">Tên sân bóng:</b>
+            {{ footballPitch ? footballPitch.name : "" }}
+          </p>
+          <p class="description field">
+            <b class="label">Mô tả: </b>
+            <span
+              class="ml-2"
+              v-if="footballPitch"
+              v-html="footballPitch.description"
+            />
+          </p>
+          <p class="duration field">
+            <b class="label">Khung giờ thuê: </b
+            >{{
+              footballPitchPriceFound.leasingDurationName
+                ? footballPitchPriceFound.leasingDurationName
+                : ""
+            }}
+          </p>
+          <p class="date field">
+            <b class="label">Ngày thuê: </b>
+            {{
+              paramFootballPitchRental.dateRental
+                ? format(
+                    new Date(paramFootballPitchRental.dateRental),
+                    "dd/MM/yyyy"
+                  )
+                : ""
+            }}
+          </p>
+          <p class="price field">
+            <b class="label">Giá thuê: </b
+            >{{
+              footballPitchPriceFound.price
+                ? `${formatPrice(footballPitchPriceFound.price)} VNĐ`
+                : ""
+            }}
+          </p>
+          <p class="customername field">
+            <b class="label">Tên khách hàng: </b>{{ user.name }}
+          </p>
+          </v-col>
+        </v-row>
       </div>
       <div class="accessory-rental">
         <v-data-table
@@ -192,19 +227,29 @@ accessoryStore.getAccessories();
           </template>
           <template #[`item.accessory`]="{ item }">
             <v-autocomplete
-              v-model="item.raw.accessoriesId"
+              v-model="item.raw.accessoryId"
               label="Chọn phụ kiện*"
               item-value="id"
               item-title="name"
               variant="outlined"
               menu-icon="false"
               class="pt-3"
-              :items="accessories"
+              :items="formattedAccessories"
               :rules="[rules.accessoryId]"
             ></v-autocomplete>
           </template>
           <template #[`item.price`]="{ item }">
-            {{ item.raw.price }}
+            <span class="price">
+              {{
+              `${
+                priceAccessories[item.raw.accessoryId]
+                  ? `${formatPrice(
+                      priceAccessories[item.raw.accessoryId].price
+                    )} VNĐ`
+                  : ""
+              }`
+            }}
+            </span>
           </template>
           <template #[`item.amount`]="{ item }">
             <v-text-field
@@ -253,18 +298,21 @@ accessoryStore.getAccessories();
     font-size: 20px;
     font-weight: bold;
   }
-  > .content > .fooballpitch > .description {
+  > .content > .fooballpitch > .row > .col > .carousel {
+    height: 200px !important;
+  }
+  > .content > .fooballpitch > .row > .col > .description {
     display: flex;
   }
-  > .content > .fooballpitch > .price {
+  > .content > .fooballpitch > .row > .col  > .price {
     color: rgb(209, 32, 32);
     font-weight: bold;
   }
-  > .content > .fooballpitch > .price > .label {
+  > .content > .fooballpitch > .row > .col > .price > .label {
     color: #000;
     font-weight: 600;
   }
-  > .content > .fooballpitch > .field {
+  > .content > .fooballpitch > .row > .col > .field {
     margin-top: 10px;
   }
 }
@@ -280,6 +328,10 @@ accessoryStore.getAccessories();
     height: 30px;
     margin: 3px;
     padding: 0;
+  }
+  :deep(.price) {
+    position: relative;
+    top: -5px;
   }
 }
 .table {

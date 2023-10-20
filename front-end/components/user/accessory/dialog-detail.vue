@@ -1,23 +1,17 @@
 <script lang="ts" setup>
-import { useDialogStore } from "~/stores";
+import { useDialogStore, useAccessoryStore } from "~/stores";
+import { formatPrice } from "~/utils/string";
+import { storeToRefs } from "pinia";
 const dialogStore = useDialogStore();
-const items = [
-  {
-    src: "https://cdn.vuetifyjs.com/images/carousel/squirrel.jpg",
-  },
-  {
-    src: "https://cdn.vuetifyjs.com/images/carousel/sky.jpg",
-  },
-  {
-    src: "https://cdn.vuetifyjs.com/images/carousel/bird.jpg",
-  },
-  {
-    src: "https://cdn.vuetifyjs.com/images/carousel/planet.jpg",
-  },
-];
+const accessoryStore = useAccessoryStore();
+const { accessory } = storeToRefs(accessoryStore);
+const { data } = dialogStore.dialog;
+
 function closeDetail() {
   dialogStore.closeDialog();
 }
+
+accessoryStore.getAccessory(data.id);
 </script>
 
 <template>
@@ -29,20 +23,32 @@ function closeDetail() {
       </v-card-title>
       <v-card-text>
         <v-row>
-          <v-col md="7" class="image">
-            <v-carousel class="carousel" hide-delimiters>
-              <v-carousel-item
-                v-for="(item, i) in items"
-                :key="i"
-                :src="item.src"
-                cover
-              ></v-carousel-item>
-            </v-carousel>
+          <v-col
+            v-if="accessory && accessory?.images.length > 0"
+            md="6"
+            class="image"
+          >
+            <common-carousel class="carousel" :images="accessory?.images" />
           </v-col>
-          <v-col md="4" class="info">
-            <p class="name"><b>Tên phụ kiện:</b></p>
-            <p class="description"><b>Mô tả:</b></p>
-            <p class="name"><b>Giá thuê:</b></p>
+          <v-col
+            :md="accessory && accessory?.images.length > 0 ? 5 : 12"
+            class="info"
+          >
+            <p class="name">
+              <b>Tên phụ kiện: </b>{{ accessory ? accessory?.name : "" }}
+            </p>
+            <p class="description">
+              <b class="label">Mô tả: </b
+              ><span
+                v-if="accessory"
+                class="ml-2"
+                v-html="accessory?.description"
+              ></span>
+            </p>
+            <p class="price">
+              <b class="label">Giá thuê: </b
+              >{{ accessory ? `${formatPrice(accessory?.price)} VNĐ` : "" }}
+            </p>
           </v-col>
         </v-row>
       </v-card-text>
@@ -61,8 +67,18 @@ function closeDetail() {
     right: 10px;
     cursor: pointer;
   }
+  :deep(.info) > .description {
+    display: flex;
+  }
+  :deep(.info) > .price {
+    color: rgb(209, 32, 32);
+    font-weight: bold;
+  }
+  :deep(.info) > .price > .label {
+    color: #000;
+  }
 }
 .carousel {
-  height: 300px !important;
+  height: 200px !important;
 }
 </style>

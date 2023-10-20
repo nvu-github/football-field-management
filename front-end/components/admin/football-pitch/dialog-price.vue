@@ -35,7 +35,7 @@ const paramsFootballPitchPrice = ref<ParamsFootballPitchPrice>({
   leasingDurationId: null,
   price: null,
 });
-let fomattedLeasingDurations = formattedLeasingDuration(leasingDurations.value);
+let formattedLeasingDurations = formattedLeasingDuration(leasingDurations.value);
 
 const formattedPrice = computed({
   get: () => {
@@ -74,7 +74,7 @@ watch(
             footballPitchId.toString().toLowerCase()
       )
       .map((priceValue) => priceValue.leasingDurationName);
-    fomattedLeasingDurations =
+    formattedLeasingDurations =
       footballPitchPriceFound.length > 0
         ? formattedLeasingDuration(leasingDurations.value).filter(
             (durationValue: any) =>
@@ -185,7 +185,7 @@ footballPitchStore.getFootballPitches();
                 label="Chọn khung giờ*"
                 item-value="id"
                 item-title="name"
-                :items="fomattedLeasingDurations"
+                :items="formattedLeasingDurations"
                 :rules="[rules.leasingDuration]"
                 variant="underlined"
               ></v-autocomplete>

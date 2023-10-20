@@ -31,16 +31,17 @@ function submitRentalInfo() {
       @submit.prevent="submitRentalInfo"
     >
       <v-row class="row">
-        <v-col :md="4" class="form">
+        <v-col :md="paramFootballPitchRental.footballPitchId ? 4 : 12" class="form">
           <user-football-pitch-rental-form />
         </v-col>
-        <v-col md="7" class="info">
+        <v-col v-if="paramFootballPitchRental.footballPitchId" md="7" class="info">
           <user-football-pitch-rental-info />
         </v-col>
         <div class="action">
           <v-btn
             :disabled="!paramFootballPitchRental.value"
             class="button -success"
+            type="submit"
           >
             Đặt sân
           </v-btn>
