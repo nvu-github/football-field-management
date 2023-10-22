@@ -10,7 +10,6 @@ import {
   Get,
   Request,
   UseGuards,
-  Query
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { FootballPitchesService } from './football-pitches.service';
@@ -22,6 +21,7 @@ import {
   PayloadLeasingDurationDto,
   PayloadFootballPitchDto,
   PayloadFootballPitchPriceDto,
+  PayloadCustomerRentalDto,
 } from './dtos';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -33,18 +33,48 @@ export class FootballPitchesController {
     private readonly uploadService: UploadService,
   ) {}
 
-  @Get('rental')
+  @Post('customer/rental')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
+  async createCustomerFootballPitchRental(
+    @Body() body: PayloadCustomerRentalDto,
+    @Request() req: any,
+  ): Promise<any> {
+    const { customerId } = req.user;
+    const { customerAccessoryRentals } = body;
+
+    delete body.customerAccessoryRentals;
+    const customerFootballPitchRental =
+      await this.footballPitchService.createCustomerFootballPitchRental({
+        ...body,
+        footballPitchLeasingDurationId: body.leasingDurationId,
+        status: 'PENDING',
+        customerId,
+      });
+
+    const payloadCustomerAccessoryRental = customerAccessoryRentals.map(
+      (accessory) => ({
+        accessoryId: accessory.accessoryId,
+        amount: Number(accessory.amount),
+        customerFootballPitchRentalId: customerFootballPitchRental.id,
+      }),
+    );
+
+    await this.footballPitchService.createAccessoryFootballPitchRental(
+      payloadCustomerAccessoryRental,
+    );
+
+    return customerFootballPitchRental;
+  }
+
+  @Get('rental')
   async getFootballPitchRentals(): Promise<any> {
     return await this.footballPitchService.getFootballPitchRentals();
   }
 
-  @Get('rental-now')
-  async getFootballPitchRentalNows(@Query() query: any): Promise<any> {
-    const { rentalDate } = query
-    console.log(rentalDate)
-    return await this.footballPitchService.getFootballPitchRentalNows(rentalDate);
+  @Get('rental/info')
+  async getFootballPitchRentalNows(): Promise<any> {
+    return await this.footballPitchService.getFootballPitchRentalNows();
   }
 
   @Post('types')

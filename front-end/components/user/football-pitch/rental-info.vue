@@ -89,9 +89,13 @@ watchEffect(async () => {
 
   if (leasingDurationId) {
     await footballPitchPriceStore.getFootballPitchPrices();
+    const leasingDurationRentalId = footballPitchPrices.value.find(
+      (footballPitchPrice) => footballPitchPrice.id === leasingDurationId
+    );
     footballPitchPriceFound.value = footballPitchPrices.value.find(
       (footballPitchPrice) =>
-        footballPitchPrice.leasingDurationId === leasingDurationId &&
+        footballPitchPrice.leasingDurationId ===
+          leasingDurationRentalId?.leasingDurationId &&
         footballPitchPrice.footballPitchId === footballPitchId
     );
   }
@@ -115,9 +119,9 @@ watch(
         };
       }
     });
-    formattedAccessories.value = accessories.value
-      // .filter((accessory) => !accessoriesValues?.includes(accessory.id))
-      // .map((accessory) => convertProxyObjToObj(accessory))
+    formattedAccessories.value = accessories.value;
+    // .filter((accessory) => !accessoriesValues?.includes(accessory.id))
+    // .map((accessory) => convertProxyObjToObj(accessory))
   },
   {
     deep: true,
@@ -167,52 +171,61 @@ accessoryStore.getAccessories();
     <div class="content">
       <div class="fooballpitch">
         <v-row class="row">
-          <v-col v-if="footballPitch && footballPitch.images.length > 0" class="col" md="6">
+          <v-col
+            v-if="footballPitch && footballPitch.images.length > 0"
+            class="col"
+            md="6"
+          >
             <common-carousel class="carousel" :images="footballPitch.images" />
           </v-col>
-          <v-col class="col" :md="footballPitch && footballPitch.images.length > 0 ? 6 : 12">
+          <v-col
+            class="col"
+            :md="footballPitch && footballPitch.images.length > 0 ? 6 : 12"
+          >
             <p class="name field">
-            <b class="label">Tên sân bóng:</b>
-            {{ footballPitch ? footballPitch.name : "" }}
-          </p>
-          <p class="description field">
-            <b class="label">Mô tả: </b>
-            <span
-              class="ml-2"
-              v-if="footballPitch"
-              v-html="footballPitch.description"
-            />
-          </p>
-          <p class="duration field">
-            <b class="label">Khung giờ thuê: </b
-            >{{
-              footballPitchPriceFound.leasingDurationName
-                ? footballPitchPriceFound.leasingDurationName
-                : ""
-            }}
-          </p>
-          <p class="date field">
-            <b class="label">Ngày thuê: </b>
-            {{
-              paramFootballPitchRental.dateRental
-                ? format(
-                    new Date(paramFootballPitchRental.dateRental),
-                    "dd/MM/yyyy"
-                  )
-                : ""
-            }}
-          </p>
-          <p class="price field">
-            <b class="label">Giá thuê: </b
-            >{{
-              footballPitchPriceFound.price
-                ? `${formatPrice(footballPitchPriceFound.price)} VNĐ`
-                : ""
-            }}
-          </p>
-          <p class="customername field">
-            <b class="label">Tên khách hàng: </b>{{ user.name }}
-          </p>
+              <b class="label">Tên sân bóng:</b>
+              {{ footballPitch ? footballPitch.name : "" }}
+            </p>
+            <p class="description field">
+              <b class="label">Mô tả: </b>
+              <span
+                v-if="footballPitch"
+                class="ml-2"
+                v-html="footballPitch.description"
+              />
+            </p>
+            <p class="duration field">
+              <b class="label">Khung giờ thuê: </b
+              >{{
+                footballPitchPriceFound &&
+                footballPitchPriceFound.leasingDurationName
+                  ? footballPitchPriceFound.leasingDurationName
+                  : ""
+              }}
+            </p>
+            <p class="date field">
+              <b class="label">Ngày thuê: </b>
+              {{
+                paramFootballPitchRental && paramFootballPitchRental.rentalDate
+                  ? format(
+                      new Date(paramFootballPitchRental.rentalDate),
+                      "dd/MM/yyyy"
+                    )
+                  : ""
+              }}
+            </p>
+            <p class="price field">
+              <b class="label">Giá thuê: </b>
+              {{
+                footballPitchPriceFound &&
+                footballPitchPriceFound.price !== undefined
+                  ? `${formatPrice(footballPitchPriceFound.price)} VNĐ`
+                  : ""
+              }}
+            </p>
+            <p class="customername field">
+              <b class="label">Tên khách hàng: </b>{{ user.name }}
+            </p>
           </v-col>
         </v-row>
       </div>
@@ -241,14 +254,14 @@ accessoryStore.getAccessories();
           <template #[`item.price`]="{ item }">
             <span class="price">
               {{
-              `${
-                priceAccessories[item.raw.accessoryId]
-                  ? `${formatPrice(
-                      priceAccessories[item.raw.accessoryId].price
-                    )} VNĐ`
-                  : ""
-              }`
-            }}
+                `${
+                  priceAccessories[item.raw.accessoryId]
+                    ? `${formatPrice(
+                        priceAccessories[item.raw.accessoryId].price
+                      )} VNĐ`
+                    : ""
+                }`
+              }}
             </span>
           </template>
           <template #[`item.amount`]="{ item }">
@@ -304,7 +317,7 @@ accessoryStore.getAccessories();
   > .content > .fooballpitch > .row > .col > .description {
     display: flex;
   }
-  > .content > .fooballpitch > .row > .col  > .price {
+  > .content > .fooballpitch > .row > .col > .price {
     color: rgb(209, 32, 32);
     font-weight: bold;
   }

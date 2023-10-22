@@ -1,62 +1,93 @@
 <script lang="ts" setup>
+import { format } from "date-fns";
+import { formatPrice } from "~/utils/string";
 const props = defineProps({
+  id: {
+    type: Number,
+    required: true,
+  },
   name: {
     type: String,
     required: true,
   },
-  durationTime: {
+  startTime: {
     type: String,
     required: true,
   },
-  dateRental: {
+  endTime: {
+    type: String,
+    required: true,
+  },
+  rentalDate: {
+    type: String,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  status: {
+    type: String,
+    required: true,
+  },
+  footballPitchType: {
     type: String,
     required: true,
   },
   avatar: {
     type: String,
     required: true,
-  }
-})
+  },
+});
 </script>
 <template>
-  <v-card class="card-info">
-    <v-img
-      src="https://cdn.vuetifyjs.com/images/cards/sunshine.jpg"
-      class="avatar"
-      cover
-    ></v-img>
+  <v-card class="card-info mx-auto">
+    <v-img :src="props.avatar" class="avatar" cover></v-img>
     <div class="card-content">
-      <v-card-title class="title"> Top western road trips </v-card-title>
+      <v-card-title class="title"> {{ props.name }} </v-card-title>
       <v-card-subtitle class="time">
         <div class="hour">
-          <v-icon>mdi mdi-clock-time-nine-outline</v-icon> 10:00 - 11:30
+          <v-icon>mdi mdi-clock-time-nine-outline</v-icon>
+          {{ props.startTime }} - {{ props.endTime }}
         </div>
         <div class="day">
-          <v-icon>mdi mdi-calendar-range</v-icon> 17/10/2023
+          <v-icon>mdi mdi-calendar-range</v-icon>
+          {{ format(new Date(props.rentalDate), "dd/MM/yyyy") }}
         </div>
       </v-card-subtitle>
-      <v-card-text class="content">
-        <div class="status"> 
-          <b class="title">Trạng thái:</b> <v-chip color="success">Đã thuê</v-chip>
-        </div>  
+      <v-card-text class="content pt-0">
+        <div class="type mt-2 mb-2">
+          <b class="title">Loại sân: </b>
+          <v-chip color="success">{{ props.footballPitchType }}</v-chip>
+        </div>
+        <div class="status">
+          <b class="title">Trạng thái: </b>
+          <v-chip :color="props.status === 'ACCEPT' ? 'error' : 'primary'">{{
+            props.status === "ACCEPT" ? "Đã đặt" : "Trống"
+          }}</v-chip>
+        </div>
         <div class="price mt-2">
-          <b class="title">Giá thuê:</b> 500.000 VNĐ
+          <b class="title">Giá thuê:</b> {{ formatPrice(props.price) }} VNĐ
         </div>
       </v-card-text>
       <v-card-action class="action">
-        <v-tooltip location="bottom" text="Thuê ngay">
+        <v-tooltip location="bottom" text="Đặt sân">
           <template #activator="{ props }">
-          <v-btn v-bind="props" class="button -primary -rental">
-            <v-icon>mdi mdi-alpha-r-circle-outline</v-icon>
-          </v-btn>
-        </template>
+            <v-btn
+              v-bind="props"
+              class="button -primary -rental"
+              :to="`football-pitches/rental?id=${id}`"
+            >
+              <v-icon>mdi mdi-alpha-r-circle-outline</v-icon>
+            </v-btn>
+          </template>
         </v-tooltip>
         <v-tooltip location="bottom" text="Chi tiết">
           <template #activator="{ props }">
-          <v-btn v-bind="props" class="button -warning -rental">
-            <v-icon>mdi mdi-alpha-d-circle-outline</v-icon>
-          </v-btn>
-        </template>
+            <v-btn v-bind="props" class="button -warning -rental">
+              <v-icon>mdi mdi-alpha-d-circle-outline</v-icon>
+            </v-btn>
+          </template>
         </v-tooltip>
       </v-card-action>
     </div>
@@ -82,7 +113,7 @@ const props = defineProps({
 .card-content {
   width: 45%;
   > .title {
-    padding: 8px 0;
+    padding: 0;
   }
   > .time {
     display: flex;
@@ -90,10 +121,10 @@ const props = defineProps({
     padding: 0;
   }
   > .content {
-    padding: 16px 0;
+    padding: 16px 0 2px;
   }
   > .content > .price {
-    color: #f75061;
+    color: #ff0000;
   }
   > .content > .price > .title {
     color: #000;
@@ -109,7 +140,7 @@ const props = defineProps({
       margin-right: 8px;
     }
   }
-  > .action :deep(.v-icon)  {
+  > .action :deep(.v-icon) {
     font-size: 20px;
   }
 }

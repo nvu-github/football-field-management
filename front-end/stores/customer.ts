@@ -1,6 +1,6 @@
 export interface CustomerFootballPitchRental {
   footballPitchId: number | null;
-  dateRental: Date | null;
+  rentalDate: Date | null;
   leasingDurationId: number | null;
   customerAccessoryRentals?: CustomerAccessoryRental[];
   note: string;
@@ -16,19 +16,19 @@ export const useCustomerStore = defineStore("customerStore", () => {
   const { $apis }: any = useNuxtApp();
   const paramFootballPitchRental = ref<CustomerFootballPitchRental>({
     footballPitchId: null,
-    dateRental: null,
+    rentalDate: null,
     leasingDurationId: null,
     customerAccessoryRentals: [],
     note: "",
   });
 
-  async function customerFootballPitchRental(
+  async function createCustomerFootballPitchRental(
     params: CustomerFootballPitchRental
   ) {
-    return await $apis.post("football-pitches/rental", {
+    return await $apis.post("football-pitches/customer/rental", {
       ...convertProjectObjToObj(params),
     });
   }
 
-  return { paramFootballPitchRental, customerFootballPitchRental };
+  return { paramFootballPitchRental, createCustomerFootballPitchRental };
 });

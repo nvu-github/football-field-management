@@ -1,4 +1,4 @@
-export interface IFootballPitchRenal {
+export interface IFootballPitchRental {
   id: number;
   customerId?: number;
   footballPitchLeasingDurationId?: number;
@@ -6,6 +6,7 @@ export interface IFootballPitchRenal {
   rentalDate: Date;
   status: string;
   customerName: string;
+  footballPitchId: number;
   footballPitchName: string;
   price: number;
   startTime: string;

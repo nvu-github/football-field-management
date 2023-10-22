@@ -25,7 +25,7 @@ const headers = [
     title: "Thời gian thuê",
     width: "15%",
     align: "start",
-    key: "dateRental",
+    key: "rentalDate",
   },
   { title: "Giá thuê", width: "15%", align: "start", key: "price" },
   {

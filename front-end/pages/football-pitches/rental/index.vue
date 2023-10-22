@@ -1,7 +1,10 @@
 <script lang="ts" setup>
+import { formatISO } from "date-fns";
 import { storeToRefs } from "pinia";
-import { useAppStore, useCustomerStore } from "~/stores";
+import { useAppStore, usePaymentStore, useCustomerStore } from "~/stores";
 
+const route = useRoute();
+const { $toast }: any = useNuxtApp();
 const customerStore = useCustomerStore();
 const appStore = useAppStore();
 const { breadCrumbs } = storeToRefs(appStore);
@@ -19,8 +22,39 @@ breadCrumbs.value = [
   },
 ];
 
-function submitRentalInfo() {
-  console.log(paramFootballPitchRental.value);
+resetForm();
+if (route.query && route.query.id) {
+  paramFootballPitchRental.value.footballPitchId = Number(route.query.id);
+}
+
+async function submitRentalInfo() {
+  usePaymentStore().createPaymentUrl({
+    amount: 10000,
+    bankCode: "NCB",
+  });
+  // try {
+  //   await customerStore.createCustomerFootballPitchRental({
+  //     ...paramFootballPitchRental.value,
+  //     rentalDate: formatISO(
+  //       new Date(paramFootballPitchRental.value.rentalDate)
+  //     ),
+  //   });
+  //   resetForm();
+  //   $toast.success("Đặt sân bóng thành công, vui lòng chờ chúng tôi xác nhận");
+  // } catch (err) {
+  //   console.log(err);
+  //   $toast.error("Đặt sân bóng thất bại");
+  // }
+}
+
+function resetForm() {
+  paramFootballPitchRental.value = {
+    footballPitchId: null,
+    rentalDate: null,
+    leasingDurationId: null,
+    customerAccessoryRentals: [],
+    note: "",
+  };
 }
 </script>
 <template>
@@ -31,20 +65,22 @@ function submitRentalInfo() {
       @submit.prevent="submitRentalInfo"
     >
       <v-row class="row">
-        <v-col :md="paramFootballPitchRental.footballPitchId ? 4 : 12" class="form">
+        <v-col
+          :md="paramFootballPitchRental.footballPitchId ? 4 : 12"
+          class="form"
+        >
           <user-football-pitch-rental-form />
         </v-col>
-        <v-col v-if="paramFootballPitchRental.footballPitchId" md="7" class="info">
+        <v-col
+          v-if="paramFootballPitchRental.footballPitchId"
+          md="7"
+          class="info"
+        >
           <user-football-pitch-rental-info />
         </v-col>
         <div class="action">
-          <v-btn
-            :disabled="!paramFootballPitchRental.value"
-            class="button -success"
-            type="submit"
-          >
-            Đặt sân
-          </v-btn>
+          <!-- :disabled="!paramFootballPitchRental.value" -->
+          <v-btn class="button -success" type="submit"> Đặt sân </v-btn>
         </div>
       </v-row>
     </v-form>

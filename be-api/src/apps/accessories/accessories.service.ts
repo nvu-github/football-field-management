@@ -8,11 +8,9 @@ import { IAccessoryType, IAccessory } from './interfaces';
 export class AccessoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  createAccessory(
-    payloads: PayloadAccessoryDto,
-  ): Promise<IAccessory | any> {
+  createAccessory(payloads: PayloadAccessoryDto): Promise<IAccessory | any> {
     return this.prisma.accessory.create({
-      data:  { ...payloads },
+      data: { ...payloads },
       select: {
         id: true,
         name: true,
@@ -109,8 +107,15 @@ export class AccessoriesService {
       },
     });
 
-    const { id, name, description, amount, price, accessoryImage, accessoryType } =
-      accessory;
+    const {
+      id,
+      name,
+      description,
+      amount,
+      price,
+      accessoryImage,
+      accessoryType,
+    } = accessory;
     const formattedAccessory = {
       id,
       name,
@@ -118,7 +123,7 @@ export class AccessoriesService {
       amount,
       price: Number(price),
       accessoryTypeId: accessoryType.id,
-      accessoryName: accessoryType.name,
+      accessoryTypeName: accessoryType.name,
       images: accessoryImage.map((image: any) => ({ ...image })),
     };
 
@@ -139,6 +144,12 @@ export class AccessoriesService {
             name: true,
           },
         },
+        accessoryImage: {
+          select: {
+            id: true,
+            url: true,
+          },
+        },
       },
     });
 
@@ -148,7 +159,7 @@ export class AccessoriesService {
         price: Number(accessory.price),
         description: accessory.description,
         accessoryTypeId: accessory.accessoryType.id,
-        accessoryName: accessory.accessoryType.name,
+        accessoryTypeName: accessory.accessoryType.name,
       };
     });
   }

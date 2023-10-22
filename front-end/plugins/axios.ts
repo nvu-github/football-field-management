@@ -1,22 +1,19 @@
 import axios from "axios";
 
 const createInstance = (apiUrl: string) => {
-
   const instanceAxios = axios.create({
     baseURL: apiUrl,
-    headers: {
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Headers": "*",
-      "Content-Type": "application/json",
-    },
-    transformResponse: [(data) => {
-      try {
-        return JSON.parse(data).data;
-      } catch (error) {
-        console.log(error)
-        return data;
-      }
-    }]
+    credentials: true,
+    transformResponse: [
+      (data) => {
+        try {
+          return JSON.parse(data).data;
+        } catch (error) {
+          console.log(error);
+          return data;
+        }
+      },
+    ],
   });
 
   instanceAxios.interceptors.request.use((config) => {
@@ -32,11 +29,11 @@ const createInstance = (apiUrl: string) => {
 
 function getToken() {
   const userLoggedIn = localStorage.getItem("userLogin");
-  let token = ""
+  let token = "";
   if (userLoggedIn) {
-    token = JSON.parse(userLoggedIn)?.accessToken
+    token = JSON.parse(userLoggedIn)?.accessToken;
   }
-  return token
+  return token;
 }
 
 export default defineNuxtPlugin(() => {

@@ -11,7 +11,7 @@ const props = defineProps({
 </script>
 
 <template>
-  <v-carousel class="carousel-component" hide-delimiters>
+  <v-carousel class="carousel-component" hide-delimiters show-arrows="hover">
     <v-carousel-item
       v-for="(image, i) in props.images"
       :key="i"

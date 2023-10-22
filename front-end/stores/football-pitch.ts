@@ -37,18 +37,32 @@ export interface FootballPitchPrice {
   price: number;
 }
 
-export interface FootballPitchRental {
+export interface FootballPitchRentalInfo {
   id: number;
-  customerId?: number;
-  footballPitchLeasingDurationId?: number;
+  name: string;
   note: string;
-  rentalDate: Date;
+  description: string;
   status: string;
-  customerName: string;
-  footballPitchName: string;
-  price: number;
+  price: string;
   startTime: string;
   endTime: string;
+  images: Array<{
+    id: number;
+    url: string;
+  }>;
+}
+
+export interface FootballPitchRental {
+  id: number;
+  footballPitchLeasingDurationId: number;
+  customerId: number;
+  note: string;
+  rentalDate: Date;
+  customerName: string;
+  startTime: string;
+  endTime: string;
+  footballPitchName: string;
+  price: number;
 }
 
 export const footballPitchStatuses: any = [
@@ -70,7 +84,8 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
   const { $apis }: any = useNuxtApp();
   const footballPitches = ref<ParamsFootballPitch[]>([]);
   const footballPitch = ref<ParamsFootballPitch>();
-  const footballPitchRentals = ref<FootballPitchRental[]>([]);
+  const footballPitchRentalInfo = ref<FootballPitchRentalInfo[]>([]);
+  const footballPitchRental = ref<FootballPitchRentalInfo[]>([]);
 
   function createFootballPitch(params: ParamsFootballPitch) {
     return $apis.post("football-pitches", {
@@ -98,9 +113,11 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     footballPitch.value = footballPitchSingle.data;
   }
 
-  async function getFootballPitchRentals() {
-    const footballPitchRentalList = await $apis.get(`football-pitches/rentals`);
-    footballPitchRentals.value = footballPitchRentalList.data;
+  async function getFootballPitchRentalInfo() {
+    const footballPitchRentalInfoList = await $apis.get(
+      `football-pitches/rental/info`
+    );
+    footballPitchRentalInfo.value = footballPitchRentalInfoList.data;
   }
 
   function getStatusFootballPitch(statusValue: string) {
@@ -109,17 +126,24 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     )?.name;
   }
 
+  async function getFootballPitchRental() {
+    const footballPitchRentalList = await $apis.get(`football-pitches/rental`);
+    footballPitchRental.value = footballPitchRentalList.data;
+  }
+
   return {
     footballPitches,
     footballPitch,
-    footballPitchRentals,
+    footballPitchRentalInfo,
+    footballPitchRental,
     createFootballPitch,
     updateFootballPitch,
     getFootballPitches,
     getFootballPitch,
     getStatusFootballPitch,
     deleteImage,
-    getFootballPitchRentals,
+    getFootballPitchRentalInfo,
+    getFootballPitchRental,
   };
 });
 

@@ -36,6 +36,11 @@ export interface ImagePreview {
   url: string;
 }
 
+export interface PayLoadPayment {
+  amount: number;
+  bankCode: string;
+}
+
 export const useAppStore = defineStore("appStore", () => {
   const { $apis }: any = useNuxtApp();
   const app = reactive<App>({
@@ -67,6 +72,7 @@ export const useAppStore = defineStore("appStore", () => {
     deleteApi,
   };
 });
+
 export const useDialogStore = defineStore("dialogStore", () => {
   const isDelete = ref<Boolean>(false);
   const defaultDialog = {
@@ -93,4 +99,16 @@ export const useDialogStore = defineStore("dialogStore", () => {
   }
 
   return { dialog, isDelete, showDialog, showPersistentDialog, closeDialog };
+});
+
+export const usePaymentStore = defineStore("paymentStore", () => {
+  const { $apis }: any = useNuxtApp();
+
+  function createPaymentUrl(payload: PayLoadPayment) {
+    return $apis.post("payment/create-payment-url", {
+      ...convertProjectObjToObj(payload),
+    });
+  }
+
+  return { createPaymentUrl };
 });

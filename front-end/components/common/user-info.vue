@@ -18,7 +18,7 @@ async function logout() {
     };
     authStore.signOut();
     $toast.success("Đăng xuất tài khoản thành công");
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     return router.push("/auth/login");
   } catch (error) {
     console.log(error);

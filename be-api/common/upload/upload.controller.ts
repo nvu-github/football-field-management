@@ -39,7 +39,9 @@ export class UploadController {
   @UseInterceptors(FilesInterceptor('files', 100))
   async uploadFiles(@UploadedFiles() files: Array<Express.Multer.File>) {
     return files.map((file) => ({
-      url: `${file.destination.split('/public/')[1]}/${file.filename}`,
+      url: `${file.destination.replace(/\\/g, '/').split('/public/')[1]}/${
+        file.filename
+      }`,
     }));
   }
 
@@ -51,6 +53,9 @@ export class UploadController {
     schema: {
       type: 'object',
       properties: {
+        type: {
+          type: 'string',
+        },
         file: {
           type: 'string',
           format: 'binary',
@@ -62,7 +67,9 @@ export class UploadController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return {
-      uri: `${file.destination.split('/public/')[1]}/${file.filename}`,
+      uri: `${file.destination.replace(/\\/g, '/').split('/public/')[1]}/${
+        file.filename
+      }`,
     };
   }
 }

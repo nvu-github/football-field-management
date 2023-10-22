@@ -5,5 +5,6 @@ export interface IAccessory {
   amount: number;
   price: number;
   accessoryTypeId: number;
-  accessoryName: string;
+  accessoryTypeName: string;
+  images?: Array<any>;
 }

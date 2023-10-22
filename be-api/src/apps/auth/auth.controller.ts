@@ -9,7 +9,7 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { OAuth2Client } from 'google-auth-library'
+import { OAuth2Client } from 'google-auth-library';
 
 import configuration from 'config/configuration';
 import { AuthService } from './auth.service';
@@ -56,32 +56,34 @@ export class AuthController {
   @Post('login-google')
   async signInWithGoogle(@Body() body: SignInGoogleDto) {
     try {
-      const roleIdCustomer = 4 
-      const { idToken } = body
+      const roleIdCustomer = 4;
+      const { idToken } = body;
 
-      const client = new OAuth2Client()
+      const client = new OAuth2Client();
       const ticket = await client.verifyIdToken({
         idToken,
         audience: process.env.WEB_CLIENT_ID,
-      })
-      const payload = ticket.getPayload()
-      const {sub: id, email } = payload
-
+      });
+      const payload = ticket.getPayload();
+      const { sub: id, email } = payload;
 
       const jwtPayloads = {
         id: id,
         email,
         roleId: roleIdCustomer,
+        type: 'google',
       };
       const accessToken = await this.jwtService.signAsync(jwtPayloads, {
         secret: configuration().jwt.secret,
       });
 
-      return {id, email, roleId: roleIdCustomer, accessToken}
+      return { id, email, roleId: roleIdCustomer, accessToken };
     } catch (error) {
-      throw new HttpException("Id token không đúng định dạng", HttpStatus.BAD_REQUEST)
+      throw new HttpException(
+        'Id token không đúng định dạng',
+        HttpStatus.BAD_REQUEST,
+      );
     }
-    
   }
 
   @Post('signup')

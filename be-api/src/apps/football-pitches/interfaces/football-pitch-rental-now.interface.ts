@@ -7,7 +7,6 @@ export interface IFootballPitchRentalNow {
     id: number;
     url: string;
   }>;
-  rentalDate: Date;
   startTime: string;
   endTime: string;
   price: number;

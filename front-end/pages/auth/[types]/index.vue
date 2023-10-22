@@ -65,7 +65,7 @@ async function loginUser() {
     );
 
     $toast.success("Đăng nhập thành công");
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     const destination = roleId === CUSTOMER_ROLE ? "/" : "/admin";
     router.push(destination);
   } catch (error) {

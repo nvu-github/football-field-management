@@ -6,12 +6,20 @@ const route = useRoute();
 
 const menus = [
   {
-    title: "Đặt sân",
-    url: "/football-pitches/rental",
+    title: "Sân bóng",
+    url: "/football-pitches",
   },
   {
     title: "Phụ kiện",
     url: "/accessories",
+  },
+  {
+    title: "Đặt sân",
+    url: "/football-pitches/rental",
+  },
+  {
+    title: "Lịch sử đặt sân",
+    url: "/",
   },
 ];
 

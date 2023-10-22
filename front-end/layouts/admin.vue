@@ -10,13 +10,13 @@ useHead({
 </script>
 <template>
   <v-app>
-    <admins-layout-navbar />
-    <admins-layout-header />
+    <admin-layout-navbar />
+    <admin-layout-header />
     <v-main>
       <div class="main">
         <slot />
       </div>
-      <admins-layout-footer :class="['footer', { '-full': !isShowSidebar }]" />
+      <admin-layout-footer :class="['footer', { '-full': !isShowSidebar }]" />
     </v-main>
     <common-dialog />
   </v-app>

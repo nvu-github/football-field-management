@@ -17,10 +17,17 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: IUserJWT) {
-    const user = await this.authService.getUserById(payload.id)
+    console.log(payload);
+    const user = await this.authService.getUserById(payload.id);
     if (!user || !user.id) {
       throw new HttpException('Account is not exists!', HttpStatus.NOT_FOUND);
     }
-    return { id: payload.id, email: payload.email, name: payload.name, role: payload.role };
+    return {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      customerId: user.customerId,
+    };
   }
 }

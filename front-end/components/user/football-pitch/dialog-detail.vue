@@ -1,51 +1,57 @@
 <script lang="ts" setup>
-import { useDialogStore, useAccessoryStore } from "~/stores";
+import { useDialogStore, useFootballPitchStore } from "~/stores";
 import { formatPrice } from "~/utils/string";
 import { storeToRefs } from "pinia";
 const dialogStore = useDialogStore();
-const accessoryStore = useAccessoryStore();
-const { accessory } = storeToRefs(accessoryStore);
+const footballPitchStore = useFootballPitchStore();
+const { footballPitch } = storeToRefs(footballPitchStore);
 const { data } = dialogStore.dialog;
 
 function closeDetail() {
   dialogStore.closeDialog();
 }
-accessoryStore.getAccessory(data.id);
+console.log(footballPitch.value);
+footballPitchStore.getFootballPitch(data.id);
 </script>
 
 <template>
-  <div class="accessory-detail">
+  <div class="football-pitch">
     <v-card>
       <v-icon class="close" @click="closeDetail">mdi mdi-close-thick</v-icon>
       <v-card-title>
-        <span class="text-h5">Thông tin phụ kiện</span>
+        <span class="text-h5">Thông tin sân bóng</span>
       </v-card-title>
       <v-card-text>
         <v-row>
           <v-col
-            v-if="accessory && accessory?.images.length > 0"
+            v-if="footballPitch && footballPitch?.images.length > 0"
             md="6"
             class="image"
           >
-            <common-carousel class="carousel" :images="accessory?.images" />
+            <common-carousel class="carousel" :images="footballPitch?.images" />
           </v-col>
           <v-col
-            :md="accessory && accessory?.images.length > 0 ? 5 : 12"
+            :md="footballPitch && footballPitch?.images.length > 0 ? 5 : 12"
             class="info"
           >
             <p class="name row mt-0">
-              <b>Tên phụ kiện: </b>{{ accessory ? accessory?.name : "" }}
+              <b>Tên phụ kiện: </b
+              >{{ footballPitch ? footballPitch?.name : "" }}
             </p>
             <p class="type row">
               <b>Loại phụ kiện: </b>
               <v-chip
                 :color="
-                  accessory && accessory.accessoryTypeId ? 'primary' : 'danger'
+                  footballPitch && footballPitch.footballTypeId
+                    ? 'primary'
+                    : 'danger'
                 "
-                >{{ accessory ? accessory?.accessoryTypeName : "" }}</v-chip
+                >{{
+                  footballPitch ? footballPitch?.footballTypeId : ""
+                }}</v-chip
               >
             </p>
-            <p class="type row">
+            <!-- <p class="type row">
               <b>Trạng thái: </b>
               <v-chip
                 :color="
@@ -55,19 +61,19 @@ accessoryStore.getAccessory(data.id);
                   accessory && accessory.amount > 0 ? "Còn hàng" : "Hết hàng"
                 }}</v-chip
               >
-            </p>
+            </p> -->
             <p class="description row">
               <b class="label">Mô tả: </b
               ><span
-                v-if="accessory"
+                v-if="footballPitch"
                 class="ml-2"
-                v-html="accessory?.description"
+                v-html="footballPitch?.description"
               ></span>
             </p>
-            <p class="price row">
+            <!-- <p class="price row">
               <b class="label">Giá thuê: </b
-              >{{ accessory ? `${formatPrice(accessory?.price)} VNĐ` : "" }}
-            </p>
+              >{{ footballPitch ? `${formatPrice(footballPitch?.price)} VNĐ` : "" }}
+            </p> -->
           </v-col>
         </v-row>
       </v-card-text>
@@ -75,7 +81,7 @@ accessoryStore.getAccessory(data.id);
   </div>
 </template>
 <style lang="scss" scoped>
-.accessory-detail {
+.football-pitch-detail {
   position: relative;
   width: 800px;
   > .v-card {

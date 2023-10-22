@@ -89,7 +89,7 @@ export class AuthService {
         password: true,
         role: { select: { name: true } },
         staff: { select: { name: true } },
-        customer: { select: { name: true } },
+        customer: { select: { id: true, name: true } },
       },
     });
 
@@ -99,7 +99,14 @@ export class AuthService {
       name = 'admin';
     }
 
-    return { id, email, password, name, role: account.role.name };
+    return {
+      id,
+      email,
+      password,
+      name,
+      role: account.role.name,
+      customerId: account.customer ? account.customer.id : null,
+    };
   }
 
   googleLogin(req) {

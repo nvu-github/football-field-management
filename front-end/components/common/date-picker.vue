@@ -24,6 +24,11 @@ const props = defineProps({
     required: false,
     default: "",
   },
+  disabled: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
 });
 const emit = defineEmits(["update:modelValue"]);
 
@@ -60,6 +65,7 @@ function validDate() {
       :enable-time-picker="props.isTimePicker"
       :clear="false"
       :placeholder="props.placeholder"
+      :disabled="props.disabled"
       @blur="validDate"
     />
     <span v-if="isValid && messageError" class="message"

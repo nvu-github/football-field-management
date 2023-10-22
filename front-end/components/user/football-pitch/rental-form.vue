@@ -31,6 +31,8 @@ watchEffect(async () => {
     leasingDurationFound.value = footballPitchPrices.value.filter(
       (leasingDuration) => leasingDuration.footballPitchId === footballPitchId
     );
+    paramFootballPitchRental.value.leasingDurationId = null;
+    paramFootballPitchRental.value.rentalDate = null;
   }
 });
 
@@ -55,20 +57,23 @@ footballPitchStore.getFootballPitches();
       :items="footballPitches"
     ></v-autocomplete>
     <common-date-picker
-      v-model="paramFootballPitchRental.dateRental"
-      :format="format"
+      v-model="paramFootballPitchRental.rentalDate"
       message-error="Vui lòng chọn thời than thuê"
       placeholder="Chọn thời gian thuê"
+      :format="format"
+      :disabled="!paramFootballPitchRental.footballPitchId"
     />
     <v-autocomplete
       v-model="paramFootballPitchRental.leasingDurationId"
       label="Chọn khung giờ*"
-      item-value="leasingDurationId"
+      item-value="id"
       item-title="leasingDurationName"
       variant="underlined"
       class="mt-2"
-      :items="
-        paramFootballPitchRental.footballPitchId ? leasingDurationFound : []
+      :items="leasingDurationFound"
+      :disabled="
+        !paramFootballPitchRental.footballPitchId ||
+        !paramFootballPitchRental.rentalDate
       "
     ></v-autocomplete>
     <v-textarea
