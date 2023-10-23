@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, NotContains } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class PayloadCreatePaymentDto {
   @ApiProperty({
@@ -9,10 +9,10 @@ export class PayloadCreatePaymentDto {
   @IsNotEmpty()
   readonly amount: number;
 
-  @ApiProperty({
-    example: 'NCB',
-  })
-  @IsString()
-  @IsNotEmpty()
-  readonly bankCode: String;
+  // @ApiProperty({
+  //   example: 'NCB',
+  // })
+  // @IsString()
+  // @IsOptional()
+  // readonly bankCode: String;
 }

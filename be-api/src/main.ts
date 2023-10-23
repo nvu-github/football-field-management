@@ -17,21 +17,18 @@ async function bootstrap() {
   const whitelist = configuration().whitelistOrigins;
 
   app.enableCors({
-    // origin: function (origin, callback) {
-    //   if (
-    //     !whitelist ||
-    //     whitelist.length == 0 ||
-    //     whitelist.indexOf(origin) !== -1
-    //   ) {
-    //     callback(null, true);
-    //   } else {
-    //     callback(new Error('Not allowed by CORS'));
-    //   }
-    // },
-    // allowedHeaders: '*',
-    // methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-    // origin: 'http://localhost:3000',
-    origin: '*',
+    origin: function (origin, callback) {
+      if (
+        !whitelist ||
+        whitelist.length == 0 ||
+        whitelist.indexOf(origin) !== -1
+      ) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });
 
@@ -48,7 +45,6 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.use('/public', expressStatic(join(__dirname, '../..', 'public')));
-
   await app.listen(configuration().port || 8085);
 }
 bootstrap();

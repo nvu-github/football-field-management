@@ -3,7 +3,12 @@ import axios from "axios";
 const createInstance = (apiUrl: string) => {
   const instanceAxios = axios.create({
     baseURL: apiUrl,
-    credentials: true,
+    headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "*",
+      "Content-Type": "application/json",
+    },
+    withCredentials: true,
     transformResponse: [
       (data) => {
         try {

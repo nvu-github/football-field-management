@@ -10,7 +10,6 @@ const { data } = dialogStore.dialog;
 function closeDetail() {
   dialogStore.closeDialog();
 }
-console.log(footballPitch.value);
 footballPitchStore.getFootballPitch(data.id);
 </script>
 
@@ -35,11 +34,11 @@ footballPitchStore.getFootballPitch(data.id);
             class="info"
           >
             <p class="name row mt-0">
-              <b>Tên phụ kiện: </b
+              <b>Tên sân bóng: </b
               >{{ footballPitch ? footballPitch?.name : "" }}
             </p>
             <p class="type row">
-              <b>Loại phụ kiện: </b>
+              <b>Loại sân bóng: </b>
               <v-chip
                 :color="
                   footballPitch && footballPitch.footballTypeId

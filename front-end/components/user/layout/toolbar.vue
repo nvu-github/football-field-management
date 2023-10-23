@@ -19,7 +19,7 @@ const menus = [
   },
   {
     title: "Lịch sử đặt sân",
-    url: "/",
+    url: "/football-pitches/histories",
   },
 ];
 

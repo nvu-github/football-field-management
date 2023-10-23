@@ -240,7 +240,7 @@ export class FootballPitchesService {
   createFootballPitchType(
     payloads: PayloadFootballPitchTypeDto,
   ): Promise<IFootballPitchType> {
-    return this.prisma.footbalType.create({
+    return this.prisma.footballType.create({
       data: {
         ...payloads,
       },
@@ -255,7 +255,7 @@ export class FootballPitchesService {
     id: number,
     payloads: PayloadFootballPitchTypeDto,
   ): Promise<IFootballPitchType> {
-    return this.prisma.footbalType.update({
+    return this.prisma.footballType.update({
       where: {
         id,
       },
@@ -270,7 +270,7 @@ export class FootballPitchesService {
   }
 
   deleteFootballPitchType(id: number): Promise<IFootballPitchType> {
-    return this.prisma.footbalType.delete({
+    return this.prisma.footballType.delete({
       where: {
         id,
       },
@@ -282,7 +282,7 @@ export class FootballPitchesService {
   }
 
   getFootballPitchTypes(): Promise<IFootballPitchType[]> {
-    return this.prisma.footbalType.findMany({
+    return this.prisma.footballType.findMany({
       select: {
         id: true,
         name: true,
@@ -291,7 +291,7 @@ export class FootballPitchesService {
   }
 
   getFootballPitchType(id: number): Promise<IFootballPitchType> {
-    return this.prisma.footbalType.findUnique({
+    return this.prisma.footballType.findUnique({
       where: {
         id,
       },

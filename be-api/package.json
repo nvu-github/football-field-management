@@ -45,6 +45,7 @@
     "fs": "^0.0.1-security",
     "google-auth-library": "^9.1.0",
     "module-alias": "^2.2.3",
+    "moment": "^2.29.4",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.1",
     "prisma": "5.3.1",

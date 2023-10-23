@@ -1,12 +1,12 @@
 <script lang="ts" setup>
 import { formatISO } from "date-fns";
 import { storeToRefs } from "pinia";
-import { useAppStore, usePaymentStore, useCustomerStore } from "~/stores";
+import { useAppStore, useCustomerStore, useDialogStore } from "~/stores";
 
 const route = useRoute();
-const { $toast }: any = useNuxtApp();
 const customerStore = useCustomerStore();
 const appStore = useAppStore();
+const dialogStore = useDialogStore();
 const { breadCrumbs } = storeToRefs(appStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
 breadCrumbs.value = [
@@ -22,39 +22,15 @@ breadCrumbs.value = [
   },
 ];
 
-resetForm();
+customerStore.resetForm();
 if (route.query && route.query.id) {
   paramFootballPitchRental.value.footballPitchId = Number(route.query.id);
 }
 
 async function submitRentalInfo() {
-  usePaymentStore().createPaymentUrl({
-    amount: 10000,
-    bankCode: "NCB",
-  });
-  // try {
-  //   await customerStore.createCustomerFootballPitchRental({
-  //     ...paramFootballPitchRental.value,
-  //     rentalDate: formatISO(
-  //       new Date(paramFootballPitchRental.value.rentalDate)
-  //     ),
-  //   });
-  //   resetForm();
-  //   $toast.success("Đặt sân bóng thành công, vui lòng chờ chúng tôi xác nhận");
-  // } catch (err) {
-  //   console.log(err);
-  //   $toast.error("Đặt sân bóng thất bại");
-  // }
-}
-
-function resetForm() {
-  paramFootballPitchRental.value = {
-    footballPitchId: null,
-    rentalDate: null,
-    leasingDurationId: null,
-    customerAccessoryRentals: [],
-    note: "",
-  };
+  dialogStore.showDialog(
+    resolveComponent("user-football-pitch-dialog-payment")
+  );
 }
 </script>
 <template>
@@ -79,8 +55,7 @@ function resetForm() {
           <user-football-pitch-rental-info />
         </v-col>
         <div class="action">
-          <!-- :disabled="!paramFootballPitchRental.value" -->
-          <v-btn class="button -success" type="submit"> Đặt sân </v-btn>
+          <v-btn class="button -success" type="submit" :disabled="!paramFootballPitchRental.value"> Đặt sân </v-btn>
         </div>
       </v-row>
     </v-form>

@@ -37,8 +37,8 @@ export interface ImagePreview {
 }
 
 export interface PayLoadPayment {
-  amount: number;
-  bankCode: string;
+  amount: number | null;
+  pricePayment?: number;
 }
 
 export const useAppStore = defineStore("appStore", () => {
@@ -103,6 +103,10 @@ export const useDialogStore = defineStore("dialogStore", () => {
 
 export const usePaymentStore = defineStore("paymentStore", () => {
   const { $apis }: any = useNuxtApp();
+  const payloadAmountPayment = ref<PayLoadPayment>({
+    amount: 0,
+    pricePayment: 0
+  })
 
   function createPaymentUrl(payload: PayLoadPayment) {
     return $apis.post("payment/create-payment-url", {
@@ -110,5 +114,5 @@ export const usePaymentStore = defineStore("paymentStore", () => {
     });
   }
 
-  return { createPaymentUrl };
+  return {payloadAmountPayment, createPaymentUrl };
 });

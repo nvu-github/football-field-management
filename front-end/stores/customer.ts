@@ -30,5 +30,16 @@ export const useCustomerStore = defineStore("customerStore", () => {
     });
   }
 
-  return { paramFootballPitchRental, createCustomerFootballPitchRental };
+
+function resetForm() {
+  paramFootballPitchRental.value = {
+    footballPitchId: null,
+    rentalDate: null,
+    leasingDurationId: null,
+    customerAccessoryRentals: [],
+    note: "",
+  };
+}
+
+  return { paramFootballPitchRental, createCustomerFootballPitchRental, resetForm };
 });

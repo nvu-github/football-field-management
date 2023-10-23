@@ -10,6 +10,7 @@ import {
   useFootballPitchStore,
   useFootballPitchPriceStore,
   useAuthStore,
+  usePaymentStore
 } from "~/stores";
 import { generateId, formatPrice } from "~/utils/string";
 import { convertProxyObjToObj } from "~/utils/object";
@@ -68,11 +69,13 @@ const customerStore = useCustomerStore();
 const accessoryStore = useAccessoryStore();
 const footballPitchStore = useFootballPitchStore();
 const footballPitchPriceStore = useFootballPitchPriceStore();
+const paymentStore = usePaymentStore();
 const authStore = useAuthStore();
 const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
 const { footballPitch } = storeToRefs(footballPitchStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
 const { accessories } = storeToRefs(accessoryStore);
+const { payloadAmountPayment } = storeToRefs(paymentStore);
 const { user } = storeToRefs(authStore);
 const dialogStore = useDialogStore();
 const footballPitchPriceFound = ref<Object>({});
@@ -98,6 +101,7 @@ watchEffect(async () => {
           leasingDurationRentalId?.leasingDurationId &&
         footballPitchPrice.footballPitchId === footballPitchId
     );
+    payloadAmountPayment.value.pricePayment = footballPitchPriceFound.value.price
   }
 });
 

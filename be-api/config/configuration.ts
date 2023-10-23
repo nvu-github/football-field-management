@@ -8,8 +8,14 @@ export default () => ({
     expires: process.env.JWT_EXPIRES,
   },
   salt: process.env.SALT,
-  whitelistOrigins: ['http://localhost:3000'],
+  whitelistOrigins: [],
   stripe: {
     secretKey: process.env.STRIPE_SECRET_KEY,
   },
+  payment: {
+    vnpayUrl: process.env.VNPAY_URL,
+    tmnCodeVnPay: process.env.VNPAY_TMN_CODE,
+    secretKeyVnPay: process.env.VNPAY_SECRET_KEY,
+    returnUrlVnPay: process.env.VNPAY_RETURN_URL
+  }
 });
