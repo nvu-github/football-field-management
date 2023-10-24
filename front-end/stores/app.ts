@@ -16,9 +16,9 @@ export interface SubMenu {
 }
 
 export interface BreadCrumb {
-  title: string;
-  disabled: boolean;
-  href: string;
+  title: string | null;
+  disabled: boolean | null;
+  href: string | null;
 }
 
 type DialogContent = Component | string;
@@ -38,7 +38,7 @@ export interface ImagePreview {
 
 export interface PayLoadPayment {
   amount: number | null;
-  pricePayment?: number;
+  pricePayment?: number | null;
 }
 
 export const useAppStore = defineStore("appStore", () => {
@@ -114,5 +114,9 @@ export const usePaymentStore = defineStore("paymentStore", () => {
     });
   }
 
-  return {payloadAmountPayment, createPaymentUrl };
+  function getPaymentResult(query: string) {
+    return $apis.get(`payment/vnpay-return?${query}`);
+  }
+
+  return {payloadAmountPayment, createPaymentUrl, getPaymentResult };
 });

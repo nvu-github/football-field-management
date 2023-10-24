@@ -1,9 +1,9 @@
 export interface CustomerFootballPitchRental {
   footballPitchId: number | null;
-  rentalDate: Date | null;
+  rentalDate: String | null;
   leasingDurationId: number | null;
   customerAccessoryRentals?: CustomerAccessoryRental[];
-  note: string;
+  note?: string;
 }
 
 export interface CustomerAccessoryRental {
@@ -31,15 +31,15 @@ export const useCustomerStore = defineStore("customerStore", () => {
   }
 
 
-function resetForm() {
-  paramFootballPitchRental.value = {
-    footballPitchId: null,
-    rentalDate: null,
-    leasingDurationId: null,
-    customerAccessoryRentals: [],
-    note: "",
-  };
-}
+  function resetForm() {
+    paramFootballPitchRental.value = {
+      footballPitchId: null,
+      rentalDate: null,
+      leasingDurationId: null,
+      customerAccessoryRentals: [],
+      note: "",
+    };
+  }
 
   return { paramFootballPitchRental, createCustomerFootballPitchRental, resetForm };
 });

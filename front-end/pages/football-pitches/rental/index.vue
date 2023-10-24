@@ -1,8 +1,12 @@
 <script lang="ts" setup>
-import { formatISO } from "date-fns";
 import { storeToRefs } from "pinia";
 import { useAppStore, useCustomerStore, useDialogStore } from "~/stores";
 
+definePageMeta({
+  middleware: ["payment"],
+});
+
+const { $toast }: any = useNuxtApp();
 const route = useRoute();
 const customerStore = useCustomerStore();
 const appStore = useAppStore();
@@ -28,9 +32,21 @@ if (route.query && route.query.id) {
 }
 
 async function submitRentalInfo() {
+  if (!validForm()) {
+    return $toast.error("Vui lòng nhập đầy đủ thông tin sân bóng");
+  }
   dialogStore.showDialog(
     resolveComponent("user-football-pitch-dialog-payment")
   );
+}
+
+function validForm(): boolean {
+  const { footballPitchId, rentalDate, leasingDurationId } =
+    paramFootballPitchRental.value;
+  if (!footballPitchId || !rentalDate || !leasingDurationId) {
+    return false;
+  }
+  return true;
 }
 </script>
 <template>
@@ -55,7 +71,13 @@ async function submitRentalInfo() {
           <user-football-pitch-rental-info />
         </v-col>
         <div class="action">
-          <v-btn class="button -success" type="submit" :disabled="!paramFootballPitchRental.value"> Đặt sân </v-btn>
+          <v-btn
+            class="button -success"
+            type="submit"
+            :disabled="!paramFootballPitchRental.value"
+          >
+            Đặt sân
+          </v-btn>
         </div>
       </v-row>
     </v-form>

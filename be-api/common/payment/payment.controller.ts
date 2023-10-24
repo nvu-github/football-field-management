@@ -41,7 +41,7 @@ export class PaymentController {
     const secretKey = this.secretKeyVnPay;
     let vnpUrl = this.vnpayUrl;
     const returnUrl =
-      `${this.returnUrlVnPay}football-pitches/thanks`;
+      `${this.returnUrlVnPay}football-pitches/rental`;
     const createDate = moment(date).format('YYYYMMDDHHmmss');
     const orderId = moment(date).format('DDHHmmss');
     const amount = body.amount;
@@ -77,7 +77,7 @@ export class PaymentController {
   }
 
   @Get('vnpay-return')
-  getVnPayReturn(@Request() req: any, @Response() res: any) {
+  getVnPayReturn(@Request() req: any) {
     let vnp_Params = req.query;
 
     let secureHash = vnp_Params['vnp_SecureHash'];

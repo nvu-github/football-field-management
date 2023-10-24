@@ -24,6 +24,8 @@ const formattedPrice = computed<any>({
   set: (value) => {
     if (value) {
       payloadAmountPayment.value.amount = parseInt(value.replace(/\./g, ""), 10);
+    } else {
+      payloadAmountPayment.value.amount = null
     }
   },
 });
@@ -32,12 +34,17 @@ payloadAmountPayment.value.amount = Number(payloadAmountPayment.value.pricePayme
 
 async function confirmPayment() {
   try {
+    const {amount, pricePayment} = payloadAmountPayment.value
+    const priceValue = Number(pricePayment) * 0.3 
+    if (Number(amount) < priceValue) {
+      return $toast.error('Số tiền thanh toán không được nhỏ hơn tiền cọc')
+    }
     const paymentUrl = await paymentStore.createPaymentUrl({
-      amount: payloadAmountPayment.value?.amount || 0,
+      amount,
     });
     const { paymentRedirect } = paymentUrl.data;
-    customerStore.resetForm();
     window.location.href = paymentRedirect;
+    customerStore.resetForm();
   } catch (err) {
     console.log(err);
     $toast.error("Đặt sân bóng thất bại");

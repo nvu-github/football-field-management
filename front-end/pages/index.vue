@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import defaultFootballImage from "~/public/logo.png";
 import { format, isEqual } from "date-fns";
 import { storeToRefs } from "pinia";
 import { useRuntimeConfig } from "nuxt/app";
@@ -56,7 +57,11 @@ footballPitchStore.getFootballPitchRentalInfo();
           :price="rentalInfo.price"
           :status="rentalInfo.status"
           :football-pitch-type="rentalInfo.footballPitchTypeName"
-          :avatar="`${runtimeConfig.public.API_URL}public/${rentalInfo.images[0].url}`"
+          :avatar="
+            rentalInfo.images.length > 0
+              ? `${runtimeConfig.public.API_URL}public/${rentalInfo.images[0].url}`
+              : defaultFootballImage
+          "
         />
       </v-col>
     </v-row>
@@ -77,7 +82,11 @@ footballPitchStore.getFootballPitchRentalInfo();
           :price="asccessory.price"
           :typeId="asccessory.accessoryType.id"
           :typeName="asccessory.accessoryType.name"
-          :avatar="`${runtimeConfig.public.API_URL}public/${asccessory.accessoryImage[0].url}`"
+          :avatar="
+            asccessory.accessoryImage.length > 0
+              ? `${runtimeConfig.public.API_URL}public/${asccessory.accessoryImage[0].url}`
+              : defaultFootballImage
+          "
         />
       </v-col>
     </v-row>
