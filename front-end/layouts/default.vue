@@ -6,20 +6,20 @@ const { breadCrumbs } = storeToRefs(appStore);
 </script>
 <template>
   <v-app class="layout-default">
-    <!-- <div class="layout-header">
+    <div class="layout-header">
       <user-layout-header class="header" />
     </div>
     <div class="layout-toolbar">
       <user-layout-toolbar class="toolbar" />
-    </div> -->
+    </div>
     <div class="main">
-      <!-- <v-breadcrumbs
+      <v-breadcrumbs
         v-if="breadCrumbs && breadCrumbs.length > 0"
         :items="breadCrumbs"
-      /> -->
+      />
       <slot />
     </div>
-    <!-- <user-layout-footer class="footer" /> -->
+    <user-layout-footer class="footer" />
     <common-dialog />
   </v-app>
 </template>

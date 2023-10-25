@@ -8,7 +8,6 @@ const createInstance = (apiUrl: string) => {
       "Access-Control-Allow-Headers": "*",
       "Content-Type": "application/json",
     },
-    withCredentials: true,
     transformResponse: [
       (data) => {
         try {

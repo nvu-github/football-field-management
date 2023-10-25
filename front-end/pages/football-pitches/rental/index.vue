@@ -45,9 +45,19 @@ if (route.query) {
       Number(id) === leasingDuration.footballPitchId &&
       leasingDuration.leasingDurationName === durationTime
   );
+  console.log(
+    "\x1B[41;93mrental/index.vue (Line 48), leasingDuration:",
+    leasingDuration
+  );
   paramFootballPitchRental.value.footballPitchId = Number(id);
-  paramFootballPitchRental.value.rentalDate = parse(rentalDate, 'dd/MM/yyyy', new Date());
-  paramFootballPitchRental.value.leasingDurationId = leasingDuration ? Number(leasingDuration.leasingDurationId) : null;
+  paramFootballPitchRental.value.rentalDate = parse(
+    rentalDate,
+    "dd/MM/yyyy",
+    new Date()
+  );
+  paramFootballPitchRental.value.leasingDurationId = leasingDuration
+    ? Number(leasingDuration.leasingDurationId)
+    : null;
 }
 
 async function submitRentalInfo() {
