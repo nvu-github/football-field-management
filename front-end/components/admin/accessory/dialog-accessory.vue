@@ -66,10 +66,7 @@ const formattedPrice = computed({
   },
   set: (value) => {
     if (value) {
-      paramsAccessory.value.price = parseInt(
-        value.replace(/\./g, ""),
-        10
-      );
+      paramsAccessory.value.price = parseInt(value.replace(/\./g, ""), 10);
     }
   },
 });
@@ -221,7 +218,9 @@ accessoryTypeStore.getAccessoryTypes();
                     variant="underlined"
                     :rules="[rules.price]"
                     required
-                  ></v-text-field>
+                  >
+                    <template #append> VNĐ </template>
+                  </v-text-field>
                 </v-col>
               </v-row>
               <v-autocomplete

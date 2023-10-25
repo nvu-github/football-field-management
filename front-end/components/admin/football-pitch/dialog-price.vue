@@ -35,7 +35,9 @@ const paramsFootballPitchPrice = ref<ParamsFootballPitchPrice>({
   leasingDurationId: null,
   price: null,
 });
-let formattedLeasingDurations = formattedLeasingDuration(leasingDurations.value);
+let formattedLeasingDurations = formattedLeasingDuration(
+  leasingDurations.value
+);
 
 const formattedPrice = computed({
   get: () => {
@@ -196,7 +198,9 @@ footballPitchStore.getFootballPitches();
                 variant="underlined"
                 :rules="[rules.price]"
                 required
-              ></v-text-field>
+              >
+                <template #append> VNĐ </template>
+              </v-text-field>
             </v-col>
           </v-row>
         </v-card-text>

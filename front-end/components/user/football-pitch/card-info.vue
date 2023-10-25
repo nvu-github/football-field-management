@@ -39,6 +39,28 @@ const props = defineProps({
     required: true,
   },
 });
+
+function getStatusFootball(status: string) {
+  let message = "Đã đặt";
+  let color = "error";
+
+  if (status === "PENDING") {
+    message = "Đang đặt";
+    color = "deep-purple";
+  }
+
+  if (status === "EMPTY") {
+    message = "Trống";
+    color = "primary";
+  }
+
+  return {
+    message,
+    color,
+  };
+}
+
+const rentalDate = format(new Date(props.rentalDate), "dd/MM/yyyy");
 </script>
 <template>
   <v-card class="card-info mx-auto">
@@ -52,7 +74,7 @@ const props = defineProps({
         </div>
         <div class="day">
           <v-icon>mdi mdi-calendar-range</v-icon>
-          {{ format(new Date(props.rentalDate), "dd/MM/yyyy") }}
+          {{ rentalDate }}
         </div>
       </v-card-subtitle>
       <v-card-text class="content pt-0">
@@ -62,9 +84,13 @@ const props = defineProps({
         </div>
         <div class="status">
           <b class="title">Trạng thái: </b>
-          <v-chip :color="props.status === 'ACCEPT' ? 'error' : 'primary'">{{
-            props.status === "ACCEPT" ? "Đã đặt" : "Trống"
-          }}</v-chip>
+          <v-chip
+            :class="{
+              pending: props.status,
+            }"
+            :color="getStatusFootball(props.status).color"
+            >{{ getStatusFootball(props.status).message }}</v-chip
+          >
         </div>
         <div class="price mt-2">
           <b class="title">Giá thuê:</b> {{ formatPrice(props.price) }} VNĐ
@@ -76,7 +102,7 @@ const props = defineProps({
             <v-btn
               v-bind="props"
               class="button -primary -rental"
-              :to="`football-pitches/rental?id=${id}`"
+              :to="`football-pitches/rental?id=${id}&startTime=${startTime}&endTime=${endTime}&rentalDate=${rentalDate}`"
             >
               <v-icon>mdi mdi-alpha-r-circle-outline</v-icon>
             </v-btn>
@@ -108,6 +134,9 @@ const props = defineProps({
   > :deep(.v-img) > .v-img__img {
     width: 300px;
   }
+  // :deep(.pending) > .v-chip__content {
+  //   color: rgb(231, 162, 23)
+  // }
 }
 
 .card-content {
@@ -124,7 +153,7 @@ const props = defineProps({
     padding: 16px 0 2px;
   }
   > .content > .price {
-    color: #ff0000;
+    color: #e60000;
   }
   > .content > .price > .title {
     color: #000;

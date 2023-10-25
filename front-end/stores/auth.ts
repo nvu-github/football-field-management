@@ -26,7 +26,7 @@ export const useAuthStore = defineStore("authStore", () => {
     });
   }
 
-  function setUserToLocalStorage() {
+  function setUserInfoFromLocalStorage() {
     const userLoggedIn = localStorage.getItem("userLogin");
     if (userLoggedIn) {
       user.value = JSON.parse(userLoggedIn);
@@ -34,11 +34,8 @@ export const useAuthStore = defineStore("authStore", () => {
   }
 
   function signOut() {
-    return new Promise((resolve, reject) => {
-      localStorage.removeItem("userLogin");
-      resolve();
-    });
+    localStorage.removeItem("userLogin");
   }
 
-  return { user, setUserToLocalStorage, signIn, signInGoogle, signOut };
+  return { user, setUserInfoFromLocalStorage, signIn, signInGoogle, signOut };
 });

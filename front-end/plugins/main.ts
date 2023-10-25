@@ -1,6 +1,8 @@
-import { useAuthStore } from "~/stores";
+import { useAuthStore, useCustomerStore } from "~/stores";
 
 export default defineNuxtPlugin(() => {
   const authStore = useAuthStore();
-  authStore.setUserToLocalStorage();
+  const customerStore = useCustomerStore();
+  authStore.setUserInfoFromLocalStorage();
+  customerStore.setFootballPitchRentalFromLocalStorage();
 });

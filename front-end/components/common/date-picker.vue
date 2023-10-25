@@ -38,6 +38,10 @@ const vModel = computed({
 
 const isValid = ref<boolean>(false);
 
+watch(vModel, function (newVal) {
+  if (newVal) isValid.value = false;
+});
+
 function validDate() {
   if (!vModel.value) isValid.value = true;
   else isValid.value = false;

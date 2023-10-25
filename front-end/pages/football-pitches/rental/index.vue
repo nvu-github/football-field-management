@@ -1,6 +1,12 @@
 <script lang="ts" setup>
+import { parse, isSameDay, isAfter } from "date-fns";
 import { storeToRefs } from "pinia";
-import { useAppStore, useCustomerStore, useDialogStore } from "~/stores";
+import {
+  useAppStore,
+  useCustomerStore,
+  useDialogStore,
+  useFootballPitchPriceStore,
+} from "~/stores";
 
 definePageMeta({
   middleware: ["payment"],
@@ -11,8 +17,12 @@ const route = useRoute();
 const customerStore = useCustomerStore();
 const appStore = useAppStore();
 const dialogStore = useDialogStore();
+const footballPitchPriceStore = useFootballPitchPriceStore();
 const { breadCrumbs } = storeToRefs(appStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
+const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
+
+await footballPitchPriceStore.getFootballPitchPrices();
 breadCrumbs.value = [
   {
     title: "Trang chủ",
@@ -27,26 +37,65 @@ breadCrumbs.value = [
 ];
 
 customerStore.resetForm();
-if (route.query && route.query.id) {
-  paramFootballPitchRental.value.footballPitchId = Number(route.query.id);
+if (route.query) {
+  const { id, startTime, endTime, rentalDate } = route.query;
+  const durationTime = `${startTime} - ${endTime}`;
+  const leasingDuration = footballPitchPrices.value.find(
+    (leasingDuration) =>
+      Number(id) === leasingDuration.footballPitchId &&
+      leasingDuration.leasingDurationName === durationTime
+  );
+  paramFootballPitchRental.value.footballPitchId = Number(id);
+  paramFootballPitchRental.value.rentalDate = parse(rentalDate, 'dd/MM/yyyy', new Date());
+  paramFootballPitchRental.value.leasingDurationId = leasingDuration ? Number(leasingDuration.leasingDurationId) : null;
 }
 
 async function submitRentalInfo() {
-  if (!validForm()) {
-    return $toast.error("Vui lòng nhập đầy đủ thông tin sân bóng");
+  const formValidation = validForm();
+
+  if (!formValidation.status) {
+    const errorMessage = formValidation.message
+      ? `Vui lòng nhập thông tin ${formValidation.message}`
+      : "Thời gian đặt sân phải lớn hơn hoặc bằng ngày hiện tại";
+
+    return $toast.error(errorMessage);
   }
+
   dialogStore.showDialog(
     resolveComponent("user-football-pitch-dialog-payment")
   );
 }
 
-function validForm(): boolean {
+function validForm() {
+  let message = "sân bóng";
+  let status = true;
   const { footballPitchId, rentalDate, leasingDurationId } =
     paramFootballPitchRental.value;
-  if (!footballPitchId || !rentalDate || !leasingDurationId) {
-    return false;
+  const currentDate = new Date();
+
+  if (!footballPitchId) {
+    status = false;
   }
-  return true;
+
+  if (!rentalDate) {
+    message = "thời gian đặt sân";
+    status = false;
+  }
+
+  if (!leasingDurationId) {
+    message = "khung giờ";
+    status = false;
+  }
+
+  const validDate =
+    isAfter(new Date(rentalDate), currentDate) ||
+    isSameDay(new Date(rentalDate), currentDate);
+  if (!validDate) {
+    message = "";
+    status = false;
+  }
+
+  return { status, message };
 }
 </script>
 <template>

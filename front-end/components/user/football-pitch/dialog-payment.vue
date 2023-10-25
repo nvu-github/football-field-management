@@ -1,6 +1,11 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
-import { useDialogStore, usePaymentStore, useCustomerStore } from "~/stores";
+import {
+  useDialogStore,
+  usePaymentStore,
+  useCustomerStore,
+  useAccessoryStore,
+} from "~/stores";
 import { formatPrice } from "~/utils/string";
 
 const rules = {
@@ -11,8 +16,12 @@ const { $toast }: any = useNuxtApp();
 const dialogStore = useDialogStore();
 const paymentStore = usePaymentStore();
 const customerStore = useCustomerStore();
+const accessoryStore = useAccessoryStore();
+const { accessories } = storeToRefs(accessoryStore);
 const { payloadAmountPayment } = storeToRefs(paymentStore);
-
+const { paramFootballPitchRental } = storeToRefs(customerStore);
+let rentalPrice = 0;
+let subRentalPrice = 0;
 
 const formattedPrice = computed<any>({
   get: () => {
@@ -23,38 +32,54 @@ const formattedPrice = computed<any>({
   },
   set: (value) => {
     if (value) {
-      payloadAmountPayment.value.amount = parseInt(value.replace(/\./g, ""), 10);
+      payloadAmountPayment.value.amount = parseInt(
+        value.replace(/\./g, ""),
+        10
+      );
     } else {
-      payloadAmountPayment.value.amount = null
+      payloadAmountPayment.value.amount = null;
     }
   },
 });
 
-payloadAmountPayment.value.amount = Number(payloadAmountPayment.value.pricePayment) * 0.3 || null
+const { customerAccessoryRentals } = paramFootballPitchRental.value;
+const accessoryTotalPrice = customerAccessoryRentals?.reduce(
+  (total, accessory) => {
+    const accessoryFound: any = accessories.value.find(
+      (accessoryVal: any) => accessoryVal.id === accessory.accessoryId
+    );
+    return (total += accessoryFound.price);
+  },
+  0
+);
+
+rentalPrice = (Number(payloadAmountPayment.value.pricePayment) + Number(accessoryTotalPrice))
+subRentalPrice = (Number(payloadAmountPayment.value.pricePayment) + Number(accessoryTotalPrice)) * 0.3
+
+payloadAmountPayment.value.amount = subRentalPrice;
 
 async function confirmPayment() {
   try {
-    const {amount, pricePayment} = payloadAmountPayment.value
-    const priceValue = Number(pricePayment) * 0.3 
+    const { amount, pricePayment } = payloadAmountPayment.value;
+    const priceValue = Number(pricePayment) * 0.3;
     if (Number(amount) < priceValue) {
-      return $toast.error('Số tiền thanh toán không được nhỏ hơn tiền cọc')
+      return $toast.error("Số tiền thanh toán không được nhỏ hơn tiền cọc");
     }
     const paymentUrl = await paymentStore.createPaymentUrl({
       amount,
     });
     const { paymentRedirect } = paymentUrl.data;
+    localStorage.setItem('customerFootballPitchRental', JSON.stringify(paramFootballPitchRental.value))
     window.location.href = paymentRedirect;
-    customerStore.resetForm();
   } catch (err) {
     console.log(err);
-    $toast.error("Đặt sân bóng thất bại");
+    $toast.error("Có lỗi xảy ra trong quá trình đặt sân");
   }
 }
 
 function cancelPayment() {
   dialogStore.closeDialog();
 }
-
 </script>
 
 <template>
@@ -64,10 +89,14 @@ function cancelPayment() {
         <v-container>
           <v-row>
             <v-col cols="12">
-              <p>
-                Để đặt sân quý khác vui lòng thanh toán trước tiền thuê hoặc
+              <div class="title mb-4">
+                Để đặt sân quý khách vui lòng thanh toán trước tiền thuê <br /> hoặc
                 thanh toán đặt cọc 30% tiền thuê
-              </p>
+              </div>
+              <div class="subtitle">
+                <p class="price mb-2"><b class="label">Tiền cọc: </b> {{ formatPrice(subRentalPrice) }} <span class="unit">VNĐ</span>  </p>
+                <p class="price mb-2"><b class="label">Tổng tiền sân: </b> {{ formatPrice(rentalPrice) }} <span class="unit">VNĐ</span> </p>
+              </div>
               <v-text-field
                 v-model.trim="formattedPrice"
                 label="Qúy khác vui lòng nhập số tiền thanh toán (VNĐ)*"
@@ -75,7 +104,11 @@ function cancelPayment() {
                 variant="underlined"
                 :rules="[rules.price]"
                 required
-              ></v-text-field>
+              >
+              <template #append>
+                VNĐ
+              </template>
+            </v-text-field>
             </v-col>
           </v-row>
         </v-container>
@@ -98,6 +131,19 @@ function cancelPayment() {
 .dialog-payment {
   :deep(.v-card) {
     padding: 5px;
+  }
+  :deep(.v-card-text) {
+    padding: 0;
+  }
+  :deep(.title) {
+    font-size: 20px;
+  }
+  :deep(.subtitle) > .price {
+    color: #e60000; 
+  }
+  :deep(.subtitle) > .price > .label,
+  :deep(.subtitle) > .price > .unit{
+    color: #000;
   }
 }
 </style>

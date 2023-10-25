@@ -1,6 +1,6 @@
 export interface CustomerFootballPitchRental {
   footballPitchId: number | null;
-  rentalDate: String | null;
+  rentalDate: String | null | Date;
   leasingDurationId: number | null;
   customerAccessoryRentals?: CustomerAccessoryRental[];
   note?: string;
@@ -9,7 +9,7 @@ export interface CustomerFootballPitchRental {
 export interface CustomerAccessoryRental {
   customerFootballPitchRentalId: number;
   amount: number;
-  accessoriesId: number;
+  accessoryId: number;
 }
 
 export const useCustomerStore = defineStore("customerStore", () => {
@@ -30,6 +30,12 @@ export const useCustomerStore = defineStore("customerStore", () => {
     });
   }
 
+  function setFootballPitchRentalFromLocalStorage() {
+    const customerFootballPitchRental = localStorage.getItem("customerFootballPitchRental");
+    if (customerFootballPitchRental) {
+      paramFootballPitchRental.value = JSON.parse(customerFootballPitchRental);
+    }
+  }
 
   function resetForm() {
     paramFootballPitchRental.value = {
@@ -39,7 +45,8 @@ export const useCustomerStore = defineStore("customerStore", () => {
       customerAccessoryRentals: [],
       note: "",
     };
+    localStorage.removeItem("customerFootballPitchRental");
   }
 
-  return { paramFootballPitchRental, createCustomerFootballPitchRental, resetForm };
+  return { paramFootballPitchRental, setFootballPitchRentalFromLocalStorage, createCustomerFootballPitchRental, resetForm };
 });

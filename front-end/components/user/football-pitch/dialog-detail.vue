@@ -95,7 +95,7 @@ footballPitchStore.getFootballPitch(data.id);
     display: flex;
   }
   :deep(.info) > .price {
-    color: #ff0000;
+    color: #e60000;
     font-weight: bold;
   }
   :deep(.info) > .price > .label {

@@ -5,7 +5,6 @@ const CUSTOMER_ROLE = 4;
 export default defineNuxtRouteMiddleware((to, from) => {
   const userInfo: any = user.value;
   if (userInfo) {
-    console.log(userInfo);
     const { loggedIn, roleId }: any = userInfo;
     if (loggedIn) {
       if (roleId === CUSTOMER_ROLE) {

@@ -79,7 +79,7 @@ const accessoryId = props.id;
     border-radius: 6px;
   }
   > .content > .price {
-    color: #ff0000;
+    color: #e60000;
   }
   > .content > .price > .label {
     color: #000;

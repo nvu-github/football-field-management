@@ -27,15 +27,13 @@ watchEffect(async () => {
   const { footballPitchId } = paramFootballPitchRental.value;
 
   if (footballPitchId) {
-    await footballPitchPriceStore.getFootballPitchPrices();
     leasingDurationFound.value = footballPitchPrices.value.filter(
       (leasingDuration) => leasingDuration.footballPitchId === footballPitchId
     );
-    paramFootballPitchRental.value.leasingDurationId = null;
-    paramFootballPitchRental.value.rentalDate = null;
+    // paramFootballPitchRental.value.leasingDurationId = null;
+    // paramFootballPitchRental.value.rentalDate = null;
   }
 });
-
 const format = (date: any): string => {
   const day = date.getDate();
   const month = date.getMonth() + 1;
@@ -43,6 +41,7 @@ const format = (date: any): string => {
 
   return `${day}/${month}/${year}`;
 };
+console.log('\x1B[41;93mfootball-pitch/rental-form.vue (Line 46), paramFootballPitchRental.value:', paramFootballPitchRental.value);
 footballPitchStore.getFootballPitches();
 </script>
 <template>

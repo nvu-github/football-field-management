@@ -23,6 +23,16 @@ const { user } = storeToRefs(authStore);
           <v-icon> mdi mdi-magnify </v-icon>
         </v-btn>
       </common-input>
+      <!-- <v-text-field
+        :loading="loading"
+        density="compact"
+        variant="solo"
+        label="Search templates"
+        append-inner-icon="mdi-magnify"
+        single-line
+        hide-details
+        @click:append-inner="onClick"
+      ></v-text-field> -->
       <nuxt-link v-if="!user" class="user" to="/auth/login">
         <v-icon class="icon">mdi mdi-account-circle</v-icon>
       </nuxt-link>

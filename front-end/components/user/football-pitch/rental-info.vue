@@ -322,7 +322,7 @@ accessoryStore.getAccessories();
     display: flex;
   }
   > .content > .fooballpitch > .row > .col > .price {
-    color: rgb(209, 32, 32);
+    color: #e60000;
     font-weight: bold;
   }
   > .content > .fooballpitch > .row > .col > .price > .label {

@@ -75,7 +75,7 @@ const vModel = computed({
 
 // .input.-error {
 //   :deep(.v-field__field) > .v-field__input {
-//     border: 1px solid #ff0000;
+//     border: 1px solid #e60000;
 //   }
 // }
 </style>
