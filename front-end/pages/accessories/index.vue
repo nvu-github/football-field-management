@@ -31,7 +31,7 @@ breadCrumbs.value = [
   },
 ];
 
-formattedAccessories.value = accessories.value
+formattedAccessories.value = accessories.value;
 function filterAccessory() {
   formattedAccessories.value = accessoryTypeId.value
     ? accessories.value.filter(
@@ -65,7 +65,7 @@ accessoryStore.getAccessories();
         </v-btn>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="formattedAccessories && formattedAccessories.length > 0">
       <v-col
         md="3"
         v-for="asccessory in formattedAccessories"
@@ -85,6 +85,7 @@ accessoryStore.getAccessories();
         />
       </v-col>
     </v-row>
+    <v-row class="emtpy" v-else> Không tìm thấy thông tin phụ kiện </v-row>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -93,5 +94,10 @@ accessoryStore.getAccessories();
     display: flex;
     align-items: center;
   }
+}
+
+.emtpy {
+  justify-content: center;
+  font-size: 30px;
 }
 </style>

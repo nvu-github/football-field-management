@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { formatISO } from 'date-fns';
+import { formatISO9075 } from 'date-fns';
 
 import { PrismaService } from '@src/prisma.service';
 
@@ -23,7 +23,7 @@ import { format } from 'date-fns';
 
 @Injectable()
 export class FootballPitchesService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   createFootballPitch(
     payloads: PayloadFootballPitchDto,
@@ -478,10 +478,10 @@ export class FootballPitchesService {
     });
   }
 
-  async getFootballPitchRentalNows(rentalDateQuery: Date): Promise<
-    IFootballPitchRentalNow[] | void
-  > {
-    console.log(rentalDateQuery)
+  async getFootballPitchRentalNows(
+    rentalDateQuery: Date,
+  ): Promise<IFootballPitchRentalNow[] | void> {
+    console.log(rentalDateQuery);
     const footballPitchRentalNows =
       await this.prisma.footballPitchLeasingDuration.findMany({
         select: {
@@ -529,13 +529,14 @@ export class FootballPitchesService {
       const customerRentalFound = customerFootballPitchRental.find(
         (customerRental) =>
           customerRental.footballPitchLeasingDurationId ===
-          footballPitchLeasingDurationId &&
+            footballPitchLeasingDurationId &&
           id === customerRental.footballPitchId &&
-          format(new Date(customerRental.rentalDate), 'dd/MM/yyyy') === format(new Date(rentalDateQuery), 'dd/MM/yyyy')
+          format(new Date(customerRental.rentalDate), 'dd/MM/yyyy') ===
+            format(new Date(rentalDateQuery), 'dd/MM/yyyy'),
       );
       const rentalDate = customerRentalFound
         ? customerRentalFound.rentalDate
-        : formatISO(new Date(rentalDateQuery));
+        : formatISO9075(new Date(rentalDateQuery));
       const statusFootballRental = customerRentalFound
         ? customerRentalFound.status
         : 'EMPTY';

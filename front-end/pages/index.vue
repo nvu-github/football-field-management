@@ -35,61 +35,63 @@ footballPitchStore.getFootballPitchRentalInfo(formatISO9075(new Date()));
 </script>
 <template>
   <div class="home-page">
-    <v-row>
-      <v-col md="12">
-        <nuxt-link class="link" to="#">
-          <h1 class="h1">Lịch đặt sân hôm nay</h1>
-        </nuxt-link>
-      </v-col>
-      <v-col
-        md="6"
-        v-for="rentalInfo in formattedFootballPitchRental(
-          footballPitchRentalInfo
-        )"
-        :key="rentalInfo.id"
-      >
-        <user-football-pitch-card-info
-          :id="rentalInfo.id"
-          :name="rentalInfo.name"
-          :startTime="rentalInfo.startTime"
-          :endTime="rentalInfo.endTime"
-          :rentalDate="rentalInfo.rentalDate"
-          :price="rentalInfo.price"
-          :status="rentalInfo.status"
-          :football-pitch-type="rentalInfo.footballPitchTypeName"
-          :avatar="
-            rentalInfo.images.length > 0
-              ? `${runtimeConfig.public.API_URL}public/${rentalInfo.images[0].url}`
-              : defaultFootballImage
-          "
-        />
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col md="12">
-        <nuxt-link class="link" to="#">
-          <h1 class="h1">Danh sách phụ kiện</h1>
-        </nuxt-link>
-      </v-col>
-      <v-col
-        md="4"
-        v-for="asccessory in accessories.slice(0, 6)"
-        :key="asccessory.id"
-      >
-        <user-accessory-card-info
-          :id="asccessory.id"
-          :name="asccessory.name"
-          :price="asccessory.price"
-          :typeId="asccessory.accessoryTypeId"
-          :typeName="asccessory.accessoryTypeName"
-          :avatar="
-            asccessory.images.length > 0
-              ? `${runtimeConfig.public.API_URL}public/${asccessory.images[0].url}`
-              : defaultFootballImage
-          "
-        />
-      </v-col>
-    </v-row>
+    <v-container>
+      <v-row>
+        <v-col md="12">
+          <nuxt-link class="link" to="/football-pitches">
+            <h1 class="h1">Lịch đặt sân hôm nay</h1>
+          </nuxt-link>
+        </v-col>
+        <v-col
+          md="6"
+          v-for="rentalInfo in formattedFootballPitchRental(
+            footballPitchRentalInfo
+          )"
+          :key="rentalInfo.id"
+        >
+          <user-football-pitch-card-info
+            :id="rentalInfo.id"
+            :name="rentalInfo.name"
+            :startTime="rentalInfo.startTime"
+            :endTime="rentalInfo.endTime"
+            :rentalDate="rentalInfo.rentalDate"
+            :price="rentalInfo.price"
+            :status="rentalInfo.status"
+            :football-pitch-type="rentalInfo.footballPitchTypeName"
+            :avatar="
+              rentalInfo.images.length > 0
+                ? `${runtimeConfig.public.API_URL}public/${rentalInfo.images[0].url}`
+                : defaultFootballImage
+            "
+          />
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col md="12">
+          <nuxt-link class="link" to="/accessories">
+            <h1 class="h1">Danh sách phụ kiện</h1>
+          </nuxt-link>
+        </v-col>
+        <v-col
+          md="3"
+          v-for="asccessory in accessories.slice(0, 6)"
+          :key="asccessory.id"
+        >
+          <user-accessory-card-info
+            :id="asccessory.id"
+            :name="asccessory.name"
+            :price="asccessory.price"
+            :typeId="asccessory.accessoryTypeId"
+            :typeName="asccessory.accessoryTypeName"
+            :avatar="
+              asccessory.images.length > 0
+                ? `${runtimeConfig.public.API_URL}public/${asccessory.images[0].url}`
+                : defaultFootballImage
+            "
+          />
+        </v-col>
+      </v-row>
+    </v-container>
   </div>
 </template>
 <style lang="scss" scoped>

@@ -64,16 +64,16 @@ const formatDatePicker = (date: any): string => {
 };
 
 footballPitchInfoFound.value = footballPitchRentalInfo.value;
-function filterFootballInfo() {
+async function filterFootballInfo() {
   const { rentalDate, leasingDuration, status } =
     conditionFilterFootballPitch.value;
 
   if (rentalDate || leasingDuration || status) {
-
     if (rentalDate) {
-      footballPitchStore.getFootballPitchRentalInfo(
+      await footballPitchStore.getFootballPitchRentalInfo(
         formatISO9075(rentalDate)
       );
+      footballPitchInfoFound.value = footballPitchRentalInfo.value;
     }
 
     footballPitchInfoFound.value = footballPitchRentalInfo.value.filter(
@@ -112,7 +112,7 @@ leasingDurationStore.getLeasingDurations();
         <v-autocomplete
           v-model="conditionFilterFootballPitch.leasingDuration"
           label="Khung giờ"
-          item-value="id"
+          item-value="name"
           item-title="name"
           :items="formattedLeasingDuration(leasingDurations)"
           variant="underlined"
@@ -137,10 +137,10 @@ leasingDurationStore.getLeasingDurations();
         </v-btn>
       </v-col>
     </v-row>
-    <v-row>
+    <v-row v-if="footballPitchInfoFound && footballPitchInfoFound.length > 0">
       <v-col
         md="6"
-        v-for="rentalInfo in footballPitchInfoFound.map((footballPitch: any) => ({...footballPitch, rentalDate: format(new Date(footballPitch.rentalDate), 'dd/MM/yyyy')}))"
+        v-for="rentalInfo in footballPitchInfoFound"
         :key="rentalInfo.id"
       >
         <user-football-pitch-card-info
@@ -160,6 +160,7 @@ leasingDurationStore.getLeasingDurations();
         />
       </v-col>
     </v-row>
+    <v-row class="emtpy" v-else> Không tìm thấy thông tin sân bóng </v-row>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -171,5 +172,10 @@ leasingDurationStore.getLeasingDurations();
     display: flex;
     align-items: center;
   }
+}
+
+.emtpy {
+  justify-content: center;
+  font-size: 30px;
 }
 </style>

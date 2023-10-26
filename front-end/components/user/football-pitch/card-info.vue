@@ -1,6 +1,9 @@
 <script lang="ts" setup>
-import {format} from 'date-fns'
+import { format, isAfter, isSameDay } from "date-fns";
+import { useNuxtApp } from "nuxt/app";
 import { formatPrice } from "~/utils/string";
+const { $toast }: any = useNuxtApp();
+
 const props = defineProps({
   id: {
     type: Number,
@@ -60,6 +63,17 @@ function getStatusFootball(status: string) {
   };
 }
 
+function navigateToRental(id: number) {
+  const currentDate = new Date();
+  const validDate =
+    isAfter(new Date(props.rentalDate), currentDate) ||
+    isSameDay(new Date(props.rentalDate), currentDate);
+
+  if (!validDate) {
+    return $toast.error("Quý khách không thể đặt sân trước ngày hiện tại!");
+  }
+  navigateTo(`football-pitches/rental?id=${id}`);
+}
 </script>
 <template>
   <v-card class="card-info mx-auto">
@@ -73,7 +87,7 @@ function getStatusFootball(status: string) {
         </div>
         <div class="day">
           <v-icon>mdi mdi-calendar-range</v-icon>
-          {{ props.rentalDate }}
+          {{ format(new Date(props.rentalDate), "dd/MM/yyyy") }}
         </div>
       </v-card-subtitle>
       <v-card-text class="content pt-0">
@@ -101,7 +115,7 @@ function getStatusFootball(status: string) {
             <v-btn
               v-bind="props"
               class="button -primary -rental"
-              :to="`football-pitches/rental?id=${id}`"
+              @click="navigateToRental(id)"
             >
               <v-icon>mdi mdi-alpha-r-circle-outline</v-icon>
             </v-btn>
@@ -133,12 +147,10 @@ function getStatusFootball(status: string) {
   > :deep(.v-img) > .v-img__img {
     width: 300px;
   }
-  // :deep(.pending) > .v-chip__content {
-  //   color: rgb(231, 162, 23)
-  // }
 }
 
 .card-content {
+  padding-left: 10px;
   width: 45%;
   > .title {
     padding: 0;
