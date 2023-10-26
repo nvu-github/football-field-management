@@ -9,13 +9,14 @@ export interface ParamsFootballPitchImage {
 }
 
 export interface ParamsAccessory {
+  id?: number;
   name: string;
   description: string;
   amount: number;
   price: number;
   images: ParamsFootballPitchImage[];
   accessoryTypeId: number;
-  typeName: string;
+  accessoryTypeName: string;
 }
 
 export const useAccessoryStore = defineStore("accessoryStore", () => {

@@ -10,6 +10,7 @@ import {
   Get,
   Request,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
 import { FootballPitchesService } from './football-pitches.service';
@@ -73,8 +74,9 @@ export class FootballPitchesController {
   }
 
   @Get('rental/info')
-  async getFootballPitchRentalNows(): Promise<any> {
-    return await this.footballPitchService.getFootballPitchRentalNows();
+  async getFootballPitchRentalNows(@Query() query: any): Promise<any> {
+    const { rentalDate } = query
+    return await this.footballPitchService.getFootballPitchRentalNows(rentalDate);
   }
 
   @Post('types')

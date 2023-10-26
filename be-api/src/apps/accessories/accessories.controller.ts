@@ -238,7 +238,7 @@ export class AccessoriesController {
   @Get()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  getAccessoryes() {
+  getAccessories() {
     return this.accessoriesService.getAccessories();
   }
 }

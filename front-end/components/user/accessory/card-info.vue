@@ -30,7 +30,7 @@ const props = defineProps({
 
 const dialogStore = useDialogStore();
 
-async function getAccessoryDetail(id: string) {
+async function getAccessoryDetail(id: number) {
   await dialogStore.showDialog(
     resolveComponent("user-accessory-dialog-detail"),
     {
@@ -49,7 +49,9 @@ const accessoryId = props.id;
     <v-card-text class="content">
       <div class="status">
         <b class="label">Loại: </b>
-        <v-chip color="primary">{{ props.typeName }}</v-chip>
+        <v-chip :color="props.typeId === 1 ? 'primary' : 'orange'">{{
+          props.typeName
+        }}</v-chip>
       </div>
       <div class="price mt-2">
         <b class="label">Giá thuê:</b> {{ props.price }}

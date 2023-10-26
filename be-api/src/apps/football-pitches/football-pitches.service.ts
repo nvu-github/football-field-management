@@ -19,9 +19,11 @@ import {
   IFootballPitchRentalNow,
 } from './interfaces';
 
+import { format } from 'date-fns';
+
 @Injectable()
 export class FootballPitchesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   createFootballPitch(
     payloads: PayloadFootballPitchDto,
@@ -476,9 +478,10 @@ export class FootballPitchesService {
     });
   }
 
-  async getFootballPitchRentalNows(): Promise<
+  async getFootballPitchRentalNows(rentalDateQuery: Date): Promise<
     IFootballPitchRentalNow[] | void
   > {
+    console.log(rentalDateQuery)
     const footballPitchRentalNows =
       await this.prisma.footballPitchLeasingDuration.findMany({
         select: {
@@ -526,12 +529,13 @@ export class FootballPitchesService {
       const customerRentalFound = customerFootballPitchRental.find(
         (customerRental) =>
           customerRental.footballPitchLeasingDurationId ===
-            footballPitchLeasingDurationId &&
-          id === customerRental.footballPitchId,
+          footballPitchLeasingDurationId &&
+          id === customerRental.footballPitchId &&
+          format(new Date(customerRental.rentalDate), 'dd/MM/yyyy') === format(new Date(rentalDateQuery), 'dd/MM/yyyy')
       );
       const rentalDate = customerRentalFound
         ? customerRentalFound.rentalDate
-        : formatISO(new Date());
+        : formatISO(new Date(rentalDateQuery));
       const statusFootballRental = customerRentalFound
         ? customerRentalFound.status
         : 'EMPTY';

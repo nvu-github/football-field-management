@@ -1,12 +1,23 @@
 <script lang="ts" setup>
-import { useAppStore, useAccessoryStore } from "~/stores";
+import defaultFootballImage from "~/public/logo.png";
+import {
+  useAppStore,
+  useAccessoryStore,
+  useAccessoryTypeStore,
+} from "~/stores";
 import { useRuntimeConfig } from "nuxt/app";
 
 const appStore = useAppStore();
 const accessoryStore = useAccessoryStore();
 const runtimeConfig = useRuntimeConfig();
+const accessoryTypeStore = useAccessoryTypeStore();
 const { breadCrumbs } = storeToRefs(appStore);
 const { accessories } = storeToRefs(accessoryStore);
+const { accessoryTypes } = storeToRefs(accessoryTypeStore);
+
+const accessoryTypeId = ref<number>();
+const formattedAccessories = ref<ParamsAccessory>();
+
 breadCrumbs.value = [
   {
     title: "Trang chủ",
@@ -20,6 +31,16 @@ breadCrumbs.value = [
   },
 ];
 
+formattedAccessories.value = accessories.value
+function filterAccessory() {
+  formattedAccessories.value = accessoryTypeId.value
+    ? accessories.value.filter(
+        (accessory) => accessory.accessoryTypeId === accessoryTypeId.value
+      )
+    : accessories.value;
+}
+
+accessoryTypeStore.getAccessoryTypes();
 accessoryStore.getAccessories();
 </script>
 <template>
@@ -27,20 +48,16 @@ accessoryStore.getAccessories();
     <v-row class="row ml-1">
       <v-col md="3">
         <v-autocomplete
+          v-model="accessoryTypeId"
           label="Loại phụ kiện"
-          :items="[
-            'California',
-            'Colorado',
-            'Florida',
-            'Georgia',
-            'Texas',
-            'Wyoming',
-          ]"
+          item-value="id"
+          item-title="name"
+          :items="accessoryTypes"
           variant="underlined"
         ></v-autocomplete>
       </v-col>
       <v-col class="action" md="2">
-        <v-btn class="button -success">
+        <v-btn class="button -success" @click="filterAccessory">
           <template #prepend>
             <v-icon>mdi mdi-magnify</v-icon>
           </template>
@@ -51,16 +68,20 @@ accessoryStore.getAccessories();
     <v-row>
       <v-col
         md="3"
-        v-for="asccessory in accessories.slice(0, 6)"
+        v-for="asccessory in formattedAccessories"
         :key="asccessory.id"
       >
         <user-accessory-card-info
           :id="asccessory.id"
           :name="asccessory.name"
           :price="asccessory.price"
-          :typeId="asccessory.accessoryType.id"
-          :typeName="asccessory.accessoryType.name"
-          :avatar="`${runtimeConfig.public.API_URL}public/${asccessory.accessoryImage[0].url}`"
+          :typeId="asccessory.accessoryTypeId"
+          :typeName="asccessory.accessoryTypeName"
+          :avatar="
+            asccessory.images.length > 0
+              ? `${runtimeConfig.public.API_URL}public/${asccessory.images[0].url}`
+              : defaultFootballImage
+          "
         />
       </v-col>
     </v-row>

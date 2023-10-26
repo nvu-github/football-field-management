@@ -113,9 +113,9 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     footballPitch.value = footballPitchSingle.data;
   }
 
-  async function getFootballPitchRentalInfo() {
+  async function getFootballPitchRentalInfo(rentalDate: String) {
     const footballPitchRentalInfoList = await $apis.get(
-      `football-pitches/rental/info`
+      `football-pitches/rental/info?rentalDate=${rentalDate}`
     );
     footballPitchRentalInfo.value = footballPitchRentalInfoList.data;
   }

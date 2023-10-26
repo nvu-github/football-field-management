@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { format } from "date-fns";
+import {format} from 'date-fns'
 import { formatPrice } from "~/utils/string";
 const props = defineProps({
   id: {
@@ -60,7 +60,6 @@ function getStatusFootball(status: string) {
   };
 }
 
-const rentalDate = format(new Date(props.rentalDate), "dd/MM/yyyy");
 </script>
 <template>
   <v-card class="card-info mx-auto">
@@ -74,7 +73,7 @@ const rentalDate = format(new Date(props.rentalDate), "dd/MM/yyyy");
         </div>
         <div class="day">
           <v-icon>mdi mdi-calendar-range</v-icon>
-          {{ rentalDate }}
+          {{ props.rentalDate }}
         </div>
       </v-card-subtitle>
       <v-card-text class="content pt-0">
@@ -102,7 +101,7 @@ const rentalDate = format(new Date(props.rentalDate), "dd/MM/yyyy");
             <v-btn
               v-bind="props"
               class="button -primary -rental"
-              :to="`football-pitches/rental?id=${id}&startTime=${startTime}&endTime=${endTime}&rentalDate=${rentalDate}`"
+              :to="`football-pitches/rental?id=${id}`"
             >
               <v-icon>mdi mdi-alpha-r-circle-outline</v-icon>
             </v-btn>

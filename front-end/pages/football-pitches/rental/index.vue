@@ -37,27 +37,23 @@ breadCrumbs.value = [
 ];
 
 customerStore.resetForm();
-if (route.query) {
+if (route.query && route.query.id) {
   const { id, startTime, endTime, rentalDate } = route.query;
-  const durationTime = `${startTime} - ${endTime}`;
-  const leasingDuration = footballPitchPrices.value.find(
-    (leasingDuration) =>
-      Number(id) === leasingDuration.footballPitchId &&
-      leasingDuration.leasingDurationName === durationTime
-  );
-  console.log(
-    "\x1B[41;93mrental/index.vue (Line 48), leasingDuration:",
-    leasingDuration
-  );
   paramFootballPitchRental.value.footballPitchId = Number(id);
-  paramFootballPitchRental.value.rentalDate = parse(
-    rentalDate,
-    "dd/MM/yyyy",
-    new Date()
-  );
-  paramFootballPitchRental.value.leasingDurationId = leasingDuration
-    ? Number(leasingDuration.leasingDurationId)
-    : null;
+  // const durationTime = `${startTime} - ${endTime}`;
+  // const leasingDuration = footballPitchPrices.value.find(
+  //   (leasingDuration) =>
+  //     Number(id) === leasingDuration.footballPitchId &&
+  //     leasingDuration.leasingDurationName === durationTime
+  // );
+  // paramFootballPitchRental.value.rentalDate = parse(
+  //   rentalDate,
+  //   "dd/MM/yyyy",
+  //   new Date()
+  // );
+  // paramFootballPitchRental.value.leasingDurationId = leasingDuration
+  //   ? Number(leasingDuration.leasingDurationId)
+  //   : null;
 }
 
 async function submitRentalInfo() {

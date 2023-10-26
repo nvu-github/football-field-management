@@ -41,7 +41,6 @@ const format = (date: any): string => {
 
   return `${day}/${month}/${year}`;
 };
-console.log('\x1B[41;93mfootball-pitch/rental-form.vue (Line 46), paramFootballPitchRental.value:', paramFootballPitchRental.value);
 footballPitchStore.getFootballPitches();
 </script>
 <template>
