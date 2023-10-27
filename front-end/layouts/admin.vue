@@ -7,6 +7,7 @@ const { title } = app.value;
 useHead({
   title: title || "Sân bóng Hoàng Quân",
 });
+
 </script>
 <template>
   <v-app>

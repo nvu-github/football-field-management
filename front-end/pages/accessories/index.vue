@@ -85,7 +85,7 @@ accessoryStore.getAccessories();
         />
       </v-col>
     </v-row>
-    <v-row class="emtpy" v-else> Không tìm thấy thông tin phụ kiện </v-row>
+    <v-row class="empty" v-else> Không tìm thấy thông tin phụ kiện </v-row>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -94,10 +94,5 @@ accessoryStore.getAccessories();
     display: flex;
     align-items: center;
   }
-}
-
-.emtpy {
-  justify-content: center;
-  font-size: 30px;
 }
 </style>

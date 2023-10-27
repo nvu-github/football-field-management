@@ -149,10 +149,21 @@ function validForm() {
     display: flex;
     justify-content: center;
     width: 100%;
-    margin-top: 30px;
+    margin: 30px 0;
   }
   > .form > .row > .action > .button {
     width: 300px;
   }
+}
+
+@media (max-width: 768px) {
+  .football-pitches-rental-page {
+    > .form > .row > .info {
+      margin-left: 0;
+      width: 100%;
+      border-top: 1px solid #b4b2b2;
+      border-left: 0;
+    }
+}
 }
 </style>

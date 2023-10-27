@@ -46,6 +46,11 @@ export const useAccessoryStore = defineStore("accessoryStore", () => {
     accessories.value = accessoryList.data;
   }
 
+  async function getCustomerAccessories() {
+    const accessoryList = await $apis.get("accessories/public");
+    accessories.value = accessoryList.data;
+  }
+
   async function getAccessory(id: number) {
     const accessorySingle = await $apis.get(`accessories/${id}`);
     accessory.value = accessorySingle.data;
@@ -60,6 +65,7 @@ export const useAccessoryStore = defineStore("accessoryStore", () => {
     getAccessories,
     getAccessory,
     deleteImage,
+    getCustomerAccessories
   };
 });
 

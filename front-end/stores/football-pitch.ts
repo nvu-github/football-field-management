@@ -173,6 +173,13 @@ export const useLeasingDurationStore = defineStore(
       leasingDurations.value = leasingDurationList.data;
     }
 
+    async function getLeasingDurationPublics() {
+      const leasingDurationList = await $apis.get(
+        "football-pitches/leasing-durations/public"
+      );
+      leasingDurations.value = leasingDurationList.data;
+    }
+
     async function getLeasingDuration(id: number) {
       const leasingDurationSingle = await $apis.get(
         `football-pitches/leasing-durations/${id}`
@@ -186,6 +193,7 @@ export const useLeasingDurationStore = defineStore(
       updateLeasingDuration,
       getLeasingDurations,
       getLeasingDuration,
+      getLeasingDurationPublics
     };
   }
 );

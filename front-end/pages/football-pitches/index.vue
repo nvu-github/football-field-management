@@ -95,12 +95,12 @@ async function filterFootballInfo() {
   }
 }
 
-leasingDurationStore.getLeasingDurations();
+leasingDurationStore.getLeasingDurationPublics();
 </script>
 <template>
   <div class="football-pitch-page">
     <v-row class="row">
-      <v-col class="col" md="4">
+      <v-col class="col" lg="4" xs="12">
         <common-date-picker
           v-model="conditionFilterFootballPitch.rentalDate"
           class="datepicker"
@@ -108,7 +108,7 @@ leasingDurationStore.getLeasingDurations();
           :format="formatDatePicker"
         />
       </v-col>
-      <v-col md="3">
+      <v-col lg="3" xs="12">
         <v-autocomplete
           v-model="conditionFilterFootballPitch.leasingDuration"
           label="Khung giờ"
@@ -118,7 +118,7 @@ leasingDurationStore.getLeasingDurations();
           variant="underlined"
         ></v-autocomplete>
       </v-col>
-      <v-col md="3">
+      <v-col lg="3" xs="12">
         <v-autocomplete
           v-model="conditionFilterFootballPitch.status"
           label="Trạng thái"
@@ -128,7 +128,7 @@ leasingDurationStore.getLeasingDurations();
           variant="underlined"
         ></v-autocomplete>
       </v-col>
-      <v-col class="action" md="2">
+      <v-col class="action" md="lg" xs="12">
         <v-btn class="button -success" @click="filterFootballInfo">
           <template #prepend>
             <v-icon>mdi mdi-magnify</v-icon>
@@ -160,7 +160,7 @@ leasingDurationStore.getLeasingDurations();
         />
       </v-col>
     </v-row>
-    <v-row class="emtpy" v-else> Không tìm thấy thông tin sân bóng </v-row>
+    <v-row class="empty" v-else> Không tìm thấy thông tin sân bóng </v-row>
   </div>
 </template>
 <style lang="scss" scoped>
@@ -172,10 +172,5 @@ leasingDurationStore.getLeasingDurations();
     display: flex;
     align-items: center;
   }
-}
-
-.emtpy {
-  justify-content: center;
-  font-size: 30px;
 }
 </style>

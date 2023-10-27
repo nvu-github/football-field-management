@@ -12,6 +12,17 @@ export interface CustomerAccessoryRental {
   accessoryId: number;
 }
 
+export interface CustomerAccessoryRentalHistory {
+  id: number;
+  name: string;
+  footballPitchName: string;
+  status: string;
+  rentalDate: string;
+  price: string;
+  startTime: string;
+  endTime: string;
+}
+
 export const useCustomerStore = defineStore("customerStore", () => {
   const { $apis }: any = useNuxtApp();
   const paramFootballPitchRental = ref<CustomerFootballPitchRental>({
@@ -21,6 +32,7 @@ export const useCustomerStore = defineStore("customerStore", () => {
     customerAccessoryRentals: [],
     note: "",
   });
+  const customerFootballPitchRentalHistories = ref<CustomerAccessoryRentalHistory[]>()
 
   async function createCustomerFootballPitchRental(
     params: CustomerFootballPitchRental
@@ -28,6 +40,11 @@ export const useCustomerStore = defineStore("customerStore", () => {
     return await $apis.post("football-pitches/customer/rental", {
       ...convertProjectObjToObj(params),
     });
+  }
+
+  async function getCustomerFootballPitchRentalHisTories() {
+    const customerFootballPitchRentalHistoryList =  await $apis.get("football-pitches/rental/customer/histories")
+    customerFootballPitchRentalHistories.value = customerFootballPitchRentalHistoryList.data
   }
 
   function setFootballPitchRentalFromLocalStorage() {
@@ -48,5 +65,5 @@ export const useCustomerStore = defineStore("customerStore", () => {
     localStorage.removeItem("customerFootballPitchRental");
   }
 
-  return { paramFootballPitchRental, setFootballPitchRentalFromLocalStorage, createCustomerFootballPitchRental, resetForm };
+  return { paramFootballPitchRental, customerFootballPitchRentalHistories, setFootballPitchRentalFromLocalStorage, createCustomerFootballPitchRental, getCustomerFootballPitchRentalHisTories, resetForm };
 });

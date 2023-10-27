@@ -3,23 +3,34 @@ import { storeToRefs } from "pinia";
 import { useAppStore } from "~/stores";
 const appStore = useAppStore();
 const { breadCrumbs } = storeToRefs(appStore);
+
 </script>
 <template>
   <v-app class="layout-default">
     <!-- <div class="layout-header">
-      <user-layout-header class="header" />
+      <v-container>
+        <user-layout-header class="header" />
+      </v-container>
     </div> -->
     <div class="layout-toolbar">
-      <user-layout-toolbar class="toolbar" />
+      <v-container>
+        <user-layout-toolbar class="toolbar" />
+      </v-container>
     </div>
     <div class="main">
-      <!-- <v-breadcrumbs
-        v-if="breadCrumbs && breadCrumbs.length > 0"
-        :items="breadCrumbs"
-      /> -->
-      <slot />
+      <v-container>
+        <!-- <v-breadcrumbs
+          v-if="breadCrumbs && breadCrumbs.length > 0"
+          :items="breadCrumbs"
+        /> -->
+        <slot />
+      </v-container>
     </div>
-    <!-- <user-layout-footer class="footer" /> -->
+    <!-- <div class="layout-footer">
+      <v-container>
+        <user-layout-footer class="footer" />
+      </v-container>
+    </div> -->
     <common-dialog />
   </v-app>
 </template>
@@ -30,33 +41,37 @@ const { breadCrumbs } = storeToRefs(appStore);
   }
 }
 
-.layout-header > .header {
-  max-width: 1200px;
-  margin: 0 auto;
+.layout-header {
+  > .v-container > .header {
+    margin: 0 auto;
+  }
 }
 
 .layout-toolbar {
   background-color: #a9ca31;
-  > .toolbar {
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-  > .toolbar > :deep(.app-header) > .v-toolbar__content > .v-toolbar {
+  > .v-container
+    > .toolbar
+    > :deep(.app-header)
+    > .v-toolbar__content
+    > .v-toolbar {
     background-color: #a9ca31 !important;
   }
 }
 
 .main {
-  margin: 0 auto;
   padding: 10px 20px;
-  width: 1200px;
-  min-height: 500px;
+  min-height: 600px;
 }
 
-.footer {
-  margin: 50px 0 0 auto;
-  padding: 10px 20px 5px;
-  width: 100%;
+.layout-footer {
   background-color: #a9ca31;
+  > .v-container {
+    padding: 0 !important;
+  }
+
+  > .v-container > .footer {
+    padding: 10px 20px 5px;
+    width: 100%;
+  }
 }
 </style>

@@ -3,6 +3,10 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+.v-container {
+  padding: 0 16px 0 !important;
+}
+
 .button {
   border-radius: 5px;
   padding: 10px 20px;
@@ -46,6 +50,11 @@ body {
   display: none;
 }
 
+.empty {
+  justify-content: center;
+  font-size: 30px;
+}
+
 @media (max-width: 768px) {
   /* Auth */
   .detail-auth {
@@ -68,21 +77,21 @@ body {
   }
   .layout-toolbar {
     max-width: 900px;
-    > .toolbar-header > .navbar > .menu {
+    > .v-container > .toolbar-header > .navbar > .menu {
       display: none !important;
     }
-    > .toolbar-header > .navbar > .sidebaricon {
+    > .v-container > .toolbar-header > .navbar > .sidebaricon {
       display: block !important;
       padding: 10px 20px;
     }
-    > .toolbar-header > .navbar > .title {
+    > .v-container > .toolbar-header > .navbar > .title {
       display: block !important;
       padding: 5px;
     }
-    > .toolbar-header > .navbar > .title > .en {
+    > .v-container > .toolbar-header > .navbar > .title > .en {
       font-style: italic;
     }
-    > .toolbar-header > .navigationdrawer {
+    > .v-container > .toolbar-header > .navigationdrawer {
       display: block !important;
     }
   }
@@ -106,6 +115,32 @@ body {
       width: 85px;
       margin-right: 10px;
     }
+  }
+
+  .card-info {
+    > .avatar {
+      display: none;
+    }
+    > .card-content {
+      padding: 5px;
+      width: 100% !important;
+    }
+  }
+
+  .accessory-detail {
+    width: 100%;
+  }
+
+  .v-row {
+    flex-direction: column;
+  }
+
+  .button {
+    width: 100%;
+  }
+
+  .footer > .content > .location {
+    display: none;
   }
 
   /* Admin */
