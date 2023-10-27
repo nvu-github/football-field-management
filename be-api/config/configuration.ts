@@ -1,5 +1,6 @@
 export default () => ({
-  port: process.env.PORT || 8080,
+  port: process.env.PORT || 8081,
+  portSocket: process.env.PORT_SOCKET || 8082,
   database: {
     uri: process.env.MONGODB_URI,
   },

@@ -45,6 +45,6 @@ async function bootstrap() {
   app.use(cookieParser());
 
   app.use('/public', expressStatic(join(__dirname, '../..', 'public')));
-  await app.listen(configuration().port || 8085);
+  await app.listen(configuration().port);
 }
 bootstrap();

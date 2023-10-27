@@ -6,6 +6,7 @@ import configuration from 'config/configuration';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './jwt-auth.strategy';
+import { WsJwtStrategy } from './ws-jwt.strategy';
 
 @Module({
   controllers: [AuthController],
@@ -16,6 +17,6 @@ import { JwtStrategy } from './jwt-auth.strategy';
       signOptions: { expiresIn: configuration().jwt.expires },
     }),
   ],
-  providers: [AuthService, PrismaService, JwtStrategy],
+  providers: [AuthService, PrismaService, JwtStrategy, WsJwtStrategy],
 })
 export class AuthModule {}

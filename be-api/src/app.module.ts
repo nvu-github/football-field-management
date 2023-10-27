@@ -13,7 +13,8 @@ import { UsersModule } from '@app/users/users.module';
 // import { GoogleAuthMiddleware } from 'middleware/google-auth.middleware';
 // import { AuthController } from '@app/auth/auth.controller';
 import { FootballPitchesModule } from '@app/football-pitches/football-pitches.module';
-import { AccessoriesModule } from './apps/accessories/accessories.module';
+import { AccessoriesModule } from '@app/accessories/accessories.module';
+import { SocketsModule } from '@app/sockets/sockets.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AccessoriesModule } from './apps/accessories/accessories.module';
     UsersModule,
     FootballPitchesModule,
     AccessoriesModule,
+    SocketsModule,
   ],
   controllers: [AppController],
   providers: [

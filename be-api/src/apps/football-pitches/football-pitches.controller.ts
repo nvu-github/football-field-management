@@ -26,13 +26,18 @@ import {
 } from './dtos';
 import { ApiTags } from '@nestjs/swagger';
 
-@ApiTags('FootballPitch')
+@ApiTags('Football Pitch')
 @Controller('football-pitches')
 export class FootballPitchesController {
   constructor(
     private readonly footballPitchService: FootballPitchesService,
     private readonly uploadService: UploadService,
   ) {}
+
+  @Get('leasing-durations/public')
+  getLeasingDurationsPublic() {
+    return this.footballPitchService.getLeasingDurations();
+  }
 
   @Post('customer/rental')
   @ApiBearerAuth()
@@ -77,6 +82,14 @@ export class FootballPitchesController {
   async getFootballPitchRentalNows(@Query() query: any): Promise<any> {
     const { rentalDate } = query
     return await this.footballPitchService.getFootballPitchRentalNows(rentalDate);
+  }
+
+  @Get('rental/customer/histories')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getFootballPitchRentalCustomer(@Request() req: any): Promise<any> {
+    const { customerId } = req.user;
+    return await this.footballPitchService.getFootballPitchCustomerRentalHistories(+customerId);
   }
 
   @Post('types')

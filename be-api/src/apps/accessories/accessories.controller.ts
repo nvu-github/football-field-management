@@ -26,6 +26,11 @@ export class AccessoriesController {
     private readonly uploadService: UploadService,
   ) {}
 
+  @Get('public')
+  getCustomerAccessories() {
+    return this.accessoriesService.getAccessories();
+  }
+
   @Post('types')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

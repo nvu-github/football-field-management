@@ -1,22 +1,25 @@
-import { Injectable, HttpStatus, HttpException } from '@nestjs/common';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import configuration from 'config/configuration';
 import { AuthService } from './auth.service';
 import { IUserJWT } from './interfaces';
 
 @Injectable()
-export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly authService: AuthService) {
+export class WsJwtStrategy extends PassportStrategy(Strategy, 'wsjwt') {
+  constructor(
+    private readonly authService: AuthService
+  ) {
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: ExtractJwt.fromHeader('authorization'),
       ignoreExpiration: false,
       secretOrKey: configuration().jwt.secret,
+      passReqToCallback: true,
     });
   }
 
-  async validate(payload: IUserJWT) {
+  async validate(req: any, payload: IUserJWT) {
     const user = await this.authService.getUserById(payload.id);
     if (!user || !user.id) {
       throw new HttpException('Account is not exists!', HttpStatus.NOT_FOUND);
