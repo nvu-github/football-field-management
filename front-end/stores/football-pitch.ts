@@ -65,18 +65,25 @@ export interface FootballPitchRental {
   price: number;
 }
 
+export interface AdminConfirmCustomerRental {
+  id: number;
+  name: string;
+  footballPitchName: string;
+  status: string;
+  rentalDate: string;
+  price: string;
+  startTime: string;
+  endTime: string;
+}
+
 export const footballPitchStatuses: any = [
   {
-    key: "EMPTY",
-    name: "Trống",
-  },
-  {
-    key: "NOT_EMPTY",
-    name: "Đang thuê",
+    key: "ACTIVE",
+    name: "Hoạt động",
   },
   {
     key: "MAINTENANCE",
-    name: "Đang bảo trì",
+    name: "Bảo trì",
   },
 ];
 
@@ -86,6 +93,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
   const footballPitch = ref<ParamsFootballPitch>();
   const footballPitchRentalInfo = ref<FootballPitchRentalInfo[]>([]);
   const footballPitchRental = ref<FootballPitchRentalInfo[]>([]);
+  const adminConfirmCustomerRental = ref<AdminConfirmCustomerRental[]>([]);
 
   function createFootballPitch(params: ParamsFootballPitch) {
     return $apis.post("football-pitches", {
@@ -131,11 +139,19 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     footballPitchRental.value = footballPitchRentalList.data;
   }
 
+  async function getAdminConfirmCustomerRental() {
+    const adminConfirmCustomerRentals = await $apis.get(
+      `football-pitches/rental/confirm`
+    );
+    adminConfirmCustomerRental.value = adminConfirmCustomerRentals.data;
+  }
+
   return {
     footballPitches,
     footballPitch,
     footballPitchRentalInfo,
     footballPitchRental,
+    adminConfirmCustomerRental,
     createFootballPitch,
     updateFootballPitch,
     getFootballPitches,
@@ -144,6 +160,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     deleteImage,
     getFootballPitchRentalInfo,
     getFootballPitchRental,
+    getAdminConfirmCustomerRental,
   };
 });
 
@@ -193,7 +210,7 @@ export const useLeasingDurationStore = defineStore(
       updateLeasingDuration,
       getLeasingDurations,
       getLeasingDuration,
-      getLeasingDurationPublics
+      getLeasingDurationPublics,
     };
   }
 );

@@ -1,9 +1,15 @@
-import { WebSocketGateway, SubscribeMessage, MessageBody, WebSocketServer, OnGatewayConnection } from '@nestjs/websockets';
-import { Request, UseGuards } from '@nestjs/common';
+import {
+  WebSocketGateway,
+  SubscribeMessage,
+  MessageBody,
+  WebSocketServer,
+  OnGatewayConnection,
+} from '@nestjs/websockets';
+import { Request, UseGuards, HttpStatus, HttpException } from '@nestjs/common';
 
 import { SocketsService } from './sockets.service';
 import { ContactService } from './contact.service';
-import { NotificationService } from './notification.service';
+import { NotificationsService } from '@app/notifications/notifications.service';
 import { WsJwtAuthGuard } from '@app/auth/ws-jwt.guard';
 
 import { PayloadNotificationDto } from './dtos';
@@ -30,9 +36,9 @@ const whitelist = configuration().whitelistOrigins;
 export class SocketsGateway implements OnGatewayConnection {
   constructor(
     private readonly socketsService: SocketsService,
-    private readonly notificationService: NotificationService,
+    private readonly notificationService: NotificationsService,
     private readonly contactService: ContactService,
-  ) { }
+  ) {}
 
   handleConnection(client) {
     console.log(`New WebSocket connection established with ID: ${client.id}`);
@@ -41,11 +47,28 @@ export class SocketsGateway implements OnGatewayConnection {
   @WebSocketServer() server;
 
   @UseGuards(WsJwtAuthGuard)
-  @SubscribeMessage('notifications')
-  async create(@MessageBody() body: PayloadNotificationDto, @Request() req: any,) {
-    const { customerId } = req.user;
-    await this.notificationService.createNotification({...body, customerId, staffId: 1})
-    return this.server.emit('emit-notification', 201);
+  @SubscribeMessage('notification')
+  async create(
+    @MessageBody() body: PayloadNotificationDto,
+    @Request() req: any,
+  ) {
+    const { customerId } = req.handshake.user;
+    const { title, content, status } = body;
+
+    if (!title || !content || !status) {
+      throw new HttpException(
+        'Vui lòng nhập đầy đủ thông tin',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+
+    const createdNotification =
+      await this.notificationService.createNotification({
+        ...body,
+        customerId,
+        staffId: 1,
+      });
+    return this.server.emit('emit-notification', createdNotification);
   }
 
   @SubscribeMessage('findAllSockets')

@@ -23,7 +23,7 @@ import { format } from 'date-fns';
 
 @Injectable()
 export class FootballPitchesService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   createFootballPitch(
     payloads: PayloadFootballPitchDto,
@@ -529,10 +529,10 @@ export class FootballPitchesService {
       const customerRentalFound = customerFootballPitchRental.find(
         (customerRental) =>
           customerRental.footballPitchLeasingDurationId ===
-          footballPitchLeasingDurationId &&
+            footballPitchLeasingDurationId &&
           id === customerRental.footballPitchId &&
           format(new Date(customerRental.rentalDate), 'dd/MM/yyyy') ===
-          format(new Date(rentalDateQuery), 'dd/MM/yyyy'),
+            format(new Date(rentalDateQuery), 'dd/MM/yyyy'),
       );
       const rentalDate = customerRentalFound
         ? customerRentalFound.rentalDate
@@ -561,8 +561,8 @@ export class FootballPitchesService {
   async getFootballPitchCustomerRentalHistories(
     customerId: number,
   ): Promise<any> {
-    const footballPitchRentalCustomerHistories : any[] =
-      await this.prisma.$queryRaw`
+    const footballPitchRentalCustomerHistories: any[] = await this.prisma
+      .$queryRaw`
         SELECT  c.id, 
                 c.name, 
                 f.name as footballPitchName,
@@ -577,8 +577,8 @@ export class FootballPitchesService {
         INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
         INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
         WHERE c.id = ${customerId}
-      `
-    return  footballPitchRentalCustomerHistories || []
+      `;
+    return footballPitchRentalCustomerHistories || [];
   }
 
   async createCustomerFootballPitchRental(payload: any): Promise<any> {
@@ -597,5 +597,24 @@ export class FootballPitchesService {
     return await this.prisma.accessoryRentalCustomer.createMany({
       data: payload,
     });
+  }
+
+  async getAdminConfirmCustomerRental(): Promise<any> {
+    const footballPitchRentalCustomers: any[] = await this.prisma.$queryRaw`
+        SELECT  c.id, 
+                c.name, 
+                f.name as footballPitchName,
+                cfpr.status, 
+                cfpr.rental_date as rentalDate, 
+                fpl.price, 
+                ld.start_time as startTime, 
+                ld.end_time as endTime 
+        FROM customers c 
+        INNER JOIN customer_football_pitch_rental cfpr on c.id = cfpr.customer_id
+        INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
+        INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
+        INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
+      `;
+    return footballPitchRentalCustomers || [];
   }
 }

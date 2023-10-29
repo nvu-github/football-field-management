@@ -136,7 +136,7 @@ model FootballPitch {
   id             Int            @id @default(autoincrement())
   name           String         @db.VarChar(255)
   description    String?        @db.Text
-  status         StatusFootball @default(EMPTY)
+  status         StatusFootball @default(ACTIVE)
   staffId        Int            @map("staff_id")
   footballTypeId Int            @map("football_type_id")
   createdAt      DateTime       @default(now()) @map("created_at")
@@ -316,8 +316,7 @@ enum StatusAccount {
 }
 
 enum StatusFootball {
-  EMPTY
-  NOT_EMPTY
+  ACTIVE
   MAINTENANCE
 
   @@map("status_footballs")

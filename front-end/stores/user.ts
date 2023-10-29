@@ -18,6 +18,18 @@ export interface Role {
   name: string;
 }
 
+export interface PersonalInfo {
+  id?: number;
+  name: string;
+  teamName?: string;
+  phoneNumber: string;
+  dateOfBirth?: string;
+  address?: string;
+  gender?: string;
+  avatar?: string;
+  email?: string;
+}
+
 export const statuses: any = {
   PENDING: "Chờ duyệt",
   APPROVED: "Đã duyệt",
@@ -29,6 +41,7 @@ export const useUserStore = defineStore("userStore", () => {
   const account = ref<Account>();
   const accounts = ref<Account[]>([]);
   const roles = ref<Role[]>([]);
+  const personalInfo = ref<PersonalInfo>({});
 
   async function getRoles() {
     const roleList = await $apis.get("users/roles");
@@ -53,6 +66,23 @@ export const useUserStore = defineStore("userStore", () => {
     });
   }
 
+  function updatePersonalInfoCustomer(params: PersonalInfo) {
+    delete params.id;
+    delete params.email;
+    if (!params.avatar) {
+      delete params.avatar;
+    }
+    return $apis.patch(`users/personal-info/customer`, {
+      ...convertProjectObjToObj(params),
+    });
+  }
+
+  function updatePersonalInfoStaff(params: PersonalInfo) {
+    return $apis.patch(`users/personal-info/staff`, {
+      ...convertProjectObjToObj(params),
+    });
+  }
+
   async function getAccounts() {
     const allAccounts = await $apis.get("users/accounts");
     accounts.value = allAccounts.data;
@@ -63,15 +93,30 @@ export const useUserStore = defineStore("userStore", () => {
     account.value = singleAccount.data;
   }
 
+  async function getCustomerInfo() {
+    const customerInfoApi = await $apis.get(`users/personal-info/customer`);
+    personalInfo.value = customerInfoApi.data;
+  }
+
+  async function getStaffInfo() {
+    const customerInfoApi = await $apis.get(`users/personal-info/staff`);
+    personalInfo.value = customerInfoApi.data;
+  }
+
   return {
     accounts,
     account,
     roles,
+    personalInfo,
     createAccount,
     updateAccount,
+    updatePersonalInfoStaff,
+    updatePersonalInfoCustomer,
     acceptAccount,
     getAccounts,
     getAccount,
     getRoles,
+    getCustomerInfo,
+    getStaffInfo,
   };
 });

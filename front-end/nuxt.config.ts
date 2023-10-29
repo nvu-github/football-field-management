@@ -19,11 +19,12 @@ export default defineNuxtConfig({
     dirs: ["stores", "utils"],
   },
   build: {
-    transpile: ["vuetify", '@vuepic/vue-datepicker'],
+    transpile: ["vuetify", "@vuepic/vue-datepicker"],
   },
   runtimeConfig: {
     public: {
       API_URL: process.env.API_URL,
+      SOCKET_URL: process.env.SOCKET_URL,
       API_KEY: process.env.API_KEY,
       AUTH_DOMAIN: process.env.AUTH_DOMAIN,
       DATABASE_URL: process.env.DATABASE_URL,

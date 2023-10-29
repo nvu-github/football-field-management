@@ -67,7 +67,7 @@ export class UploadController {
   @UseInterceptors(FileInterceptor('file'))
   async uploadFile(@UploadedFile() file: Express.Multer.File) {
     return {
-      uri: `${file.destination.replace(/\\/g, '/').split('/public/')[1]}/${
+      url: `${file.destination.replace(/\\/g, '/').split('/public/')[1]}/${
         file.filename
       }`,
     };

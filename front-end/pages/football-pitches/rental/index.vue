@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { parse, isSameDay, isAfter } from "date-fns";
+import { isSameDay, isAfter } from "date-fns";
 import { storeToRefs } from "pinia";
 import {
   useAppStore,
@@ -20,7 +20,6 @@ const dialogStore = useDialogStore();
 const footballPitchPriceStore = useFootballPitchPriceStore();
 const { breadCrumbs } = storeToRefs(appStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
-const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
 
 await footballPitchPriceStore.getFootballPitchPrices();
 breadCrumbs.value = [
@@ -38,22 +37,8 @@ breadCrumbs.value = [
 
 customerStore.resetForm();
 if (route.query && route.query.id) {
-  const { id, startTime, endTime, rentalDate } = route.query;
+  const { id } = route.query;
   paramFootballPitchRental.value.footballPitchId = Number(id);
-  // const durationTime = `${startTime} - ${endTime}`;
-  // const leasingDuration = footballPitchPrices.value.find(
-  //   (leasingDuration) =>
-  //     Number(id) === leasingDuration.footballPitchId &&
-  //     leasingDuration.leasingDurationName === durationTime
-  // );
-  // paramFootballPitchRental.value.rentalDate = parse(
-  //   rentalDate,
-  //   "dd/MM/yyyy",
-  //   new Date()
-  // );
-  // paramFootballPitchRental.value.leasingDurationId = leasingDuration
-  //   ? Number(leasingDuration.leasingDurationId)
-  //   : null;
 }
 
 async function submitRentalInfo() {
@@ -164,6 +149,6 @@ function validForm() {
       border-top: 1px solid #b4b2b2;
       border-left: 0;
     }
-}
+  }
 }
 </style>

@@ -1,17 +1,17 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
-const prisma = new PrismaClient()
+const prisma = new PrismaClient();
 async function main() {
   try {
-    const passwordDefault = "123456"
-    const saltDefault = 12
+    const passwordDefault = '123456';
+    const saltDefault = 12;
 
     // delete all data
-    await prisma.customer.deleteMany({})
-    await prisma.staff.deleteMany({})
-    await prisma.account.deleteMany({})
-    await prisma.role.deleteMany({})
-    await prisma.accessoryType.deleteMany({})
+    await prisma.customer.deleteMany({});
+    await prisma.staff.deleteMany({});
+    await prisma.account.deleteMany({});
+    await prisma.role.deleteMany({});
+    await prisma.accessoryType.deleteMany({});
 
     // Seed roles
     await prisma.role.createMany({
@@ -28,48 +28,33 @@ async function main() {
       data: [
         {
           email: 'admin@gmail.com',
-          password: bcrypt.hashSync(
-            passwordDefault,
-            saltDefault,
-          ),
+          password: bcrypt.hashSync(passwordDefault, saltDefault),
           status: 'APPROVED',
-          roleId: 1, 
+          roleId: 1,
         },
         {
           email: 'staff1@gmail.com',
-          password: bcrypt.hashSync(
-            passwordDefault,
-            saltDefault,
-          ),
+          password: bcrypt.hashSync(passwordDefault, saltDefault),
           status: 'APPROVED',
-          roleId: 2, 
+          roleId: 2,
         },
         {
           email: 'staff2@gmail.com',
-          password: bcrypt.hashSync(
-            passwordDefault,
-            saltDefault,
-          ),
+          password: bcrypt.hashSync(passwordDefault, saltDefault),
           status: 'APPROVED',
-          roleId: 3, 
+          roleId: 3,
         },
         {
           email: 'user1@gmail.com',
-          password: bcrypt.hashSync(
-            passwordDefault,
-            saltDefault,
-          ),
+          password: bcrypt.hashSync(passwordDefault, saltDefault),
           status: 'APPROVED',
-          roleId: 4, 
+          roleId: 4,
         },
         {
           email: 'user2@gmail.com',
-          password: bcrypt.hashSync(
-            passwordDefault,
-            saltDefault,
-          ),
+          password: bcrypt.hashSync(passwordDefault, saltDefault),
           status: 'APPROVED',
-          roleId: 4, 
+          roleId: 4,
         },
       ],
     });
@@ -101,13 +86,13 @@ async function main() {
           name: 'Customer 1',
           teamName: 'Team A',
           phoneNumber: '5555555555',
-          accountId: 4
+          accountId: 4,
         },
         {
           name: 'Customer 2',
           teamName: 'Team B',
           phoneNumber: '7777777777',
-          accountId: 5
+          accountId: 5,
         },
       ],
     });

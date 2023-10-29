@@ -48,13 +48,17 @@ const accessoryTotalPrice = customerAccessoryRentals?.reduce(
     const accessoryFound: any = accessories.value.find(
       (accessoryVal: any) => accessoryVal.id === accessory.accessoryId
     );
-    return (total += accessoryFound.price);
+    return (total += accessoryFound.price * accessoryFound.amount);
   },
   0
 );
 
-rentalPrice = (Number(payloadAmountPayment.value.pricePayment) + Number(accessoryTotalPrice))
-subRentalPrice = (Number(payloadAmountPayment.value.pricePayment) + Number(accessoryTotalPrice)) * 0.3
+rentalPrice =
+  Number(payloadAmountPayment.value.pricePayment) + Number(accessoryTotalPrice);
+subRentalPrice =
+  (Number(payloadAmountPayment.value.pricePayment) +
+    Number(accessoryTotalPrice)) *
+  0.3;
 
 payloadAmountPayment.value.amount = subRentalPrice;
 
@@ -69,7 +73,10 @@ async function confirmPayment() {
       amount,
     });
     const { paymentRedirect } = paymentUrl.data;
-    localStorage.setItem('customerFootballPitchRental', JSON.stringify(paramFootballPitchRental.value))
+    localStorage.setItem(
+      "customerFootballPitchRental",
+      JSON.stringify(paramFootballPitchRental.value)
+    );
     window.location.href = paymentRedirect;
   } catch (err) {
     console.log(err);
@@ -90,12 +97,19 @@ function cancelPayment() {
           <v-row>
             <v-col cols="12">
               <div class="title mb-4">
-                Để đặt sân quý khách vui lòng thanh toán trước tiền thuê <br /> hoặc
-                thanh toán đặt cọc 30% tiền thuê
+                Để đặt sân quý khách vui lòng thanh toán trước tiền thuê <br />
+                hoặc thanh toán đặt cọc 30% tiền thuê
               </div>
               <div class="subtitle">
-                <p class="price mb-2"><b class="label">Tiền cọc: </b> {{ formatPrice(subRentalPrice) }} <span class="unit">VNĐ</span>  </p>
-                <p class="price mb-2"><b class="label">Tổng tiền sân: </b> {{ formatPrice(rentalPrice) }} <span class="unit">VNĐ</span> </p>
+                <p class="price mb-2">
+                  <b class="label">Tiền cọc: </b>
+                  {{ formatPrice(subRentalPrice) }}
+                  <span class="unit">VNĐ</span>
+                </p>
+                <p class="price mb-2">
+                  <b class="label">Tổng tiền sân: </b>
+                  {{ formatPrice(rentalPrice) }} <span class="unit">VNĐ</span>
+                </p>
               </div>
               <v-text-field
                 v-model.trim="formattedPrice"
@@ -105,10 +119,8 @@ function cancelPayment() {
                 :rules="[rules.price]"
                 required
               >
-              <template #append>
-                VNĐ
-              </template>
-            </v-text-field>
+                <template #append> VNĐ </template>
+              </v-text-field>
             </v-col>
           </v-row>
         </v-container>
@@ -130,7 +142,7 @@ function cancelPayment() {
 <style lang="scss" scoped>
 .dialog-payment {
   :deep(.v-card) {
-    padding: 5px;
+    padding: 15px 5px 5px;
   }
   :deep(.v-card-text) {
     padding: 0;
@@ -139,10 +151,10 @@ function cancelPayment() {
     font-size: 20px;
   }
   :deep(.subtitle) > .price {
-    color: #e60000; 
+    color: #e60000;
   }
   :deep(.subtitle) > .price > .label,
-  :deep(.subtitle) > .price > .unit{
+  :deep(.subtitle) > .price > .unit {
     color: #000;
   }
 }

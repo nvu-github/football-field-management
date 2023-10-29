@@ -3,15 +3,14 @@ import { storeToRefs } from "pinia";
 import { useAppStore } from "~/stores";
 const appStore = useAppStore();
 const { breadCrumbs } = storeToRefs(appStore);
-
 </script>
 <template>
   <v-app class="layout-default">
-    <!-- <div class="layout-header">
+    <div class="layout-header">
       <v-container>
         <user-layout-header class="header" />
       </v-container>
-    </div> -->
+    </div>
     <div class="layout-toolbar">
       <v-container>
         <user-layout-toolbar class="toolbar" />
@@ -19,18 +18,18 @@ const { breadCrumbs } = storeToRefs(appStore);
     </div>
     <div class="main">
       <v-container>
-        <!-- <v-breadcrumbs
+        <v-breadcrumbs
           v-if="breadCrumbs && breadCrumbs.length > 0"
           :items="breadCrumbs"
-        /> -->
+        />
         <slot />
       </v-container>
     </div>
-    <!-- <div class="layout-footer">
+    <div class="layout-footer">
       <v-container>
         <user-layout-footer class="footer" />
       </v-container>
-    </div> -->
+    </div>
     <common-dialog />
   </v-app>
 </template>
@@ -42,6 +41,7 @@ const { breadCrumbs } = storeToRefs(appStore);
 }
 
 .layout-header {
+  border-top: 3px solid #a9ca31;
   > .v-container > .header {
     margin: 0 auto;
   }
@@ -61,6 +61,9 @@ const { breadCrumbs } = storeToRefs(appStore);
 .main {
   padding: 10px 20px;
   min-height: 600px;
+  :deep(.v-breadcrumbs) {
+    padding-bottom: 0;
+  }
 }
 
 .layout-footer {

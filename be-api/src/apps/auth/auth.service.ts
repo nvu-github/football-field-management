@@ -57,8 +57,8 @@ export class AuthService {
         password: true,
         roleId: true,
         role: { select: { name: true } },
-        staff: { select: { name: true } },
-        customer: { select: { name: true } },
+        staff: { select: { name: true, avatar: true } },
+        customer: { select: { name: true, avatar: true } },
       },
     });
 
@@ -68,8 +68,17 @@ export class AuthService {
 
     const { id, email, password, roleId } = account;
     const name = account.customer?.name || account.staff?.name;
+    const avatar = account.customer?.avatar || account.staff?.avatar;
 
-    return { id, email, password, name, role: account.role.name, roleId };
+    return {
+      id,
+      email,
+      password,
+      name,
+      role: account.role.name,
+      roleId,
+      avatar,
+    };
   }
 
   async getAccountByEmail(emailUser: string): Promise<IUser | undefined> {

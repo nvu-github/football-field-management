@@ -2,6 +2,7 @@ export interface User {
   name: string | null;
   email: string | null;
   roleId: number | null;
+  avatar?: string | null;
   loggedIn: boolean;
 }
 

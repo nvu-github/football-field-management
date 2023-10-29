@@ -55,10 +55,7 @@ function openDiaglogConfirm(id: string) {
 function getColorStatusFootballPitch(status: string) {
   let color = "success";
   switch (status) {
-    case "EMPTY":
-      color = "primary";
-      break;
-    case "NOT_EMPTY":
+    case "MAINTENANCE":
       color = "orange";
       break;
   }

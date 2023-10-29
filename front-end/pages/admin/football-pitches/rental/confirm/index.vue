@@ -1,6 +1,8 @@
 <script lang="ts" setup>
 import { storeToRefs } from "pinia";
 import { useAppStore, useFootballPitchStore, useDialogStore } from "~/stores";
+import { format } from "date-fns";
+import { formatPrice } from "~/utils/string";
 
 const headers = [
   {
@@ -11,26 +13,32 @@ const headers = [
   },
   {
     title: "Tên sân bóng",
-    width: "30%",
+    width: "20%",
     align: "start",
-    key: "footballPitchname",
+    key: "footballPitchName",
   },
   {
     title: "Tên khách hàng",
-    width: "25%",
+    width: "20%",
     align: "start",
-    key: "customerName",
+    key: "name",
   },
   {
-    title: "Thời gian thuê",
+    title: "Ngày thuê",
     width: "15%",
     align: "start",
     key: "rentalDate",
   },
+  {
+    title: "Khung giờ",
+    width: "18%",
+    align: "start",
+    key: "leasingDuration",
+  },
   { title: "Giá thuê", width: "15%", align: "start", key: "price" },
   {
     title: "Tác vụ",
-    width: "15%",
+    width: "20%",
     align: "center",
     key: "actions",
     sortable: false,
@@ -41,7 +49,7 @@ const footballPitchStore = useFootballPitchStore();
 const dialogStore = useDialogStore();
 const { isDelete } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
-const { footballPitchRentals } = storeToRefs(footballPitchStore);
+const { adminConfirmCustomerRental } = storeToRefs(footballPitchStore);
 app.value.title = "Quản lý đặt sân";
 
 watch(isDelete, async () => {
@@ -49,7 +57,7 @@ watch(isDelete, async () => {
   isDelete.value = false;
 });
 
-async function openDiaglogFooballPitchRental(id?: string) {
+async function openDiaglogFooballPitchRentalDetail(id?: string) {
   await dialogStore.showDialog(
     resolveComponent("admins-football-pitches-dialog-leasing-duration"),
     {
@@ -80,35 +88,30 @@ function getColorStatusFootballPitchRental(status: string) {
   return color;
 }
 
-footballPitchStore.getFootballPitchRental();
+footballPitchStore.getAdminConfirmCustomerRental();
 </script>
 <template>
   <div class="football-pitch-confirm-page">
     <v-row>
       <v-col md="12">
-        <v-data-table :headers="headers" :items="footballPitchRentals">
+        <v-data-table
+          class="table"
+          :headers="headers"
+          :items="adminConfirmCustomerRental"
+        >
           <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
-          <template #[`item.description`]="{ item }">
-            <span v-html="item.raw.description"></span>
+          <template #[`item.rentalDate`]="{ item }">
+            {{ format(new Date(item.raw.rentalDate), "dd/MM/yyyy") }}
           </template>
-          <template #[`item.status`]="{ item }">
-            <v-chip
-              class="ma-2"
-              :color="getColorStatusFootballPitchRental(item.raw.status)"
-              text-color="white"
-            >
-              {{ footballPitchStore.getStatusFootballPitch(item.raw.status) }}
-            </v-chip>
+          <template #[`item.leasingDuration`]="{ item }">
+            {{ item.raw.startTime }} - {{ item.raw.endTime }}
+          </template>
+          <template #[`item.price`]="{ item }">
+            {{ formatPrice(item.raw.price) }} VNĐ
           </template>
           <template #[`item.actions`]="{ item }">
-            <v-btn
-              class="button -warning"
-              @click="openDiaglogFooballPitchRental(item.raw.id)"
-            >
-              <v-icon> mdi-pencil </v-icon>
-            </v-btn>
             <v-btn
               class="button -success"
               :disabled="item.raw.status !== 'PENDING'"
@@ -120,7 +123,14 @@ footballPitchStore.getFootballPitchRental();
               class="button -danger"
               @click="openDiaglogConfirm(item.raw.id)"
             >
-              <v-icon> mdi-delete </v-icon>
+              <v-icon> mdi mdi-close-circle-outline </v-icon>
+            </v-btn>
+
+            <v-btn
+              class="button -warning"
+              @click="openDiaglogFooballPitchRentalDetail(item.raw.id)"
+            >
+              <v-icon> mdi mdi-list-box </v-icon>
             </v-btn>
           </template>
         </v-data-table>

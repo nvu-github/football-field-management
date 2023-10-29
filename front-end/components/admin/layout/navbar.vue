@@ -34,14 +34,14 @@ const menus = ref<Menu>([
     url: "/admin/football-pitches",
     subMenus: [
       {
+        icon: "mdi mdi-format-list-bulleted-type",
+        title: "Loại sân bóng",
+        url: "/admin/football-pitches/types",
+      },
+      {
         icon: "mdi mdi-soccer",
         title: "Sân bóng",
         url: "/admin/football-pitches",
-      },
-      {
-        icon: "mdi mdi-cog",
-        title: "Giá thuê sân",
-        url: "/admin/football-pitches/prices",
       },
       {
         icon: "mdi mdi-clock-time-three-outline",
@@ -49,14 +49,14 @@ const menus = ref<Menu>([
         url: "/admin/football-pitches/leasing-durations",
       },
       {
-        icon: "mdi mdi-format-list-bulleted-type",
-        title: "Loại sân bóng",
-        url: "/admin/football-pitches/types",
+        icon: "mdi mdi-cog",
+        title: "Giá thuê sân",
+        url: "/admin/football-pitches/prices",
       },
       {
         icon: "mdi mdi-check-all",
         title: "Xác nhận đặt sân",
-        url: "/admin/football-pitches/confirm",
+        url: "/admin/football-pitches/rental/confirm",
       },
     ],
     roleId: 1,
@@ -66,7 +66,7 @@ const menus = ref<Menu>([
     title: "Quản lý phụ kiện",
     url: "/admin/accessories",
     subMenus: [
-      { 
+      {
         icon: "mdi mdi-receipt-text-edit-outline",
         title: "Loại phụ kiện",
         url: "/admin/accessories/types",

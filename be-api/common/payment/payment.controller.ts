@@ -18,18 +18,15 @@ export class PaymentController {
   private readonly returnUrlVnPay: string;
 
   constructor() {
-    const { payment } = configuration()
-    this.vnpayUrl = payment.vnpayUrl
-    this.tmnCodeVnPay = payment.tmnCodeVnPay
-    this.secretKeyVnPay = payment.secretKeyVnPay
-    this.returnUrlVnPay = payment.returnUrlVnPay
+    const { payment } = configuration();
+    this.vnpayUrl = payment.vnpayUrl;
+    this.tmnCodeVnPay = payment.tmnCodeVnPay;
+    this.secretKeyVnPay = payment.secretKeyVnPay;
+    this.returnUrlVnPay = payment.returnUrlVnPay;
   }
 
   @Post('create-payment-url')
-  createPaymentUrl(
-    @Body() body: PayloadCreatePaymentDto,
-    @Request() req: any,
-  ) {
+  createPaymentUrl(@Body() body: PayloadCreatePaymentDto, @Request() req: any) {
     const ipAddr =
       req.headers['x-forwarded-for'] ||
       req.connection.remoteAddress ||
@@ -40,8 +37,7 @@ export class PaymentController {
     const tmnCode = this.tmnCodeVnPay;
     const secretKey = this.secretKeyVnPay;
     let vnpUrl = this.vnpayUrl;
-    const returnUrl =
-      `${this.returnUrlVnPay}football-pitches/rental`;
+    const returnUrl = `${this.returnUrlVnPay}football-pitches/rental`;
     const createDate = moment(date).format('YYYYMMDDHHmmss');
     const orderId = moment(date).format('DDHHmmss');
     const amount = body.amount;
@@ -67,7 +63,6 @@ export class PaymentController {
     // }
 
     vnp_Params = sortObject(vnp_Params);
-
     const signData = queryString.stringify(vnp_Params, { encode: false });
     const hmac = crypto.createHmac('sha512', secretKey);
     const signed = hmac.update(new Buffer(signData, 'utf-8')).digest('hex');
@@ -96,15 +91,15 @@ export class PaymentController {
     if (secureHash === signed) {
       //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
 
-      return { code: vnp_Params['vnp_ResponseCode'] }
+      return { code: vnp_Params['vnp_ResponseCode'] };
     } else {
-      return { code: '97' }
+      return { code: '97' };
     }
   }
 
   @Get('vnpay-ipn')
   getVNPayIpn(@Request() req: any, @Response() res: any) {
-    console.log('co chay vao day')
+    console.log('co chay vao day');
     let vnp_Params = req.query;
     let secureHash = vnp_Params['vnp_SecureHash'];
 
@@ -121,9 +116,9 @@ export class PaymentController {
       let orderId = vnp_Params['vnp_TxnRef'];
       let rspCode = vnp_Params['vnp_ResponseCode'];
       //Kiem tra du lieu co hop le khong, cap nhat trang thai don hang va gui ket qua cho VNPAY theo dinh dang duoi
-      return 'success'
+      return 'success';
     } else {
-      return 'fail'
+      return 'fail';
     }
   }
 }

@@ -48,10 +48,19 @@ export const useAppStore = defineStore("appStore", () => {
   });
   const isShowSidebar = ref<boolean>(false);
   const isLoading = ref<boolean>(false);
-  const breadCrumbs = ref<BreadCrumb>();
+  const breadCrumbs = ref<BreadCrumb[]>([]);
 
   function uploadImages(formData: FormData) {
     return $apis.post("upload", formData, {
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  }
+
+  function uploadImage(formData: FormData) {
+    return $apis.post("upload/single", formData, {
       headers: {
         Accept: "*/*",
         "Content-Type": "multipart/form-data",
@@ -69,6 +78,7 @@ export const useAppStore = defineStore("appStore", () => {
     isLoading,
     breadCrumbs,
     uploadImages,
+    uploadImage,
     deleteApi,
   };
 });
@@ -105,8 +115,8 @@ export const usePaymentStore = defineStore("paymentStore", () => {
   const { $apis }: any = useNuxtApp();
   const payloadAmountPayment = ref<PayLoadPayment>({
     amount: 0,
-    pricePayment: 0
-  })
+    pricePayment: 0,
+  });
 
   function createPaymentUrl(payload: PayLoadPayment) {
     return $apis.post("payment/create-payment-url", {
@@ -118,5 +128,5 @@ export const usePaymentStore = defineStore("paymentStore", () => {
     return $apis.get(`payment/vnpay-return?${query}`);
   }
 
-  return {payloadAmountPayment, createPaymentUrl, getPaymentResult };
+  return { payloadAmountPayment, createPaymentUrl, getPaymentResult };
 });

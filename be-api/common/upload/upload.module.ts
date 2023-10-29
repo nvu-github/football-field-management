@@ -1,3 +1,4 @@
+import { Body } from './../../../front-end/.nuxt/components.d';
 import { HttpException, HttpStatus, Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';
@@ -12,8 +13,10 @@ import { UploadService } from './upload.service';
   imports: [
     MulterModule.register({
       storage: multer.diskStorage({
-        destination: function (req, file, cb) {
+        destination: function (req: any, file: any, cb) {
+          const TYPE_FOLDER = 'avatar';
           const { type } = req.body;
+          const { id } = req.user;
 
           if (
             file.mimetype.match(
@@ -28,6 +31,7 @@ import { UploadService } from './upload.service';
               'public',
               'uploads',
               type,
+              type === TYPE_FOLDER ? String(id) : '',
             );
             if (!fs.existsSync(pathDir)) {
               fs.mkdirSync(pathDir);

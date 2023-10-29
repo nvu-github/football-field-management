@@ -1,18 +1,33 @@
 <script lang="ts" setup>
 import format from "date-fns/format";
 import { storeToRefs } from "pinia";
-import { useCustomerStore } from "~/stores";
+import { useCustomerStore, useAppStore } from "~/stores";
 import { formatPrice } from "~/utils/string";
 
 const customerStore = useCustomerStore();
+const appStore = useAppStore();
+const { breadCrumbs } = storeToRefs(appStore);
 const { customerFootballPitchRentalHistories }: any =
   storeToRefs(customerStore);
 const conditionFilterHistory = ref<any>({
   rentalDate: null,
   status: null,
 });
-const formattedHistories = ref<CustomerAccessoryRentalHistory>()
+
+const formattedHistories = ref<CustomerAccessoryRentalHistory>();
 await customerStore.getCustomerFootballPitchRentalHisTories();
+breadCrumbs.value = [
+  {
+    title: "Trang chủ",
+    disabled: false,
+    href: "/",
+  },
+  {
+    title: "Lịch sử đặt sân",
+    disabled: true,
+    href: "/fooball-piches/rental",
+  },
+];
 
 const formatDatePicker = (date: any): string => {
   const day = date.getDate();
@@ -22,30 +37,29 @@ const formatDatePicker = (date: any): string => {
   return `${day}/${month}/${year}`;
 };
 
-formattedHistories.value = customerFootballPitchRentalHistories.value
+formattedHistories.value = customerFootballPitchRentalHistories.value;
 function filterHistories() {
   const { rentalDate: rentalDateCondition, status: statusCondition } =
     conditionFilterHistory.value;
 
-    formattedHistories.value =
-    customerFootballPitchRentalHistories.value.filter(
-      (customerFootballPitchRental: any) => {
-        let condition: boolean = true;
-        const { rentalDate, status } = customerFootballPitchRental;
-        if (rentalDateCondition) {
-          condition =
-            condition &&
-            format(new Date(rentalDate), "dd/MM/yyyy") ===
-              format(new Date(rentalDateCondition), "dd/MM/yyyy");
-        }
-
-        if (statusCondition) {
-          condition = condition && statusCondition === status;
-        }
-
-        return condition;
+  formattedHistories.value = customerFootballPitchRentalHistories.value.filter(
+    (customerFootballPitchRental: any) => {
+      let condition: boolean = true;
+      const { rentalDate, status } = customerFootballPitchRental;
+      if (rentalDateCondition) {
+        condition =
+          condition &&
+          format(new Date(rentalDate), "dd/MM/yyyy") ===
+            format(new Date(rentalDateCondition), "dd/MM/yyyy");
       }
-    );
+
+      if (statusCondition) {
+        condition = condition && statusCondition === status;
+      }
+
+      return condition;
+    }
+  );
 }
 
 function getStatusInfo(status: string) {
@@ -67,7 +81,6 @@ function getStatusInfo(status: string) {
     color,
   };
 }
-
 </script>
 <template>
   <div class="football-pitches-history-page">
@@ -100,13 +113,15 @@ function getStatusInfo(status: string) {
       </v-col>
     </v-row>
     <v-row v-if="formattedHistories && formattedHistories.length > 0">
-      <v-col md="6">
+      <v-col
+        md="6"
+        v-for="customerFootballPitchRental in formattedHistories"
+        :key="customerFootballPitchRental.id"
+      >
         <v-card
           class="mx-auto mt-3"
           prepend-icon="mdi mdi-soccer-field"
           variant="outlined"
-          v-for="customerFootballPitchRental in formattedHistories"
-          :key="customerFootballPitchRental.id"
         >
           <template v-slot:title>
             {{ customerFootballPitchRental.footballPitchName }}
@@ -164,9 +179,7 @@ function getStatusInfo(status: string) {
         </v-card>
       </v-col>
     </v-row>
-    <v-row class="empty" v-else>
-      Không có thông tin đặt sân
-    </v-row>
+    <v-row v-else class="empty"> Không có thông tin đặt sân </v-row>
   </div>
 </template>
 <style lang="scss" scoped>

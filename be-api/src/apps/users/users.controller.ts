@@ -18,7 +18,7 @@ import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
 import configuration from 'config/configuration';
 import { UsersService } from './users.service';
 
-import { StaffDto, CreateAccountDto } from './dto';
+import { StaffDto, CreateAccountDto, UpdatePersonalDto } from './dto';
 
 @ApiTags('Users')
 @ApiBearerAuth()
@@ -83,6 +83,40 @@ export class UsersController {
     }
 
     return await this.usersService.updateStatusAccount(+id, body.status);
+  }
+
+  @Patch('personal-info/customer')
+  async updatePersonalInfoCustomer(
+    @Request() req: any,
+    @Body() body: UpdatePersonalDto,
+  ) {
+    const { id } = req.user;
+
+    return await this.usersService.updatePersonalCustomer(+id, body);
+  }
+
+  @Patch('personal-info/saff')
+  async updatePersonalInfoStaff(
+    @Request() req: any,
+    @Body() body: UpdatePersonalDto,
+  ) {
+    const { id } = req.user;
+
+    return await this.usersService.updatePersonalStaff(+id, body);
+  }
+
+  @Get('personal-info/customer')
+  async getPersonalInfoCustomer(@Request() req: any) {
+    const { id } = req.user;
+
+    return await this.usersService.getCustomerInfo(+id);
+  }
+
+  @Get('personal-info/staff')
+  async getPersonalInfoStaff(@Request() req: any) {
+    const { id } = req.user;
+
+    return await this.usersService.getStaffInfo(+id);
   }
 
   @Patch('account/:id')

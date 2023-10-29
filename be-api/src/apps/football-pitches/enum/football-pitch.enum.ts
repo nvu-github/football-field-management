@@ -1,5 +1,4 @@
 export enum EFootballPitchStatus {
-  EMPTY = 'EMPTY',
-  NOT_EMPTY = 'NOT_EMPTY',
+  ACTIVE = 'ACTIVE',
   MAINTENANCE = 'MAINTENANCE',
 }

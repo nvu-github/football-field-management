@@ -22,14 +22,18 @@ export class AllExceptionsFilter implements ExceptionFilter {
     if (exception instanceof HttpException) {
       httpStatus = exception.getStatus();
       const exceptionResponse = exception.getResponse() || exception.message;
-      console.log(exception.getResponse())
+      console.log(exception);
+      console.log(exception.getResponse());
       if (exceptionResponse && exceptionResponse['message']) {
         message = exceptionResponse['message'];
       } else {
-        message = [exceptionResponse && exceptionResponse.toString() || 'Internal server error!'];
+        message = [
+          (exceptionResponse && exceptionResponse.toString()) ||
+            'Internal server error!',
+        ];
       }
     } else {
-      console.log(exception)
+      console.log(exception);
     }
 
     if (exception && exception['code'] && exception['code'] == 'ENOENT') {

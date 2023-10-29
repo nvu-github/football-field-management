@@ -15,6 +15,7 @@ import { UsersModule } from '@app/users/users.module';
 import { FootballPitchesModule } from '@app/football-pitches/football-pitches.module';
 import { AccessoriesModule } from '@app/accessories/accessories.module';
 import { SocketsModule } from '@app/sockets/sockets.module';
+import { NotificationsModule } from './apps/notifications/notifications.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { SocketsModule } from '@app/sockets/sockets.module';
     FootballPitchesModule,
     AccessoriesModule,
     SocketsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [

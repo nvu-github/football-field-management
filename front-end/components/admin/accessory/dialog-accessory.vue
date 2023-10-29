@@ -157,11 +157,11 @@ async function uploadFile() {
 }
 
 function setAccessoryToForm() {
-  const { name, description, images, amount, price, accessoryName }: any =
+  const { name, description, images, amount, price, accessoryTypeName }: any =
     accessory.value;
   paramsAccessory.value.name = name;
   paramsAccessory.value.description = description || "";
-  paramsAccessory.value.accessoryTypeId = accessoryName;
+  paramsAccessory.value.accessoryTypeId = accessoryTypeName;
   paramsAccessory.value.amount = amount;
   paramsAccessory.value.price = price;
   imagePreviews.value = images.map((image: any) => ({

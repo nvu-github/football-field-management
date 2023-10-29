@@ -1,7 +1,10 @@
 <script lang="ts" setup>
 import { formatISO } from "date-fns";
 import { navigateTo } from "nuxt/app";
-import { useCustomerStore } from "~/stores";
+
+import { useCustomerStore, useFootballPitchStore } from "~/stores";
+import { sendMessage } from "~/services/socket";
+import { storeToRefs } from "pinia";
 
 definePageMeta({
   middleware: [
@@ -15,6 +18,8 @@ definePageMeta({
 });
 
 const customerStore = useCustomerStore();
+const footballPitchStore = useFootballPitchStore();
+const { footballPitch } = storeToRefs(footballPitchStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
 const timer = ref(10);
 
@@ -35,7 +40,14 @@ customerStore
     ...paramFootballPitchRental.value,
     rentalDate: formatISO(new Date(paramFootballPitchRental.value.rentalDate)),
   })
-  .then(() => {
+  .then(async () => {
+    const { footballPitchId } = paramFootballPitchRental.value;
+    await footballPitchStore.getFootballPitch(footballPitchId);
+    sendMessage("notification", {
+      title: "Yêu cầu đặt sân",
+      content: footballPitch.value?.name,
+      status: "UNREAD",
+    });
     customerStore.resetForm();
   })
   .catch((error) => {
@@ -49,12 +61,11 @@ customerStore
       <v-col md="12">
         <div class="content">
           <h2>Đặt sân thành công</h2>
-          <v-icon class="icon">
-            mdi mdi-check-circle-outline
-          </v-icon>
+          <v-icon class="icon"> mdi mdi-check-circle-outline </v-icon>
           <p>
-            Bấm <nuxt-link to="/">vào đây</nuxt-link> để quay về trang chủ <br /> hoặc
-            hệ thống sẽ tự động chuyển hướng sang trang lịch sử sau
+            Bấm <nuxt-link to="/">vào đây</nuxt-link> để quay về trang chủ
+            <br />
+            hoặc hệ thống sẽ tự động chuyển hướng sang trang lịch sử sau
             {{ timer }} giây nữa
           </p>
         </div>

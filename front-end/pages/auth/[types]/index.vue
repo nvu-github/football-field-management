@@ -52,16 +52,24 @@ async function loginUser() {
   try {
     const { email, password } = loginPayloads.value;
     const userLogin = await authStore.signIn({ email, password });
-    const { name, roleId, accessToken } = userLogin.data;
+    const { name, roleId, accessToken, avatar } = userLogin.data;
     user.value = {
       name: name || email,
       email,
       roleId,
+      avatar,
       loggedIn: true,
     };
     localStorage.setItem(
       "userLogin",
-      JSON.stringify({ name, email, roleId, loggedIn: true, accessToken })
+      JSON.stringify({
+        name,
+        email,
+        roleId,
+        avatar,
+        loggedIn: true,
+        accessToken,
+      })
     );
 
     $toast.success("Đăng nhập thành công");
@@ -85,11 +93,18 @@ async function loginGoogle() {
     const userLoginGoogle = await authStore.signInGoogle(idToken);
     const { email, roleId, accessToken } = userLoginGoogle.data;
     const name = result.user.displayName || email;
-    user.value = { name, email, roleId, loggedIn: true };
+    user.value = { name, email, roleId, avatar: "", loggedIn: true };
 
     localStorage.setItem(
       "userLogin",
-      JSON.stringify({ name, email, roleId, loggedIn: true, accessToken })
+      JSON.stringify({
+        name,
+        email,
+        roleId,
+        avatar: "",
+        loggedIn: true,
+        accessToken,
+      })
     );
     $toast.error("Đăng nhập thành công");
     await new Promise((resolve) => setTimeout(resolve, 1500));

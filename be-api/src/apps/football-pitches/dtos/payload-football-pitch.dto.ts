@@ -29,7 +29,7 @@ export class PayloadFootballPitchDto {
   readonly description: string;
 
   @ApiProperty({
-    example: EFootballPitchStatus.EMPTY,
+    example: EFootballPitchStatus.ACTIVE,
   })
   @IsString()
   @IsNotEmpty()

@@ -1,18 +1,22 @@
 <script lang="ts" setup>
+import userImg from "~/public/user.jpg";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "~/stores";
-import { useRouter, useNuxtApp } from "nuxt/app";
+import { useRouter, useNuxtApp, useRuntimeConfig } from "nuxt/app";
 const router = useRouter();
 const { $toast }: any = useNuxtApp();
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
+const runtimeConfig = useRuntimeConfig();
 const menu = ref(false);
+const CUSTOMER_ROLE = 4;
 
 async function logout() {
   try {
     user.value = {
       name: "",
       email: "",
+      avatar: "",
       roleId: null,
       loggedIn: false,
     };
@@ -27,7 +31,7 @@ async function logout() {
 }
 </script>
 <template>
-  <v-menu v-model="menu" :close-on-content-click="false">
+  <v-menu v-model="menu">
     <template v-slot:activator="{ props }">
       <div
         v-bind="props"
@@ -46,7 +50,11 @@ async function logout() {
     <v-card min-width="250">
       <v-list>
         <v-list-item
-          prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg"
+          :prepend-avatar="
+            user?.avatar
+              ? `${runtimeConfig.public.API_URL}public/${user.avatar}`
+              : userImg
+          "
           :title="user?.name"
           :subtitle="user?.email"
         >
@@ -57,7 +65,11 @@ async function logout() {
 
       <v-list>
         <v-list-item
-          to="/users/info"
+          :to="
+            user?.roleId === CUSTOMER_ROLE
+              ? '/personal-info'
+              : '/admin/personal-info'
+          "
           prepend-icon="mdi mdi-folder-account"
           title="Thông tin cá nhân"
           link

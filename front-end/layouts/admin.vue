@@ -7,7 +7,6 @@ const { title } = app.value;
 useHead({
   title: title || "Sân bóng Hoàng Quân",
 });
-
 </script>
 <template>
   <v-app>
@@ -40,6 +39,7 @@ useHead({
   :deep(.v-data-table__td):last-child > .button {
     min-width: 40px;
     margin: 5px;
+    padding: 0;
   }
 
   :deep(.v-data-table-footer__pagination) > .v-btn {
