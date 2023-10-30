@@ -79,6 +79,24 @@ const menus = ref<Menu>([
     ],
     roleId: 1,
   },
+  {
+    icon: "mdi mdi-receipt-text-outline",
+    title: "Quản lý hóa đơn",
+    url: "/admin/invoices",
+    subMenus: [
+      {
+        icon: "mdi mdi-receipt-text-edit-outline",
+        title: "Loại hóa đơn",
+        url: "/admin/invoice-types",
+      },
+      {
+        icon: "mdi mdi-receipt-text-plus",
+        title: "Hóa đơn",
+        url: "/admin/invoice",
+      },
+    ],
+    roleId: 1,
+  },
 ]);
 function closeNavbar() {
   // drawer.value = false;

@@ -635,18 +635,18 @@ export class FootballPitchesService {
         INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
         WHERE cfpr.id = ${id}
       `;
-      
+
     return footballPitchRentalCustomers || [];
   }
 
-  async updateStatusFootballPitchRental(id: number, status: any) {
+  async updateStatusFootballPitchRental(rentalId: number, status: any) {
     return this.prisma.customerFootballPitchRental.update({
       where: {
-        id
+        id: rentalId,
       },
       data: {
-        status
-      }
-    })
+        status,
+      },
+    });
   }
 }

@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import { formatISO } from "date-fns";
-import { navigateTo } from "nuxt/app";
-
-import { useCustomerStore, useFootballPitchStore } from "~/stores";
+import { navigateTo, useRoute } from "nuxt/app";
+import {
+  useCustomerStore,
+  useFootballPitchStore,
+  useInvoiceStore,
+} from "~/stores";
 import { sendMessage } from "~/services/socket";
 import { storeToRefs } from "pinia";
 
@@ -19,9 +22,11 @@ definePageMeta({
 
 const customerStore = useCustomerStore();
 const footballPitchStore = useFootballPitchStore();
+const invoiceStore = useInvoiceStore();
 const { footballPitch } = storeToRefs(footballPitchStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
 const timer = ref(10);
+const payloadInvoice = ref<Invoice>();
 
 const intervalId = setInterval(() => {
   if (timer.value === 0) {
@@ -33,27 +38,46 @@ const intervalId = setInterval(() => {
 }, 1000);
 
 const route = useRoute();
-const queryString = route.fullPath.split("?")[1];
-
 customerStore
   .createCustomerFootballPitchRental({
     ...paramFootballPitchRental.value,
     rentalDate: formatISO(new Date(paramFootballPitchRental.value.rentalDate)),
   })
-  .then(async () => {
-    const { footballPitchId } = paramFootballPitchRental.value;
-    await footballPitchStore.getFootballPitch(footballPitchId);
-    sendMessage("notification", {
-      title: "Yêu cầu đặt sân",
-      content: footballPitch.value?.name,
-      status: "UNREAD",
-    });
+  .then(async (rentalData) => {
+    const { id } = rentalData.data;
+    await createInvoice(id);
+    await createNotification();
     customerStore.resetForm();
   })
   .catch((error) => {
     console.log(error);
     navigateTo("/");
   });
+
+async function createInvoice(customerFootballPitchRentalId: number) {
+  const { rentalPrice } = paramFootballPitchRental.value;
+  const { vnp_Amount } = route.query;
+  const moneyPaid = Number(vnp_Amount) / 100;
+  payloadInvoice.value = {
+    totalPrice: rentalPrice,
+    moneyPaid,
+    status: "DEPOSIT",
+    staffId: 1,
+    invoiceTypeId: 1,
+    customerFootballId: customerFootballPitchRentalId,
+  };
+  await invoiceStore.createInvoice(payloadInvoice.value);
+}
+
+async function createNotification() {
+  const { footballPitchId } = paramFootballPitchRental.value;
+  await footballPitchStore.getFootballPitch(footballPitchId);
+  sendMessage("notification", {
+    title: "Yêu cầu đặt sân",
+    content: footballPitch.value?.name,
+    status: "UNREAD",
+  });
+}
 </script>
 <template>
   <div class="football-pitches-thank-page">

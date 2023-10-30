@@ -226,8 +226,6 @@ export class AccessoriesController {
   }
 
   @Get('/:id')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
   async getAccessory(@Param('id') id: string) {
     const accessory = await this.accessoriesService.getAccessory(+id);
 

@@ -4,6 +4,7 @@ export interface CustomerFootballPitchRental {
   leasingDurationId: number | null;
   customerAccessoryRentals?: CustomerAccessoryRental[];
   note?: string;
+  rentalPrice?: number | null;
 }
 
 export interface CustomerAccessoryRental {
@@ -32,23 +33,30 @@ export const useCustomerStore = defineStore("customerStore", () => {
     customerAccessoryRentals: [],
     note: "",
   });
-  const customerFootballPitchRentalHistories = ref<CustomerAccessoryRentalHistory[]>()
+  const customerFootballPitchRentalHistories =
+    ref<CustomerAccessoryRentalHistory[]>();
 
   async function createCustomerFootballPitchRental(
     params: CustomerFootballPitchRental
   ) {
+    delete params.rentalPrice;
     return await $apis.post("football-pitches/customer/rental", {
       ...convertProjectObjToObj(params),
     });
   }
 
   async function getCustomerFootballPitchRentalHisTories() {
-    const customerFootballPitchRentalHistoryList =  await $apis.get("football-pitches/rental/customer/histories")
-    customerFootballPitchRentalHistories.value = customerFootballPitchRentalHistoryList.data
+    const customerFootballPitchRentalHistoryList = await $apis.get(
+      "football-pitches/rental/customer/histories"
+    );
+    customerFootballPitchRentalHistories.value =
+      customerFootballPitchRentalHistoryList.data;
   }
 
   function setFootballPitchRentalFromLocalStorage() {
-    const customerFootballPitchRental = localStorage.getItem("customerFootballPitchRental");
+    const customerFootballPitchRental = localStorage.getItem(
+      "customerFootballPitchRental"
+    );
     if (customerFootballPitchRental) {
       paramFootballPitchRental.value = JSON.parse(customerFootballPitchRental);
     }
@@ -65,5 +73,12 @@ export const useCustomerStore = defineStore("customerStore", () => {
     localStorage.removeItem("customerFootballPitchRental");
   }
 
-  return { paramFootballPitchRental, customerFootballPitchRentalHistories, setFootballPitchRentalFromLocalStorage, createCustomerFootballPitchRental, getCustomerFootballPitchRentalHisTories, resetForm };
+  return {
+    paramFootballPitchRental,
+    customerFootballPitchRentalHistories,
+    setFootballPitchRentalFromLocalStorage,
+    createCustomerFootballPitchRental,
+    getCustomerFootballPitchRentalHisTories,
+    resetForm,
+  };
 });

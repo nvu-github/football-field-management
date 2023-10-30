@@ -54,15 +54,38 @@ const { adminConfirmCustomerRental } = storeToRefs(footballPitchStore);
 app.value.title = "Quản lý đặt sân";
 const conditionFilterFootballPitch = ref<any>({
   rentalDate: new Date(),
-  leasingDuration: null,
   status: null,
 });
 const footballPitchConfirmFound = ref<any>();
+await footballPitchStore.getAdminConfirmCustomerRental();
+
+const statusFootballPitch = [
+  {
+    key: "ACCEPT",
+    title: "Xác nhận",
+  },
+  {
+    key: "REJECT",
+    title: "Từ chối",
+  },
+  {
+    key: "PENDING",
+    title: "Yêu cầu",
+  },
+];
 
 watch(isDelete, async () => {
   await footballPitchStore.getAdminConfirmCustomerRental();
   isDelete.value = false;
 });
+
+const formatDatePicker = (date: any): string => {
+  const day = date.getDate();
+  const month = date.getMonth() + 1;
+  const year = date.getFullYear();
+
+  return `${day}/${month}/${year}`;
+};
 
 function openDialogConfirm(id: number, status: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
@@ -87,6 +110,7 @@ function openDialogConfirm(id: number, status: string) {
 function openDialogReject(id: number, status: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     store: footballPitchStore,
+    callback: "updateStatusFootballPitchRental",
     payload: {
       id,
       status,
@@ -104,7 +128,8 @@ function openDialogReject(id: number, status: string) {
   });
 }
 
-footballPitchConfirmFound.value = adminConfirmCustomerRental.value;
+// footballPitchConfirmFound.value = adminConfirmCustomerRental.value;
+filterFootballConfirm();
 async function filterFootballConfirm() {
   const { rentalDate, leasingDuration, status } =
     conditionFilterFootballPitch.value;
@@ -138,21 +163,19 @@ async function filterFootballConfirm() {
 
 function getColorStatusFootballPitchRental(status: string) {
   let color = "success";
-  let message = "Đã xác nhận";
+  let message = "Xác nhận";
   switch (status) {
     case "REJECT":
       color = "primary";
-      message = "Đã từ chối";
+      message = "Từ chối";
       break;
     case "PENDING":
       color = "orange";
-      message = "Đang yêu cầu";
+      message = "Yêu cầu";
       break;
   }
   return { color, message };
 }
-
-footballPitchStore.getAdminConfirmCustomerRental();
 </script>
 <template>
   <div class="football-pitch-confirm-page">
@@ -164,16 +187,6 @@ footballPitchStore.getAdminConfirmCustomerRental();
           placeholder="Thời gian thuê"
           :format="formatDatePicker"
         />
-      </v-col>
-      <v-col lg="3" xs="12">
-        <v-autocomplete
-          v-model="conditionFilterFootballPitch.leasingDuration"
-          label="Khung giờ"
-          item-value="name"
-          item-title="name"
-          :items="formattedLeasingDuration(leasingDurations)"
-          variant="underlined"
-        ></v-autocomplete>
       </v-col>
       <v-col lg="3" xs="12">
         <v-autocomplete

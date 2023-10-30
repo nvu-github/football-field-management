@@ -60,6 +60,7 @@ subRentalPrice =
     Number(accessoryTotalPrice)) *
   0.3;
 
+paramFootballPitchRental.value.rentalPrice = rentalPrice;
 payloadAmountPayment.value.amount = subRentalPrice;
 
 async function confirmPayment() {
