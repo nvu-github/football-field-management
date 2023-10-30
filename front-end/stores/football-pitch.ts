@@ -111,6 +111,14 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     });
   }
 
+  function updateStatusFootballPitchRental({ id, status }: { id: number, status: string }) {
+    return $apis.patch(`football-pitches/rental/${id}/status`, { status })
+  }
+
+  function deleteFootballPitch({ id }: { id: number }) {
+    return $apis.delete(`football-pitches/${id}`);
+  }
+
   async function getFootballPitches() {
     const footballPitchList = await $apis.get("football-pitches");
     footballPitches.value = footballPitchList.data;
@@ -154,10 +162,12 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     adminConfirmCustomerRental,
     createFootballPitch,
     updateFootballPitch,
+    updateStatusFootballPitchRental,
     getFootballPitches,
     getFootballPitch,
     getStatusFootballPitch,
     deleteImage,
+    deleteFootballPitch,
     getFootballPitchRentalInfo,
     getFootballPitchRental,
     getAdminConfirmCustomerRental,
@@ -181,6 +191,10 @@ export const useLeasingDurationStore = defineStore(
       return $apis.patch(`football-pitches/leasing-durations/${id}`, {
         ...convertProjectObjToObj(params),
       });
+    }
+
+    function deleteLeasingDuration({id}: {id: number}) {
+      return $apis.delete(`football-pitches/leasing-durations/${id}`)
     }
 
     async function getLeasingDurations() {
@@ -208,6 +222,7 @@ export const useLeasingDurationStore = defineStore(
       leasingDuration,
       createLeasingDuration,
       updateLeasingDuration,
+      deleteLeasingDuration,
       getLeasingDurations,
       getLeasingDuration,
       getLeasingDurationPublics,
@@ -237,6 +252,10 @@ export const useFootballPitchTypeStore = defineStore(
       });
     }
 
+    function deleteFootballPitchType({id}: {id: number}) {
+      return $apis.delete( `football-pitches/types/${id}`)
+    }
+
     async function getFootballPitchTypes() {
       const footballPitchTypeList = await $apis.get("football-pitches/types");
       footballPitchTypes.value = footballPitchTypeList.data;
@@ -253,6 +272,7 @@ export const useFootballPitchTypeStore = defineStore(
       footballPitchType,
       createFootballPitchType,
       updateFootballPitchType,
+      deleteFootballPitchType,
       getFootballPitchTypes,
       getFootballPitchType,
     };
@@ -281,6 +301,10 @@ export const useFootballPitchPriceStore = defineStore(
       });
     }
 
+    function deleteFootballPitchPrice({id}: {id: number}) {
+      return $apis.delete(`football-pitches/prices/${id}`)
+    }
+
     async function getFootballPitchPrices() {
       const footballPitchPriceList = await $apis.get("football-pitches/prices");
       footballPitchPrices.value = footballPitchPriceList.data;
@@ -297,6 +321,7 @@ export const useFootballPitchPriceStore = defineStore(
       footballPitchPrice,
       createFootballPitchPrice,
       updateFootballPitchPrice,
+      deleteFootballPitchPrice,
       getFootballPitchPrices,
       getFootballPitchPrice,
     };

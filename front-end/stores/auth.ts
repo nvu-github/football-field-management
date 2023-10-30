@@ -11,6 +11,13 @@ export interface Login {
   password: string;
 }
 
+export interface Register {
+  email: string;
+  name: string;
+  phoneNumber: string;
+  password: string;
+}
+
 export const useAuthStore = defineStore("authStore", () => {
   const { $apis }: any = useNuxtApp();
   const user = ref<User>();
@@ -27,6 +34,12 @@ export const useAuthStore = defineStore("authStore", () => {
     });
   }
 
+  function signUp(params: Register) {
+    return $apis.post("auth/signup", {
+      ...params,
+    });
+  }
+
   function setUserInfoFromLocalStorage() {
     const userLoggedIn = localStorage.getItem("userLogin");
     if (userLoggedIn) {
@@ -38,5 +51,5 @@ export const useAuthStore = defineStore("authStore", () => {
     localStorage.removeItem("userLogin");
   }
 
-  return { user, setUserInfoFromLocalStorage, signIn, signInGoogle, signOut };
+  return { user, setUserInfoFromLocalStorage, signIn, signUp, signInGoogle, signOut };
 });

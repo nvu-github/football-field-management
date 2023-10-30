@@ -39,7 +39,7 @@ onEvent("emit-notification", function (data: any) {
       </div>
       <v-divider></v-divider>
 
-      <v-list>
+      <v-list v-if="notifications && notifications.length > 0">
         <v-list-item
           v-for="notification in notifications"
           :key="notification.id"
@@ -68,6 +68,9 @@ onEvent("emit-notification", function (data: any) {
           </v-list-item-content>
         </v-list-item>
       </v-list>
+      <p v-else class="empty">
+        Không có thông báo
+      </p>
     </v-card>
   </v-menu>
 </template>
@@ -97,5 +100,11 @@ onEvent("emit-notification", function (data: any) {
 
 .unread {
   background: #ececec;
+}
+
+.empty {
+  margin: 10px;
+  text-align: center;
+  font-size: 15px;
 }
 </style>

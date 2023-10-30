@@ -46,9 +46,20 @@ async function openDiaglogFooballField(type?: string, id?: string) {
 
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
-    id,
-    endpoint: `football-pitches/${id}`,
-    nameObject: "sân bóng",
+    store: footballPitchStore,
+    callback: 'deleteFootballPitch',
+    payload: {
+      id,
+    },
+    message: {
+      success: 'Xóa sân bóng thành công',
+      error: 'Xóa sân bóng thất bại',
+    },
+    title: 'Bạn có chắc chắn muốn xóa',
+    button: {
+      text: 'Xóa',
+      class: '-danger'
+    }
   });
 }
 

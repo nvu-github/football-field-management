@@ -14,7 +14,7 @@ import {
   ILeasingDuration,
   IFootballPitchType,
   IFootballPitch,
-  IFootbalPitchPrice,
+  IFootballPitchPrice,
   IFootballPitchRental,
   IFootballPitchRentalNow,
 } from './interfaces';
@@ -336,7 +336,7 @@ export class FootballPitchesService {
     });
   }
 
-  async getFootballPitchPrices(): Promise<IFootbalPitchPrice[]> {
+  async getFootballPitchPrices(): Promise<IFootballPitchPrice[]> {
     const footballPitchPrices =
       await this.prisma.footballPitchLeasingDuration.findMany({
         select: {
@@ -368,7 +368,7 @@ export class FootballPitchesService {
     }));
   }
 
-  async getFootballPitchPrice(priceId: number): Promise<IFootbalPitchPrice> {
+  async getFootballPitchPrice(priceId: number): Promise<IFootballPitchPrice> {
     const footballPitchPrice =
       await this.prisma.footballPitchLeasingDuration.findUnique({
         where: {
@@ -616,5 +616,37 @@ export class FootballPitchesService {
         INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
       `;
     return footballPitchRentalCustomers || [];
+  }
+
+  async getCustomerFootballPitchRental(id: number): Promise<any> {
+    const footballPitchRentalCustomers: any[] = await this.prisma.$queryRaw`
+        SELECT  c.id, 
+                c.name, 
+                f.name as footballPitchName,
+                cfpr.status, 
+                cfpr.rental_date as rentalDate, 
+                fpl.price, 
+                ld.start_time as startTime, 
+                ld.end_time as endTime 
+        FROM customers c 
+        INNER JOIN customer_football_pitch_rental cfpr on c.id = cfpr.customer_id
+        INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
+        INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
+        INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
+        WHERE cfpr.id = ${id}
+      `;
+      
+    return footballPitchRentalCustomers || [];
+  }
+
+  async updateStatusFootballPitchRental(id: number, status: any) {
+    return this.prisma.customerFootballPitchRental.update({
+      where: {
+        id
+      },
+      data: {
+        status
+      }
+    })
   }
 }

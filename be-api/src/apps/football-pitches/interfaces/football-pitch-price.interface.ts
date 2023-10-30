@@ -1,4 +1,4 @@
-export interface IFootbalPitchPrice {
+export interface IFootballPitchPrice {
   id: number;
   footballPitchName: string;
   footballPitchId?: number;

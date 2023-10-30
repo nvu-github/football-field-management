@@ -95,7 +95,7 @@ export class UsersController {
     return await this.usersService.updatePersonalCustomer(+id, body);
   }
 
-  @Patch('personal-info/saff')
+  @Patch('personal-info/staff')
   async updatePersonalInfoStaff(
     @Request() req: any,
     @Body() body: UpdatePersonalDto,

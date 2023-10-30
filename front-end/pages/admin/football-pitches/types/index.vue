@@ -29,7 +29,7 @@ watch(isDelete, async () => {
   isDelete.value = false;
 });
 
-async function openDiaglogFootballPitchType(type?: string, id?: string) {
+async function openDialogFootballPitchType(type?: string, id?: string) {
   await dialogStore.showDialog(
     resolveComponent("admin-football-pitch-dialog-type"),
     {
@@ -39,11 +39,22 @@ async function openDiaglogFootballPitchType(type?: string, id?: string) {
   );
 }
 
-function openDiaglogConfirm(id: string) {
+function openDialogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
-    id,
-    endpoint: `football-pitches/types/${id}`,
-    nameObject: "loại sân bóng",
+    store: footballTypeStore,
+    callback: 'deleteFootballPitchType',
+    payload: {
+      id,
+    },
+    message: {
+      success: 'Xóa loại sân bóng thành công',
+      error: 'Xóa loại sân bóng thất bại',
+    },
+    title: 'Bạn có chắc chắn muốn xóa',
+    button: {
+      text: 'Xóa',
+      class: '-danger'
+    }
   });
 }
 
@@ -53,7 +64,7 @@ footballTypeStore.getFootballPitchTypes();
   <div class="football-pitch-type-page">
     <v-row class="row">
       <v-col md="12" class="column">
-        <v-btn class="button -success" @click="openDiaglogFootballPitchType">
+        <v-btn class="button -success" @click="openDialogFootballPitchType">
           Thêm loại sân
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
@@ -70,13 +81,13 @@ footballTypeStore.getFootballPitchTypes();
           <template #[`item.actions`]="{ item }">
             <v-btn
               class="button -warning"
-              @click="openDiaglogFootballPitchType('update', item.raw.id)"
+              @click="openDialogFootballPitchType('update', item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
             </v-btn>
             <v-btn
               class="button -danger"
-              @click="openDiaglogConfirm(item.raw.id)"
+              @click="openDialogConfirm(item.raw.id)"
             >
               <v-icon> mdi-delete </v-icon>
             </v-btn>

@@ -38,9 +38,20 @@ async function openDiaglogLeasingDuration(type?: string, id?: string) {
 
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
-    id,
-    endpoint: `football-pitches/leasing-durations/${id}`,
-    nameObject: "thời gian thuê",
+    store: leasingDurationStore,
+    callback: 'deleteLeasingDuration',
+    payload: {
+      id,
+    },
+    message: {
+      success: 'Xóa thời gian thuê sân thành công',
+      error: 'Xóa thời gian thuê sân thất bại',
+    },
+    title: 'Bạn có chắc chắn muốn xóa',
+    button: {
+      text: 'Xóa',
+      class: '-danger'
+    }
   });
 }
 

@@ -54,9 +54,20 @@ async function openDiaglogFootballPitchPrice(type?: string, id?: string) {
 
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
-    id,
-    endpoint: `football-pitches/prices/${id}`,
-    nameObject: "giá thuê sân",
+    store: footballPitchPriceStore,
+    callback: 'deleteFootballPitchPrice',
+    payload: {
+      id,
+    },
+    message: {
+      success: 'Xóa giá thuê sân thành công',
+      error: 'Xóa giá thuê sân thất bại',
+    },
+    title: 'Bạn có chắc chắn muốn xóa',
+    button: {
+      text: 'Xóa',
+      class: '-danger'
+    }
   });
 }
 

@@ -10,12 +10,12 @@ export class AuthService {
   constructor(private prisma: PrismaService) {}
 
   async signUp(payloads: SignUpDto): Promise<IUser | undefined> {
-    const { name, teamName, email, phoneNumber, password } = payloads;
+    const { name, email, phoneNumber, password } = payloads;
     const account = await this.prisma.account.create({
       data: {
         email,
         password,
-        roleId: 1,
+        roleId: 4,
       },
       select: {
         id: true,
@@ -31,7 +31,6 @@ export class AuthService {
     const customer = await this.prisma.customer.create({
       data: {
         name,
-        teamName,
         phoneNumber,
         accountId: account.id,
       },

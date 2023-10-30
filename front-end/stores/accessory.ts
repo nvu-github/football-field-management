@@ -41,6 +41,10 @@ export const useAccessoryStore = defineStore("accessoryStore", () => {
     });
   }
 
+  function deleteAccessory({ id } : { id: string }) {
+    return $apis.delete(`accessories/${id}`)
+  }
+
   async function getAccessories() {
     const accessoryList = await $apis.get("accessories");
     accessories.value = accessoryList.data;
@@ -62,6 +66,7 @@ export const useAccessoryStore = defineStore("accessoryStore", () => {
     accessoryRentals,
     createAccessory,
     updateAccessory,
+    deleteAccessory,
     getAccessories,
     getAccessory,
     deleteImage,
@@ -91,6 +96,10 @@ export const useAccessoryTypeStore = defineStore(
       });
     }
 
+    function deleteAccessoryType({id}: {id: string}) {
+      return $apis.delete(`accessories/types/${id}`)
+    }
+
     async function getAccessoryTypes() {
       const AccessoryTypeList = await $apis.get("accessories/types");
       accessoryTypes.value = AccessoryTypeList.data;
@@ -107,6 +116,7 @@ export const useAccessoryTypeStore = defineStore(
       accessoryType,
       createAccessoryType,
       updateAccessoryType,
+      deleteAccessoryType,
       getAccessoryTypes,
       getAccessoryType,
     };

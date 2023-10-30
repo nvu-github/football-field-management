@@ -63,6 +63,13 @@ async function main() {
     await prisma.staff.createMany({
       data: [
         {
+          name: 'Admin',
+          phoneNumber: '1234567890',
+          address: 'Phu Tho',
+          gender: 'MALE',
+          accountId: 1,
+        },
+        {
           name: 'John Doe',
           phoneNumber: '1234567890',
           address: 'Phu Tho',
@@ -108,6 +115,33 @@ async function main() {
         },
       ],
     });
+
+    // Seed football type
+    await prisma.footballType.createMany({
+      data: [
+        {
+          name: 'Sân 7 người'
+        },
+        {
+          name: 'Sân 9 người'
+        },
+        {
+          name: 'Sân 11 người'
+        }
+      ]
+    })
+
+    // Seed invoice type
+    await prisma.invoiceType.createMany({
+      data: [
+        {
+          name: 'Hóa đơn thuê'
+        },
+        {
+          name: 'Hóa đơn bán'
+        },
+      ]
+    })
   } catch (error) {
     console.error('Error seeding data:', error);
   } finally {

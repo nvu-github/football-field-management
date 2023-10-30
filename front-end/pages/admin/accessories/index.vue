@@ -48,9 +48,20 @@ async function openDialogAccessory(type?: string, id?: string) {
 
 function openDialogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
-    id,
-    endpoint: `accessories/${id}`,
-    nameObject: "phụ kiện",
+    store: accessoryStore,
+    callback: 'deleteAccessory',
+    payload: {
+      id,
+    },
+    message: {
+      success: 'Xóa phụ kiện thành công',
+      error: 'Xóa phụ kiện thất bại',
+    },
+    title: 'Bạn có chắc chắn muốn xóa',
+    button: {
+      text: 'Xóa',
+      class: '-danger'
+    }
   });
 }
 

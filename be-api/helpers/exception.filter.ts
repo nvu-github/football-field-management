@@ -23,7 +23,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
       httpStatus = exception.getStatus();
       const exceptionResponse = exception.getResponse() || exception.message;
       console.log(exception);
-      console.log(exception.getResponse());
+      console.log('response exception: ', exception.getResponse());
       if (exceptionResponse && exceptionResponse['message']) {
         message = exceptionResponse['message'];
       } else {

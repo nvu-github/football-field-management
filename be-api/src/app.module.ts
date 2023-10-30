@@ -16,6 +16,7 @@ import { FootballPitchesModule } from '@app/football-pitches/football-pitches.mo
 import { AccessoriesModule } from '@app/accessories/accessories.module';
 import { SocketsModule } from '@app/sockets/sockets.module';
 import { NotificationsModule } from './apps/notifications/notifications.module';
+import { InvoicesModule } from './apps/invoices/invoices.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { NotificationsModule } from './apps/notifications/notifications.module';
     AccessoriesModule,
     SocketsModule,
     NotificationsModule,
+    InvoicesModule,
   ],
   controllers: [AppController],
   providers: [

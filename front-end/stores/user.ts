@@ -78,6 +78,8 @@ export const useUserStore = defineStore("userStore", () => {
   }
 
   function updatePersonalInfoStaff(params: PersonalInfo) {
+    delete params.id;
+    delete params.email;
     return $apis.patch(`users/personal-info/staff`, {
       ...convertProjectObjToObj(params),
     });

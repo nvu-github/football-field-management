@@ -174,6 +174,13 @@ function getStatusInfo(status: string) {
                   </v-btn>
                 </template>
               </v-tooltip>
+              <!-- <v-tooltip location="bottom" text="Hủy đặt sân">
+                <template #activator="{ props }">
+                  <v-btn v-bind="props" class="button -danger">
+                    <v-icon> mdi mdi-close-circle-outline </v-icon>
+                  </v-btn>
+                </template>
+              </v-tooltip> -->
             </div>
           </v-card-action>
         </v-card>

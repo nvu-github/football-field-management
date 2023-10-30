@@ -10,13 +10,6 @@ export class SignUpDto {
   readonly name: string;
 
   @ApiProperty({
-    example: 'Team 1',
-  })
-  @IsString()
-  @IsNotEmpty()
-  readonly teamName: string;
-
-  @ApiProperty({
     example: 'email@example.com',
   })
   @IsString()

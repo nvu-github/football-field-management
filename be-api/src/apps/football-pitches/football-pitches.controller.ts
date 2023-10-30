@@ -73,6 +73,17 @@ export class FootballPitchesController {
     return customerFootballPitchRental;
   }
 
+  @Patch('rental/:id/status')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async updateStatusFootballPitchRental(@Param('id') id: string, @Body() body: any) {
+    const footballPitchRentalFound = await this.footballPitchService.getCustomerFootballPitchRental(+id)
+
+    if (footballPitchRentalFound.length === 0) throw new HttpException('Không tìm thấy thông tin đặt sân', HttpStatus.BAD_REQUEST)
+
+    return this.footballPitchService.updateStatusFootballPitchRental(+id, body.status)
+  }
+
   @Get('rental')
   async getFootballPitchRentals(): Promise<any> {
     return await this.footballPitchService.getFootballPitchRentals();
