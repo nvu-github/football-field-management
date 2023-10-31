@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { onBeforeMount, watch, computed } from 'vue'
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import {

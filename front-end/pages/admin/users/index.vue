@@ -18,13 +18,13 @@ const headers = [
 const appStore = useAppStore();
 const userStore = useUserStore();
 const dialogStore = useDialogStore();
-const { isDelete } = storeToRefs(dialogStore);
+const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { accounts } = storeToRefs(userStore);
 app.value.title = "Quản lý tài khoản";
-watch(isDelete, async () => {
+watch(isConfirm, async () => {
   await userStore.getAccounts();
-  isDelete.value = false;
+  isConfirm.value = false;
 });
 
 async function openDialogUser(type?: string, id?: string) {

@@ -4,7 +4,7 @@ import { useNuxtApp } from "nuxt/app";
 import { useDialogStore } from "~/stores";
 
 const dialogStore = useDialogStore();
-const { isDelete } = storeToRefs(dialogStore);
+const { isConfirm } = storeToRefs(dialogStore);
 const { $toast }: any = useNuxtApp();
 const { data }: any = dialogStore.dialog;
 
@@ -14,7 +14,7 @@ async function confirm() {
   try {
     await store[data.callback](payload);
     $toast.success(success);
-    isDelete.value = true;
+    isConfirm.value = true;
   } catch (e) {
     console.log(e);
     $toast.success(error);

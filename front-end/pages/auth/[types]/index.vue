@@ -1,8 +1,9 @@
 <script lang="ts" setup>
+import { ref } from 'vue'
 import { storeToRefs } from "pinia";
 import { useNuxtApp, useRoute, useRouter } from "nuxt/app";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { useAuthStore } from "~/stores";
+import { useAuthStore, appStore } from "~/stores";
 
 definePageMeta({
   layout: "blank",
@@ -44,6 +45,8 @@ const router = useRouter();
 const route = useRoute();
 const { $toast }: any = useNuxtApp();
 const authStore = useAuthStore();
+const appStore = useAppStore();
+const { isLoading } = storeToRefs(appStore);
 const { user } = storeToRefs(authStore);
 const step = ref(route.params.types);
 const loginPayloads = ref<Login>({
@@ -67,6 +70,7 @@ function changeRouter() {
 }
 
 async function loginUser() {
+  isLoading.value = true
   try {
     const { email, password } = loginPayloads.value;
     const userLogin = await authStore.signIn({ email, password });
@@ -98,6 +102,7 @@ async function loginUser() {
     console.log(error);
     $toast.error("Thông tin email hoặc mật khẩu không chính xác");
   }
+  isLoading.value = false
 }
 
 async function Register() {
@@ -114,7 +119,7 @@ async function Register() {
 
 async function loginGoogle() {
   try {
-    const { $firebaseAuth } = useNuxtApp();
+    const { $firebaseAuth }: any = useNuxtApp();
     const provider = new GoogleAuthProvider();
     const result = await signInWithPopup($firebaseAuth, provider);
 
@@ -197,6 +202,7 @@ async function loginGoogle() {
                             class="btn"
                             block
                             type="submit"
+                            :loading="isLoading"
                             :disabled="!loginPayloads.value"
                             >Đăng nhập</v-btn
                           >
@@ -328,6 +334,7 @@ async function loginGoogle() {
                             dark
                             block
                             type="submit"
+                            :loading="isLoading"
                             :disabled="!registerPayloads.value"
                             >Đăng ký</v-btn
                           >

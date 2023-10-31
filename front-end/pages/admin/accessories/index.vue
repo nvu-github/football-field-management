@@ -26,14 +26,14 @@ const headers = [
 const appStore = useAppStore();
 const accessoryStore = useAccessoryStore();
 const dialogStore = useDialogStore();
-const { isDelete } = storeToRefs(dialogStore);
+const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { accessories } = storeToRefs(accessoryStore);
 app.value.title = "Quản lý phụ kiện";
 
-watch(isDelete, async () => {
+watch(isConfirm, async () => {
   await accessoryStore.getAccessories();
-  isDelete.value = false;
+  isConfirm.value = false;
 });
 
 async function openDialogAccessory(type?: string, id?: string) {

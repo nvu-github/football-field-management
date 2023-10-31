@@ -84,7 +84,7 @@ export const useAppStore = defineStore("appStore", () => {
 });
 
 export const useDialogStore = defineStore("dialogStore", () => {
-  const isDelete = ref<Boolean>(false);
+  const isConfirm = ref<Boolean>(false);
   const defaultDialog = {
     isVisible: false,
     isPersistent: false,
@@ -108,7 +108,7 @@ export const useDialogStore = defineStore("dialogStore", () => {
     dialog.value = defaultDialog;
   }
 
-  return { dialog, isDelete, showDialog, showPersistentDialog, closeDialog };
+  return { dialog, isConfirm, showDialog, showPersistentDialog, closeDialog };
 });
 
 export const usePaymentStore = defineStore("paymentStore", () => {

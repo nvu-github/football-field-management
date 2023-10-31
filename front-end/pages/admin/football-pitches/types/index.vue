@@ -19,14 +19,14 @@ const headers = [
 const appStore = useAppStore();
 const footballTypeStore = useFootballPitchTypeStore();
 const dialogStore = useDialogStore();
-const { isDelete } = storeToRefs(dialogStore);
+const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { footballPitchTypes } = storeToRefs(footballTypeStore);
 app.value.title = "Quản lý loại sân bóng";
 
-watch(isDelete, async () => {
+watch(isConfirm, async () => {
   await footballTypeStore.getFootballPitchTypes();
-  isDelete.value = false;
+  isConfirm.value = false;
 });
 
 async function openDialogFootballPitchType(type?: string, id?: string) {

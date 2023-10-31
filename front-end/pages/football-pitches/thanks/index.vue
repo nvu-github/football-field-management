@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ref } from "vue"
 import { formatISO } from "date-fns";
 import { navigateTo, useRoute } from "nuxt/app";
 import {
@@ -51,6 +52,7 @@ customerStore
   })
   .catch((error) => {
     console.log(error);
+    clearInterval(intervalId);
     navigateTo("/");
   });
 
@@ -71,7 +73,7 @@ async function createInvoice(customerFootballPitchRentalId: number) {
 
 async function createNotification() {
   const { footballPitchId } = paramFootballPitchRental.value;
-  await footballPitchStore.getFootballPitch(footballPitchId);
+  await footballPitchStore.getFootballPitch(Number(footballPitchId));
   sendMessage("notification", {
     title: "Yêu cầu đặt sân",
     content: footballPitch.value?.name,

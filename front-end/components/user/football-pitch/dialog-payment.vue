@@ -1,10 +1,13 @@
 <script lang="ts" setup>
+import { ref, computed } from "vue"
 import { storeToRefs } from "pinia";
+import { useNuxtApp } from "nuxt/app"
 import {
   useDialogStore,
   usePaymentStore,
   useCustomerStore,
   useAccessoryStore,
+  useAppStore
 } from "~/stores";
 import { formatPrice } from "~/utils/string";
 
@@ -17,6 +20,8 @@ const dialogStore = useDialogStore();
 const paymentStore = usePaymentStore();
 const customerStore = useCustomerStore();
 const accessoryStore = useAccessoryStore();
+const appStore = useAppStore();
+const { isLoading } = storeToRefs(appStore);
 const { accessories } = storeToRefs(accessoryStore);
 const { payloadAmountPayment } = storeToRefs(paymentStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
@@ -64,6 +69,7 @@ paramFootballPitchRental.value.rentalPrice = rentalPrice;
 payloadAmountPayment.value.amount = subRentalPrice;
 
 async function confirmPayment() {
+  isLoading.value = true
   try {
     const { amount, pricePayment } = payloadAmountPayment.value;
     const priceValue = Number(pricePayment) * 0.3;
@@ -83,6 +89,7 @@ async function confirmPayment() {
     console.log(err);
     $toast.error("Có lỗi xảy ra trong quá trình đặt sân");
   }
+  isLoading.value = false
 }
 
 function cancelPayment() {
@@ -132,6 +139,7 @@ function cancelPayment() {
         <v-btn
           class="button -success"
           :disabled="!payloadAmountPayment"
+          :loading="isLoading"
           @click="confirmPayment"
         >
           Thanh toán

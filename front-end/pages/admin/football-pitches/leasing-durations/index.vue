@@ -16,14 +16,14 @@ const headers = [
 const appStore = useAppStore();
 const leasingDurationStore = useLeasingDurationStore();
 const dialogStore = useDialogStore();
-const { isDelete } = storeToRefs(dialogStore);
+const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { leasingDurations } = storeToRefs(leasingDurationStore);
 app.value.title = "Quản lý thời gian thuê";
 
-watch(isDelete, async () => {
+watch(isConfirm, async () => {
   await leasingDurationStore.getLeasingDurations();
-  isDelete.value = false;
+  isConfirm.value = false;
 });
 
 async function openDiaglogLeasingDuration(type?: string, id?: string) {

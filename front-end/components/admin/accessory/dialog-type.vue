@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ref, onBeforeMount } from "vue"
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import { useAccessoryTypeStore, useAppStore, useDialogStore } from "~/stores";
@@ -14,7 +15,7 @@ const { isLoading } = storeToRefs(appStore);
 const { accessoryType } = storeToRefs(accessoryTypeStore);
 const { dialog, closeDialog } = useDialogStore();
 const { data }: any = dialog;
-const paramsAccessoryType = ref<paramsAccessoryType>({
+const paramsAccessoryType = ref<ParamsAccessoryType>({
   name: "",
 });
 

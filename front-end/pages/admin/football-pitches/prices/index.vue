@@ -32,14 +32,14 @@ const headers = [
 const appStore = useAppStore();
 const footballPitchPriceStore = useFootballPitchPriceStore();
 const dialogStore = useDialogStore();
-const { isDelete } = storeToRefs(dialogStore);
+const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
 app.value.title = "Quản lý giá thuê sân bóng";
 
-watch(isDelete, async () => {
+watch(isConfirm, async () => {
   await footballPitchPriceStore.getFootballPitchPrices();
-  isDelete.value = false;
+  isConfirm.value = false;
 });
 
 async function openDiaglogFootballPitchPrice(type?: string, id?: string) {

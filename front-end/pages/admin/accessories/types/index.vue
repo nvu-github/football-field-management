@@ -19,14 +19,14 @@ const headers = [
 const appStore = useAppStore();
 const accessoryTypeStore = useAccessoryTypeStore();
 const dialogStore = useDialogStore();
-const { isDelete } = storeToRefs(dialogStore);
+const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { accessoryTypes } = storeToRefs(accessoryTypeStore);
 app.value.title = "Quản lý loại phụ kiện";
 
-watch(isDelete, async () => {
+watch(isConfirm, async () => {
   await accessoryTypeStore.getAccessoryTypes();
-  isDelete.value = false;
+  isConfirm.value = false;
 });
 
 async function openDialogAccessoryType(type?: string, id?: string) {

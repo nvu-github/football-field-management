@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { ref, watch, resolveComponent, onBeforeMount } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore, useFootballPitchStore, useDialogStore } from "~/stores";
 import { format } from "date-fns";
@@ -45,20 +46,6 @@ const headers = [
     sortable: false,
   },
 ];
-const appStore = useAppStore();
-const footballPitchStore = useFootballPitchStore();
-const dialogStore = useDialogStore();
-const { isDelete } = storeToRefs(dialogStore);
-const { app } = storeToRefs(appStore);
-const { adminConfirmCustomerRental } = storeToRefs(footballPitchStore);
-app.value.title = "Quản lý đặt sân";
-const conditionFilterFootballPitch = ref<any>({
-  rentalDate: new Date(),
-  status: null,
-});
-const footballPitchConfirmFound = ref<any>();
-await footballPitchStore.getAdminConfirmCustomerRental();
-
 const statusFootballPitch = [
   {
     key: "ACCEPT",
@@ -74,9 +61,21 @@ const statusFootballPitch = [
   },
 ];
 
-watch(isDelete, async () => {
-  await footballPitchStore.getAdminConfirmCustomerRental();
-  isDelete.value = false;
+const appStore = useAppStore();
+const footballPitchStore = useFootballPitchStore();
+const dialogStore = useDialogStore();
+const { isConfirm } = storeToRefs(dialogStore);
+const { app } = storeToRefs(appStore);
+const { adminConfirmCustomerRental } = storeToRefs(footballPitchStore);
+app.value.title = "Quản lý đặt sân";
+const conditionFilterFootballPitch = ref<any>({
+  rentalDate: new Date(),
+  status: null,
+});
+const footballPitchConfirmFound = ref<any>();
+watch(isConfirm, async () => {
+  await filterFootballConfirm();
+  isConfirm.value = false;
 });
 
 const formatDatePicker = (date: any): string => {
@@ -86,6 +85,10 @@ const formatDatePicker = (date: any): string => {
 
   return `${day}/${month}/${year}`;
 };
+
+onBeforeMount(async () => {
+  await filterFootballConfirm();
+})
 
 function openDialogConfirm(id: number, status: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
@@ -128,12 +131,10 @@ function openDialogReject(id: number, status: string) {
   });
 }
 
-// footballPitchConfirmFound.value = adminConfirmCustomerRental.value;
-filterFootballConfirm();
 async function filterFootballConfirm() {
   const { rentalDate, leasingDuration, status } =
     conditionFilterFootballPitch.value;
-
+  await footballPitchStore.getAdminConfirmCustomerRental();
   if (rentalDate || leasingDuration || status) {
     footballPitchConfirmFound.value = adminConfirmCustomerRental.value.filter(
       (footballPitch) => {

@@ -23,7 +23,6 @@ export const useAccessoryStore = defineStore("accessoryStore", () => {
   const { $apis }: any = useNuxtApp();
   const accessories = ref<ParamsAccessory[]>([]);
   const accessory = ref<ParamsAccessory>();
-  const accessoryRentals = ref<AccessoryRental[]>([]);
 
   function createAccessory(params: ParamsAccessory) {
     return $apis.post("accessories", {
@@ -63,7 +62,6 @@ export const useAccessoryStore = defineStore("accessoryStore", () => {
   return {
     accessories,
     accessory,
-    accessoryRentals,
     createAccessory,
     updateAccessory,
     deleteAccessory,

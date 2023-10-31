@@ -1,6 +1,8 @@
 <script lang="ts" setup>
+import {resolveComponent} from "vue"
 import { isSameDay, isAfter } from "date-fns";
 import { storeToRefs } from "pinia";
+import { useRoute, useNuxtApp } from "nuxt/app"
 import {
   useAppStore,
   useCustomerStore,
@@ -18,6 +20,7 @@ const customerStore = useCustomerStore();
 const appStore = useAppStore();
 const dialogStore = useDialogStore();
 const footballPitchPriceStore = useFootballPitchPriceStore();
+const { isLoading } = storeToRefs(appStore);
 const { breadCrumbs } = storeToRefs(appStore);
 const { paramFootballPitchRental } = storeToRefs(customerStore);
 
@@ -42,6 +45,7 @@ if (route.query && route.query.id) {
 }
 
 async function submitRentalInfo() {
+  isLoading.value = true
   const formValidation = validForm();
 
   if (!formValidation.status) {
@@ -49,12 +53,14 @@ async function submitRentalInfo() {
       ? `Vui lòng nhập thông tin ${formValidation.message}`
       : "Thời gian đặt sân phải lớn hơn hoặc bằng ngày hiện tại";
 
+    isLoading.value = false
     return $toast.error(errorMessage);
   }
 
   dialogStore.showDialog(
     resolveComponent("user-football-pitch-dialog-payment")
   );
+  isLoading.value = false
 }
 
 function validForm() {
@@ -114,6 +120,7 @@ function validForm() {
           <v-btn
             class="button -success"
             type="submit"
+            :loading="isLoading"
             :disabled="!paramFootballPitchRental.value"
           >
             Đặt sân

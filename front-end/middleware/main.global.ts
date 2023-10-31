@@ -11,14 +11,15 @@ export default defineNuxtRouteMiddleware((to, from) => {
     if (!loggedIn) {
       return navigateTo("/auth/login");
     }
-    if (roleId === CUSTOMER_ROLE) {
+    if (loggedIn && roleId === CUSTOMER_ROLE) {
       return navigateTo("/");
     }
   } else {
-    const includedEndpointLogin = ['football-pitches-rental', 'football-pitches-histories']
+    const includedEndpointLogin = ['football-pitches-rental', 'football-pitches-histories', 'football-pitches-thanks']
     const { name }: any = to; 
-    if (includedEndpointLogin.includes(name) && !loggedIn) {
-      return navigateTo("/auth/login");
+    if (includedEndpointLogin.includes(name)) {
+      if (!loggedIn) return navigateTo("/auth/login");
+      if (loggedIn && roleId !== CUSTOMER_ROLE) return navigateTo("/admin");
     }
   }
 });

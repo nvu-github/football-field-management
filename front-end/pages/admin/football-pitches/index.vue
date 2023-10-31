@@ -24,14 +24,14 @@ const headers = [
 const appStore = useAppStore();
 const footballPitchStore = useFootballPitchStore();
 const dialogStore = useDialogStore();
-const { isDelete } = storeToRefs(dialogStore);
+const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { footballPitches } = storeToRefs(footballPitchStore);
 app.value.title = "Quản lý sân bóng";
 
-watch(isDelete, async () => {
+watch(isConfirm, async () => {
   await footballPitchStore.getFootballPitches();
-  isDelete.value = false;
+  isConfirm.value = false;
 });
 
 async function openDiaglogFooballField(type?: string, id?: string) {

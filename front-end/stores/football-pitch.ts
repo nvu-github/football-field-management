@@ -74,6 +74,7 @@ export interface AdminConfirmCustomerRental {
   price: string;
   startTime: string;
   endTime: string;
+  customerId: number;
 }
 
 export const footballPitchStatuses: any = [
