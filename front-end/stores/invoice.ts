@@ -15,5 +15,24 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
       ...convertProjectObjToObj(payload),
     });
   }
-  return { createInvoice };
+
+  function getStatusInvoice(status: string | any) {
+    let text = 'Đã thanh toán';
+    let color = 'success';
+
+    switch (status) {
+      case 'DEPOSIT':
+        text = 'Đã cọc';
+        color = 'primary'
+        break;
+
+      case 'UNPAID':
+        text = 'Chưa thanh toán';
+        color = 'orange'
+        break;
+    }
+    return { text, color }
+  }
+
+  return { createInvoice, getStatusInvoice };
 });

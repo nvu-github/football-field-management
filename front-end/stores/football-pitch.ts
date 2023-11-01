@@ -65,7 +65,7 @@ export interface FootballPitchRental {
   price: number;
 }
 
-export interface AdminConfirmCustomerRental {
+export interface CustomerFootballPitchRental {
   id: number;
   name: string;
   footballPitchName: string;
@@ -75,6 +75,27 @@ export interface AdminConfirmCustomerRental {
   startTime: string;
   endTime: string;
   customerId: number;
+}
+
+export interface CustomerFootballPitchRentalDetail extends CustomerFootballPitchRental {
+  customer: {
+    name: string;
+    phoneNumber: string;
+  };
+  invoice: {
+    totalPrice: number;
+    moneyPaid: number;
+    status: string;
+  };
+  footballPitchTypeId: number;
+  footballPitchTypeName: string;
+  leasingDurationName: string;
+  footballPitchImages: Array<ParamsFootballPitchImage>;
+  accessoryRentals: Array<{
+    name: string;
+    amount: number;
+    price: number;
+  }>
 }
 
 export const footballPitchStatuses: any = [
@@ -94,7 +115,8 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
   const footballPitch = ref<ParamsFootballPitch>();
   const footballPitchRentalInfo = ref<FootballPitchRentalInfo[]>([]);
   const footballPitchRental = ref<FootballPitchRentalInfo[]>([]);
-  const adminConfirmCustomerRental = ref<AdminConfirmCustomerRental[]>([]);
+  const customerFootballPitchRentals = ref<CustomerFootballPitchRental[]>([]);
+  const customerFootballPitchRentalDetail = ref<CustomerFootballPitchRentalDetail>()
 
   function createFootballPitch(params: ParamsFootballPitch) {
     return $apis.post("football-pitches", {
@@ -149,10 +171,33 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
   }
 
   async function getAdminConfirmCustomerRental() {
-    const adminConfirmCustomerRentals = await $apis.get(
+    const customerFootballPitchRentalList = await $apis.get(
       `football-pitches/rental/confirm`
     );
-    adminConfirmCustomerRental.value = adminConfirmCustomerRentals.data;
+    customerFootballPitchRentals.value = customerFootballPitchRentalList.data;
+  }
+
+  async function getCustomerFootballPitchRentalDetail(id: number) {
+    const customerFootballPitchRentalDetailData = await $apis.get(
+      `football-pitches/rental/${id}/detail`
+    );
+    customerFootballPitchRentalDetail.value = customerFootballPitchRentalDetailData.data
+  }
+
+  function getStatusCustomerFootballPitchRental(status: string | any) {
+    let color = "success";
+    let text = "Xác nhận";
+    switch (status) {
+      case "REJECT":
+        color = "red";
+        text = "Hủy";
+        break;
+      case "PENDING":
+        color = "orange";
+        text = "Yêu cầu";
+        break;
+    }
+    return { color, text };
   }
 
   return {
@@ -160,7 +205,8 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     footballPitch,
     footballPitchRentalInfo,
     footballPitchRental,
-    adminConfirmCustomerRental,
+    customerFootballPitchRentals,
+    customerFootballPitchRentalDetail,
     createFootballPitch,
     updateFootballPitch,
     updateStatusFootballPitchRental,
@@ -172,6 +218,8 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     getFootballPitchRentalInfo,
     getFootballPitchRental,
     getAdminConfirmCustomerRental,
+    getCustomerFootballPitchRentalDetail,
+    getStatusCustomerFootballPitchRental,
   };
 });
 

@@ -73,7 +73,7 @@ export class FootballPitchesController {
     return customerFootballPitchRental;
   }
 
-  @Get('rental/:id')
+  @Get('rental/:id/detail')
   async getFootballPitchRentalDetail(@Param('id') id: string) {
     const footballPitchRentalFound =
       await this.footballPitchService.getCustomerFootballPitchRental(+id);

@@ -65,8 +65,8 @@ const appStore = useAppStore();
 const footballPitchStore = useFootballPitchStore();
 const dialogStore = useDialogStore();
 const { isConfirm } = storeToRefs(dialogStore);
-const { app } = storeToRefs(appStore);
-const { adminConfirmCustomerRental } = storeToRefs(footballPitchStore);
+const { app, isLoading } = storeToRefs(appStore);
+const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
 app.value.title = "Quản lý đặt sân";
 const conditionFilterFootballPitch = ref<any>({
   rentalDate: new Date(),
@@ -88,7 +88,7 @@ const formatDatePicker = (date: any): string => {
 
 onBeforeMount(async () => {
   await filterFootballConfirm();
-})
+});
 
 function openDialogConfirm(id: number, status: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
@@ -131,12 +131,22 @@ function openDialogReject(id: number, status: string) {
   });
 }
 
+function openDialogDetail(id: number) {
+  dialogStore.showDialog(
+    resolveComponent("common-football-pitch-dialog-rental-detail"),
+    {
+      id,
+    }
+  );
+}
+
 async function filterFootballConfirm() {
+  isLoading.value = true;
   const { rentalDate, leasingDuration, status } =
     conditionFilterFootballPitch.value;
   await footballPitchStore.getAdminConfirmCustomerRental();
   if (rentalDate || leasingDuration || status) {
-    footballPitchConfirmFound.value = adminConfirmCustomerRental.value.filter(
+    footballPitchConfirmFound.value = customerFootballPitchRentals.value.filter(
       (footballPitch) => {
         let condition = true;
 
@@ -160,22 +170,7 @@ async function filterFootballConfirm() {
       }
     );
   }
-}
-
-function getColorStatusFootballPitchRental(status: string) {
-  let color = "success";
-  let message = "Xác nhận";
-  switch (status) {
-    case "REJECT":
-      color = "primary";
-      message = "Từ chối";
-      break;
-    case "PENDING":
-      color = "orange";
-      message = "Yêu cầu";
-      break;
-  }
-  return { color, message };
+  isLoading.value = false;
 }
 </script>
 <template>
@@ -200,7 +195,11 @@ function getColorStatusFootballPitchRental(status: string) {
         ></v-autocomplete>
       </v-col>
       <v-col class="action" md="lg" xs="12">
-        <v-btn class="button -success" @click="filterFootballConfirm">
+        <v-btn
+          class="button -success"
+          :loading="isLoading"
+          @click="filterFootballConfirm"
+        >
           <template #prepend>
             <v-icon>mdi mdi-magnify</v-icon>
           </template>
@@ -229,9 +228,15 @@ function getColorStatusFootballPitchRental(status: string) {
           </template>
           <template #[`item.status`]="{ item }">
             <v-chip
-              :color="getColorStatusFootballPitchRental(item.raw.status).color"
+              :color="
+                footballPitchStore.getStatusCustomerFootballPitchRental(
+                  item.raw.status
+                ).color
+              "
               >{{
-                getColorStatusFootballPitchRental(item.raw.status).message
+                footballPitchStore.getStatusCustomerFootballPitchRental(
+                  item.raw.status
+                ).text
               }}</v-chip
             >
           </template>
@@ -245,12 +250,16 @@ function getColorStatusFootballPitchRental(status: string) {
             </v-btn>
             <v-btn
               class="button -danger"
+              :disabled="item.raw.status === 'REJECT'"
               @click="openDialogReject(item.raw.id, 'REJECT')"
             >
               <v-icon> mdi mdi-close-circle-outline </v-icon>
             </v-btn>
 
-            <v-btn class="button -warning">
+            <v-btn
+              class="button -warning"
+              @click="openDialogDetail(item.raw.id)"
+            >
               <v-icon> mdi mdi-list-box </v-icon>
             </v-btn>
           </template>

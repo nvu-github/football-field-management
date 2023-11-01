@@ -1,11 +1,19 @@
 <script lang="ts" setup>
+import { ref, resolveComponent } from "vue";
 import format from "date-fns/format";
 import { storeToRefs } from "pinia";
-import { useCustomerStore, useAppStore } from "~/stores";
+import {
+  useCustomerStore,
+  useAppStore,
+  useDialogStore,
+  useFootballPitchStore,
+} from "~/stores";
 import { formatPrice } from "~/utils/string";
 
-const customerStore = useCustomerStore();
 const appStore = useAppStore();
+const dialogStore = useDialogStore();
+const customerStore = useCustomerStore();
+const footballPitchStore = useFootballPitchStore();
 const { breadCrumbs } = storeToRefs(appStore);
 const { customerFootballPitchRentalHistories }: any =
   storeToRefs(customerStore);
@@ -62,24 +70,13 @@ function filterHistories() {
   );
 }
 
-function getStatusInfo(status: string) {
-  let text = "Đã thuê";
-  let color = "success";
-
-  if (status === "PENDING") {
-    text = "Chờ xác nhận";
-    color = "orange";
-  }
-
-  if (status === "REJECT") {
-    text = "Từ chối";
-    color = "danger";
-  }
-
-  return {
-    text,
-    color,
-  };
+function openDialogDetail(id: number) {
+  dialogStore.showDialog(
+    resolveComponent("common-football-pitch-dialog-rental-detail"),
+    {
+      id,
+    }
+  );
 }
 </script>
 <template>
@@ -153,16 +150,26 @@ function getStatusInfo(status: string) {
             <div class="status">
               <label for="">Trạng thái: </label>
               <v-chip
-                :color="getStatusInfo(customerFootballPitchRental.status).color"
+                :color="
+                  footballPitchStore.getStatusCustomerFootballPitchRental(
+                    customerFootballPitchRental.status
+                  ).color
+                "
                 >{{
-                  getStatusInfo(customerFootballPitchRental.status).text
+                  footballPitchStore.getStatusCustomerFootballPitchRental(
+                    customerFootballPitchRental.status
+                  ).text
                 }}</v-chip
               >
             </div>
             <div class="action">
               <v-tooltip location="bottom" text="Chi tiết">
                 <template #activator="{ props }">
-                  <v-btn v-bind="props" class="button -primary -rental">
+                  <v-btn
+                    v-bind="props"
+                    class="button -primary -rental"
+                    @click="openDialogDetail(customerFootballPitchRental.id)"
+                  >
                     <v-icon>mdi mdi-alpha-d-circle-outline</v-icon>
                   </v-btn>
                 </template>

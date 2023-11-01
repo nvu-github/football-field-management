@@ -18,5 +18,11 @@ export default () => ({
     tmnCodeVnPay: process.env.VNPAY_TMN_CODE,
     secretKeyVnPay: process.env.VNPAY_SECRET_KEY,
     returnUrlVnPay: process.env.VNPAY_RETURN_URL
+  },
+  mail: {
+    clientId: process.env.EMAIL_CLIENT_ID,
+    clientSecret: process.env.EMAIL_CLIENT_SECRET,
+    refreshToken: process.env.EMAIL_REFRESH_TOKEN,
+    address: process.env.EMAIL_ADDRESS
   }
 });

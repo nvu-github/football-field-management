@@ -8,6 +8,7 @@ import { AllExceptionsFilter } from 'helpers/exception.filter';
 
 import { UploadModule } from 'common/upload/upload.module';
 import { PaymentModule } from 'common/payment/payment.module';
+import { MailModule } from 'common/mail/mail.module';
 import { AuthModule } from '@app/auth/auth.module';
 import { UsersModule } from '@app/users/users.module';
 // import { GoogleAuthMiddleware } from 'middleware/google-auth.middleware';
@@ -23,6 +24,7 @@ import { InvoicesModule } from './apps/invoices/invoices.module';
     AuthModule,
     UploadModule,
     PaymentModule,
+    MailModule,
     UsersModule,
     FootballPitchesModule,
     AccessoriesModule,

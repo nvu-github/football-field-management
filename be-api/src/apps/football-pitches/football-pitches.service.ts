@@ -23,7 +23,7 @@ import { format } from 'date-fns';
 
 @Injectable()
 export class FootballPitchesService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   createFootballPitch(
     payloads: PayloadFootballPitchDto,
@@ -528,10 +528,10 @@ export class FootballPitchesService {
       const customerRentalFound = customerFootballPitchRental.find(
         (customerRental) =>
           customerRental.footballPitchLeasingDurationId ===
-          footballPitchLeasingDurationId &&
+            footballPitchLeasingDurationId &&
           id === customerRental.footballPitchId &&
           format(new Date(customerRental.rentalDate), 'dd/MM/yyyy') ===
-          format(new Date(rentalDateQuery), 'dd/MM/yyyy'),
+            format(new Date(rentalDateQuery), 'dd/MM/yyyy'),
       );
       const rentalDate = customerRentalFound
         ? customerRentalFound.rentalDate
@@ -618,43 +618,84 @@ export class FootballPitchesService {
     return footballPitchRentalCustomers || [];
   }
 
-  async getCustomerFootballPitchRental(customerFootballPitchId: number): Promise<any> {
-    const customerFootballPitchRental = await this.prisma.customerFootballPitchRental.findUnique({
-      where: {
-        id: customerFootballPitchId
-      },
-      select: {
-        id: true,
-        status: true,
-        rentalDate: true,
-        footballPitchId: true,
-        footballPitchLeasingDurationId: true,
-        customer: {
-          select: {
-            name: true,
-          }
+  async getCustomerFootballPitchRental(
+    customerFootballPitchId: number,
+  ): Promise<any> {
+    const customerFootballPitchRental =
+      await this.prisma.customerFootballPitchRental.findUnique({
+        where: {
+          id: customerFootballPitchId,
         },
-        accessoryRentalCustomer: {
-          select: {
-            accessory: {
-              select: {
-                name: true,
-                amount: true,
-                price: true,
-              }
-            }
-          }
-        }
-      }
-    })
+        select: {
+          id: true,
+          status: true,
+          rentalDate: true,
+          footballPitchId: true,
+          footballPitchLeasingDurationId: true,
+          customer: {
+            select: {
+              name: true,
+              phoneNumber: true,
+            },
+          },
+          invoice: {
+            select: {
+              totalPrice: true,
+              moneyPaid: true,
+              status: true,
+            },
+          },
+          accessoryRentalCustomer: {
+            select: {
+              accessory: {
+                select: {
+                  name: true,
+                  amount: true,
+                  price: true,
+                },
+              },
+            },
+          },
+        },
+      });
 
-    const footballPitch = await this.getFootballPitch(customerFootballPitchRental.footballPitchId)
-    const footballPitchLeasingDuration = await this.getFootballPitchPrice(customerFootballPitchRental.footballPitchLeasingDurationId)
-    const { id, status, rentalDate, accessoryRentalCustomer } = customerFootballPitchRental
-    const { name: footballPitchName } = footballPitch
-    const { price, leasingDurationName } = footballPitchLeasingDuration
+    const footballPitch = await this.getFootballPitch(
+      customerFootballPitchRental.footballPitchId,
+    );
+    const footballPitchLeasingDuration = await this.getFootballPitchPrice(
+      customerFootballPitchRental.footballPitchLeasingDurationId,
+    );
+    const {
+      id,
+      status,
+      rentalDate,
+      customer,
+      invoice,
+      accessoryRentalCustomer,
+    } = customerFootballPitchRental;
+    const {
+      name: footballPitchName,
+      images: footballPitchImages,
+      footballTypeName: footballPitchTypeName,
+      footballTypeId: footballPitchTypeId,
+    } = footballPitch;
+    const { price, leasingDurationName } = footballPitchLeasingDuration;
+
     return {
-      id, status, rentalDate, footballPitchName, price, leasingDurationName, accessoryRental: accessoryRentalCustomer.map(accessoryRental => accessoryRental.accessory)
+      id,
+      status,
+      rentalDate,
+      customer,
+      invoice,
+      footballPitchName,
+      footballPitchTypeId,
+      footballPitchTypeName,
+      price,
+      leasingDurationName,
+      footballPitchImages,
+      accessoryRentals: accessoryRentalCustomer.map(
+        (accessoryRental) => accessoryRental.accessory,
+      ),
     };
   }
 
