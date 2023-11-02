@@ -1,8 +1,27 @@
 <script lang="ts" setup>
+import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "~/stores";
+import { useHead, useNuxtApp } from "nuxt/app"
+
+const { $apis }: any = useNuxtApp();
 const appStore = useAppStore();
 const { breadCrumbs, isLoading } = storeToRefs(appStore);
+
+onMounted(() => {
+  $apis.interceptors.request.use((config: any) => {
+    isLoading.value = true
+    return config;
+  });
+
+  $apis.interceptors.response.use((response: any) => {
+    isLoading.value = false
+    return response;
+  }, (error: any) => {
+    isLoading.value = false
+    return Promise.reject(error);
+  });
+})
 </script>
 <template>
   <v-app class="layout-default">

@@ -3,7 +3,7 @@ import { ref } from 'vue'
 import { storeToRefs } from "pinia";
 import { useNuxtApp, useRoute, useRouter } from "nuxt/app";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
-import { useAuthStore, appStore } from "~/stores";
+import { useAuthStore, useAppStore } from "~/stores";
 
 definePageMeta({
   layout: "blank",

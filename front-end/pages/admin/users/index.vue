@@ -20,10 +20,9 @@ const appStore = useAppStore();
 const userStore = useUserStore();
 const dialogStore = useDialogStore();
 const { isConfirm } = storeToRefs(dialogStore);
-const { app, isLoading } = storeToRefs(appStore);
+const { app } = storeToRefs(appStore);
 const { accounts } = storeToRefs(userStore);
 app.value.title = "Quản lý tài khoản";
-isLoading.value = true;
 watch(isConfirm, async () => {
   await userStore.getAccounts();
   isConfirm.value = false;
@@ -35,7 +34,6 @@ async function openDialogUser(type?: string, id?: string) {
     id,
   });
 }
-
 function openDialogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     store: userStore,
@@ -87,8 +85,7 @@ function getColorStatusAccount(status: string) {
   return color;
 }
 
-await userStore.getAccounts();
-isLoading.value = false;
+userStore.getAccounts();
 </script>
 <template>
   <div class="user-page">

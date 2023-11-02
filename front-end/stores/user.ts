@@ -85,11 +85,11 @@ export const useUserStore = defineStore("userStore", () => {
     });
   }
 
-  function updateStatusAccount(id: number) {
+  function updateStatusAccount({id} : { id: number}) {
     return $apis.patch(`users/account/${id}/accept`);
   }
 
-  function deleteAccount(id: number) {
+  function deleteAccount({id} : { id: number}) {
     return $apis.patch(`users/account/${id}`);
   }
 

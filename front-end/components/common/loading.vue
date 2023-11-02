@@ -6,7 +6,7 @@ import loading from '~/public/ball-triangle.svg';
     <v-overlay
       :model-value="true"
       class="align-center justify-center"
-      disabled
+      disabled="false"
     >
       <v-img :src="loading" width="100" />
     </v-overlay>
