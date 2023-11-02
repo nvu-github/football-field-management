@@ -599,7 +599,7 @@ export class FootballPitchesService {
     });
   }
 
-  async getAdminConfirmCustomerRental(): Promise<any> {
+  async getCustomerFootballPitchRentals(): Promise<any> {
     const footballPitchRentalCustomers: any[] = await this.prisma.$queryRaw`
         SELECT  cfpr.id,
                 c.id as customerId, 

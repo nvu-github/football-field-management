@@ -1,10 +1,8 @@
 <script lang="ts" setup>
-import { storeToRefs } from "pinia";
 import { useNuxtApp } from "nuxt/app";
 import { useDialogStore } from "~/stores";
 
 const dialogStore = useDialogStore();
-const { isConfirm } = storeToRefs(dialogStore);
 const { $toast }: any = useNuxtApp();
 const { data }: any = dialogStore.dialog;
 
@@ -12,12 +10,12 @@ async function confirm() {
   const { store, payload } = data;
   const { success, error }: any = data.message;
   try {
-    await store[data.callback](payload);
+    await store[data.action](payload);
     $toast.success(success);
-    isConfirm.value = true;
+    await store[data.callback]();
   } catch (e) {
     console.log(e);
-    $toast.success(error);
+    $toast.error(error);
   }
   dialogStore.closeDialog();
 }

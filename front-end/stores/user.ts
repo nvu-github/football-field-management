@@ -1,4 +1,5 @@
-export interface AccountCreate {
+export interface ParamAccount {
+  id?: number;
   email: string;
   password: string;
   roleName?: string;
@@ -48,7 +49,8 @@ export const useUserStore = defineStore("userStore", () => {
     roles.value = roleList.data;
   }
 
-  function createAccount(params: AccountCreate) {
+  function createAccount(params: ParamAccount) {
+    delete params.id;
     return $apis.post("users/account", {
       ...convertProjectObjToObj(params),
     });
@@ -60,7 +62,9 @@ export const useUserStore = defineStore("userStore", () => {
     });
   }
 
-  function updateAccount(id: number, params: AccountCreate) {
+  function updateAccount(params: ParamAccount) {
+    const { id }: any = params;
+    delete params.id;
     return $apis.patch(`users/account/${id}`, {
       ...convertProjectObjToObj(params),
     });
@@ -85,12 +89,12 @@ export const useUserStore = defineStore("userStore", () => {
     });
   }
 
-  function updateStatusAccount({id} : { id: number}) {
+  function updateStatusAccount({ id }: { id: number }) {
     return $apis.patch(`users/account/${id}/accept`);
   }
 
-  function deleteAccount({id} : { id: number}) {
-    return $apis.patch(`users/account/${id}`);
+  function deleteAccount({ id }: { id: number }) {
+    return $apis.delete(`users/account/${id}`);
   }
 
   async function getAccounts() {

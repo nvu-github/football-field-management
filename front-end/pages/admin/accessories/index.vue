@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { resolveComponent } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore, useAccessoryStore, useDialogStore } from "~/stores";
 import { formatPrice } from "~/utils/string";
@@ -26,22 +27,27 @@ const headers = [
 const appStore = useAppStore();
 const accessoryStore = useAccessoryStore();
 const dialogStore = useDialogStore();
-const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { accessories } = storeToRefs(accessoryStore);
 app.value.title = "Quản lý phụ kiện";
 
-watch(isConfirm, async () => {
-  await accessoryStore.getAccessories();
-  isConfirm.value = false;
-});
-
-async function openDialogAccessory(type?: string, id?: string) {
+async function openDialogCreateAccessory() {
   await dialogStore.showDialog(
     resolveComponent("admin-accessory-dialog-accessory"),
     {
-      type: type,
+      title: "Thêm",
+      action: "createAccessory",
+    }
+  );
+}
+
+async function openDialogUpadteAccessory(id: string) {
+  await dialogStore.showDialog(
+    resolveComponent("admin-accessory-dialog-accessory"),
+    {
       id,
+      title: "Cập nhật",
+      action: "updateAccessory",
     }
   );
 }
@@ -49,19 +55,20 @@ async function openDialogAccessory(type?: string, id?: string) {
 function openDialogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     store: accessoryStore,
-    callback: 'deleteAccessory',
+    action: "deleteAccessory",
+    callback: "getAccessories",
     payload: {
       id,
     },
     message: {
-      success: 'Xóa phụ kiện thành công',
-      error: 'Xóa phụ kiện thất bại',
+      success: "Xóa phụ kiện thành công",
+      error: "Xóa phụ kiện thất bại",
     },
-    title: 'Bạn có chắc chắn muốn xóa',
+    title: "Bạn có chắc chắn muốn xóa",
     button: {
-      text: 'Xóa',
-      class: '-danger'
-    }
+      text: "Xóa",
+      class: "-danger",
+    },
   });
 }
 
@@ -71,7 +78,7 @@ accessoryStore.getAccessories();
   <div class="accessory-page">
     <v-row class="row">
       <v-col md="12" class="column">
-        <v-btn class="button -success" @click="openDialogAccessory">
+        <v-btn class="button -success" @click="openDialogCreateAccessory">
           Thêm phụ kiện
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
@@ -94,7 +101,7 @@ accessoryStore.getAccessories();
           <template #[`item.actions`]="{ item }">
             <v-btn
               class="button -warning"
-              @click="openDialogAccessory('update', item.raw.id)"
+              @click="openDialogUpadteAccessory(item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
             </v-btn>

@@ -36,8 +36,7 @@ const rules = {
     return true;
   },
 };
-const defaultTypeBtn = "update";
-const accessoryStore = useAccessoryStore();
+const accessoryStore: any = useAccessoryStore();
 const accessoryTypeStore = useAccessoryTypeStore();
 const appStore = useAppStore();
 const runtimeConfig = useRuntimeConfig();
@@ -46,7 +45,7 @@ const { isLoading } = storeToRefs(appStore);
 const { accessory } = storeToRefs(accessoryStore);
 const { accessoryTypes } = storeToRefs(accessoryTypeStore);
 const { dialog, closeDialog } = useDialogStore();
-const { data }: any = dialog;
+const { id, title, action }: any = dialog.data;
 const paramsAccessory = ref<ParamsAccessory>({
   name: "",
   description: "",
@@ -72,8 +71,8 @@ const formattedPrice = computed({
 });
 
 onBeforeMount(async () => {
-  if (data.type === defaultTypeBtn) {
-    await accessoryStore.getAccessory(data.id);
+  if (id) {
+    await accessoryStore.getAccessory(id);
     setAccessoryToForm();
   }
 });
@@ -83,19 +82,17 @@ function closeDialogAccessory() {
 }
 
 async function addAccessory() {
-  const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
   try {
-    isLoading.value = true;
-
     const images = await uploadFile();
 
     let paramsAccessoryFormatted = {
       ...paramsAccessory.value,
       images: images.data,
+      amount: Number(paramsAccessory.value.amount),
     };
     const { accessoryTypeId } = paramsAccessory.value;
 
-    if (data.type === defaultTypeBtn) {
+    if (id) {
       const foundAccessoryType = accessoryTypes.value.find(
         (type) =>
           type.name.toLowerCase() === accessoryTypeId.toString().toLowerCase()
@@ -107,20 +104,17 @@ async function addAccessory() {
       };
     }
 
-    const action =
-      data.type === defaultTypeBtn
-        ? accessoryStore.updateAccessory(data.id, paramsAccessoryFormatted)
-        : accessoryStore.createAccessory(paramsAccessoryFormatted);
+    paramsAccessoryFormatted = id
+      ? { ...paramsAccessoryFormatted, id }
+      : paramsAccessoryFormatted;
+    await accessoryStore[action](paramsAccessoryFormatted);
 
-    await action;
-
-    $toast.success(`${message} phụ kiện thành công`);
+    $toast.success(`${title} phụ kiện thành công`);
     await accessoryStore.getAccessories();
   } catch (error) {
     console.log(error);
-    $toast.error(`${message} phụ kiện thất bại`);
+    $toast.error(`${title} phụ kiện thất bại`);
   } finally {
-    isLoading.value = false;
     closeDialog();
   }
 }
@@ -177,11 +171,7 @@ accessoryTypeStore.getAccessoryTypes();
     <v-form v-model="paramsAccessory.value" @submit.prevent="addAccessory">
       <v-card>
         <v-card-title>
-          <span class="text-h5"
-            >{{
-              data && data.type === defaultTypeBtn ? "Cập nhật " : "Thêm "
-            }}phụ kiện</span
-          >
+          <span class="text-h5">{{ title }} phụ kiện</span>
         </v-card-title>
         <v-card-text>
           <v-row>
@@ -265,22 +255,12 @@ accessoryTypeStore.getAccessoryTypes();
             Đóng
           </v-btn>
           <v-btn
-            v-if="data && data.type !== 'update'"
             class="button -primary"
             type="submit"
             :loading="isLoading"
             :disabled="!paramsAccessory.value"
           >
-            Lưu
-          </v-btn>
-          <v-btn
-            v-else
-            class="button -primary"
-            type="submit"
-            :loading="isLoading"
-            :disabled="!paramsAccessory.value"
-          >
-            Cập nhật
+            {{ title }}
           </v-btn>
         </v-card-actions>
       </v-card>

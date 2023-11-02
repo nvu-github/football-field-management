@@ -1,19 +1,23 @@
 export interface ParamsLeasingDuration {
+  id?: number;
   startTime: string;
   endTime: string;
 }
 
 export interface ParamsFootballPitchType {
+  id?: number;
   name: string;
 }
 
 export interface ParamsFootballPitchPrice {
+  id?: number;
   footballPitchId: number;
   leasingDurationId: number;
   price: number;
 }
 
 export interface ParamsFootballPitch {
+  id?: number;
   name: string;
   description: string;
   status: string;
@@ -77,7 +81,8 @@ export interface CustomerFootballPitchRental {
   customerId: number;
 }
 
-export interface CustomerFootballPitchRentalDetail extends CustomerFootballPitchRental {
+export interface CustomerFootballPitchRentalDetail
+  extends CustomerFootballPitchRental {
   customer: {
     name: string;
     phoneNumber: string;
@@ -95,7 +100,7 @@ export interface CustomerFootballPitchRentalDetail extends CustomerFootballPitch
     name: string;
     amount: number;
     price: number;
-  }>
+  }>;
 }
 
 export const footballPitchStatuses: any = [
@@ -116,9 +121,11 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
   const footballPitchRentalInfo = ref<FootballPitchRentalInfo[]>([]);
   const footballPitchRental = ref<FootballPitchRentalInfo[]>([]);
   const customerFootballPitchRentals = ref<CustomerFootballPitchRental[]>([]);
-  const customerFootballPitchRentalDetail = ref<CustomerFootballPitchRentalDetail>()
+  const customerFootballPitchRentalDetail =
+    ref<CustomerFootballPitchRentalDetail>();
 
   function createFootballPitch(params: ParamsFootballPitch) {
+    delete params.id;
     return $apis.post("football-pitches", {
       ...convertProjectObjToObj(params),
     });
@@ -128,14 +135,22 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     return $apis.delete(`football-pitches/images/${id}`);
   }
 
-  function updateFootballPitch(id: number, params: ParamsFootballPitch) {
+  function updateFootballPitch(params: ParamsFootballPitch) {
+    const { id }: any = params;
+    delete params.id;
     return $apis.patch(`football-pitches/${id}`, {
       ...convertProjectObjToObj(params),
     });
   }
 
-  function updateStatusFootballPitchRental({ id, status }: { id: number, status: string }) {
-    return $apis.patch(`football-pitches/rental/${id}/status`, { status })
+  function updateStatusFootballPitchRental({
+    id,
+    status,
+  }: {
+    id: number;
+    status: string;
+  }) {
+    return $apis.patch(`football-pitches/rental/${id}/status`, { status });
   }
 
   function deleteFootballPitch({ id }: { id: number }) {
@@ -170,7 +185,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     footballPitchRental.value = footballPitchRentalList.data;
   }
 
-  async function getAdminConfirmCustomerRental() {
+  async function getCustomerFootballPitchRentals() {
     const customerFootballPitchRentalList = await $apis.get(
       `football-pitches/rental/confirm`
     );
@@ -181,7 +196,8 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     const customerFootballPitchRentalDetailData = await $apis.get(
       `football-pitches/rental/${id}/detail`
     );
-    customerFootballPitchRentalDetail.value = customerFootballPitchRentalDetailData.data
+    customerFootballPitchRentalDetail.value =
+      customerFootballPitchRentalDetailData.data;
   }
 
   function getStatusCustomerFootballPitchRental(status: string | any) {
@@ -217,7 +233,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     deleteFootballPitch,
     getFootballPitchRentalInfo,
     getFootballPitchRental,
-    getAdminConfirmCustomerRental,
+    getCustomerFootballPitchRentals,
     getCustomerFootballPitchRentalDetail,
     getStatusCustomerFootballPitchRental,
   };
@@ -231,19 +247,22 @@ export const useLeasingDurationStore = defineStore(
     const leasingDuration = ref<ParamsLeasingDuration>();
 
     function createLeasingDuration(params: ParamsLeasingDuration) {
+      delete params.id;
       return $apis.post("football-pitches/leasing-durations", {
         ...convertProjectObjToObj(params),
       });
     }
 
-    function updateLeasingDuration(id: number, params: ParamsLeasingDuration) {
+    function updateLeasingDuration(params: ParamsLeasingDuration) {
+      const { id }: any = params;
+      delete params.id;
       return $apis.patch(`football-pitches/leasing-durations/${id}`, {
         ...convertProjectObjToObj(params),
       });
     }
 
-    function deleteLeasingDuration({id}: {id: number}) {
-      return $apis.delete(`football-pitches/leasing-durations/${id}`)
+    function deleteLeasingDuration({ id }: { id: number }) {
+      return $apis.delete(`football-pitches/leasing-durations/${id}`);
     }
 
     async function getLeasingDurations() {
@@ -287,22 +306,22 @@ export const useFootballPitchTypeStore = defineStore(
     const footballPitchType = ref<ParamsFootballPitchType>();
 
     function createFootballPitchType(params: ParamsFootballPitchType) {
+      delete params.id;
       return $apis.post("football-pitches/types", {
         ...convertProjectObjToObj(params),
       });
     }
 
-    function updateFootballPitchType(
-      id: number,
-      params: ParamsFootballPitchType
-    ) {
+    function updateFootballPitchType(params: ParamsFootballPitchType) {
+      const { id }: any = params;
+      delete params.id;
       return $apis.patch(`football-pitches/types/${id}`, {
         ...convertProjectObjToObj(params),
       });
     }
 
-    function deleteFootballPitchType({id}: {id: number}) {
-      return $apis.delete( `football-pitches/types/${id}`)
+    function deleteFootballPitchType({ id }: { id: number }) {
+      return $apis.delete(`football-pitches/types/${id}`);
     }
 
     async function getFootballPitchTypes() {
@@ -336,22 +355,22 @@ export const useFootballPitchPriceStore = defineStore(
     const footballPitchPrice = ref<FootballPitchPrice>();
 
     function createFootballPitchPrice(params: ParamsFootballPitchPrice) {
+      delete params.id;
       return $apis.post("football-pitches/prices", {
         ...convertProjectObjToObj(params),
       });
     }
 
-    function updateFootballPitchPrice(
-      id: number,
-      params: ParamsFootballPitchPrice
-    ) {
+    function updateFootballPitchPrice(params: ParamsFootballPitchPrice) {
+      const { id }: any = params;
+      delete params.id;
       return $apis.patch(`football-pitches/prices/${id}`, {
         ...convertProjectObjToObj(params),
       });
     }
 
-    function deleteFootballPitchPrice({id}: {id: number}) {
-      return $apis.delete(`football-pitches/prices/${id}`)
+    function deleteFootballPitchPrice({ id }: { id: number }) {
+      return $apis.delete(`football-pitches/prices/${id}`);
     }
 
     async function getFootballPitchPrices() {

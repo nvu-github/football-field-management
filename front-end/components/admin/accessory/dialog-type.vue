@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onBeforeMount } from "vue"
+import { ref, onBeforeMount } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import { useAccessoryTypeStore, useAppStore, useDialogStore } from "~/stores";
@@ -7,21 +7,20 @@ import { useAccessoryTypeStore, useAppStore, useDialogStore } from "~/stores";
 const rules = {
   name: (value: string) => !!value || "Vui lòng nhập tên loại phụ kiện",
 };
-const defaultTypeBtn = "update";
-const accessoryTypeStore = useAccessoryTypeStore();
+const accessoryTypeStore: any = useAccessoryTypeStore();
 const appStore = useAppStore();
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
 const { accessoryType } = storeToRefs(accessoryTypeStore);
 const { dialog, closeDialog } = useDialogStore();
-const { data }: any = dialog;
+const { id, title, action }: any = dialog.data;
 const paramsAccessoryType = ref<ParamsAccessoryType>({
   name: "",
 });
 
 onBeforeMount(async () => {
-  if (data.type === defaultTypeBtn) {
-    await accessoryTypeStore.getAccessoryType(data.id);
+  if (id) {
+    await accessoryTypeStore.getAccessoryType(id);
     setAccessoryTypeToForm();
   }
 });
@@ -31,30 +30,17 @@ function closeDialogAccessoryType() {
 }
 
 async function addAccessoryType() {
-  const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
   try {
-    isLoading.value = true;
-
-    if (data.type === defaultTypeBtn) {
-      const action = accessoryTypeStore.updateAccessoryType(
-        data.id,
-        paramsAccessoryType.value
-      );
-      await action;
-    } else {
-      const action = accessoryTypeStore.createAccessoryType(
-        paramsAccessoryType.value
-      );
-      await action;
-    }
-
-    $toast.success(`${message} loại phụ kiện thành công`);
+    paramsAccessoryType.value = id
+      ? { ...paramsAccessoryType.value, id }
+      : paramsAccessoryType.value;
+    await accessoryTypeStore[action](paramsAccessoryType.value);
+    $toast.success(`${title} loại phụ kiện thành công`);
     await accessoryTypeStore.getAccessoryTypes();
   } catch (error) {
     console.log(error);
-    $toast.error(`${message} loại phụ kiện thất bại`);
+    $toast.error(`${title} loại phụ kiện thất bại`);
   } finally {
-    isLoading.value = false;
     closeDialog();
   }
 }
@@ -72,11 +58,7 @@ function setAccessoryTypeToForm() {
     >
       <v-card>
         <v-card-title>
-          <span class="text-h5"
-            >{{
-              data && data.type === defaultTypeBtn ? "Cập nhật " : "Thêm "
-            }}loại phụ kiện</span
-          >
+          <span class="text-h5">{{ title }} loại phụ kiện</span>
         </v-card-title>
         <v-card-text>
           <v-row>
@@ -98,22 +80,12 @@ function setAccessoryTypeToForm() {
             Đóng
           </v-btn>
           <v-btn
-            v-if="data && data.type !== 'update'"
             class="button -primary"
             type="submit"
             :loading="isLoading"
             :disabled="!paramsAccessoryType.value"
           >
-            Lưu
-          </v-btn>
-          <v-btn
-            v-else
-            class="button -primary"
-            type="submit"
-            :loading="isLoading"
-            :disabled="!paramsAccessoryType.value"
-          >
-            Cập nhật
+            {{ title }}
           </v-btn>
         </v-card-actions>
       </v-card>

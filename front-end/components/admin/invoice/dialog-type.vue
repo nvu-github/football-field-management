@@ -2,74 +2,68 @@
 import { ref, onBeforeMount } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
-import {
-  useFootballPitchTypeStore,
-  useAppStore,
-  useDialogStore,
-} from "~/stores";
+import { useInvoiceTypeStore, useAppStore, useDialogStore } from "~/stores";
 
 const rules = {
-  name: (value: string) => !!value || "Vui lòng nhập tên loại sân",
+  name: (value: string) => !!value || "Vui lòng nhập tên loại hóa đơn",
 };
-const footballFieldTypeStore: any = useFootballPitchTypeStore();
+const defaultTypeBtn = "update";
+const invoiceTypeStore: any = useInvoiceTypeStore();
 const appStore = useAppStore();
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
-const { footballPitchType }: any = storeToRefs(footballFieldTypeStore);
+const { invoiceType } = storeToRefs(invoiceTypeStore);
 const { dialog, closeDialog } = useDialogStore();
-const { id, title, action }: any = dialog.data;
-const paramsFootballFieldType = ref<ParamsFootballFieldType>({
+const { data }: any = dialog;
+const { id, title, action } = data;
+const paramsInvoiceType = ref<InvoiceType>({
   name: "",
 });
-
 onBeforeMount(async () => {
   if (id) {
-    await footballFieldTypeStore.getFootballPitchType(id);
-    setFootballFieldTypeToForm();
+    await invoiceTypeStore.getInvoiceType(id);
+    setInvoiceTypeToForm();
   }
 });
 
-function closeDialogFootballFieldType() {
+function closeDialogInvoiceType() {
   closeDialog();
 }
 
-async function addFootballFieldType() {
+async function addInvoiceType() {
   try {
-    paramsFootballFieldType.value = id
-      ? { ...paramsFootballFieldType.value, id }
-      : paramsFootballFieldType.value;
-    await footballFieldTypeStore[action](paramsFootballFieldType.value);
-    $toast.success(`${title} loại sân bóng thành công`);
-    await footballFieldTypeStore.getFootballPitchTypes();
+    paramsInvoiceType.value = id
+      ? { ...paramsInvoiceType.value, id }
+      : paramsInvoiceType.value;
+    await invoiceTypeStore[action](paramsInvoiceType.value);
+    $toast.success(`${title} loại hóa đơn thành công`);
+    await invoiceTypeStore.getInvoiceTypes();
   } catch (error) {
     console.log(error);
-    $toast.error(`${title} loại sân bóng thất bại`);
+    $toast.error(`${title} loại hóa đơn thất bại`);
   } finally {
     closeDialog();
   }
 }
 
-function setFootballFieldTypeToForm() {
-  const { name }: any = footballPitchType.value;
-  paramsFootballFieldType.value.name = name;
+function setInvoiceTypeToForm() {
+  const { name }: any = invoiceType.value;
+  paramsInvoiceType.value.name = name;
 }
 </script>
 <template>
   <div class="dialog-football-pitch-type-create">
-    <v-form
-      v-model="paramsFootballFieldType.value"
-      @submit.prevent="addFootballFieldType"
-    >
+    <v-form v-model="paramsInvoiceType.value" @submit.prevent="addInvoiceType">
       <v-card>
         <v-card-title>
-          <span class="text-h5">{{ title }} loại sân bóng</span>
+          <span class="text-h5">{{ title }} loại hóa đơn</span>
         </v-card-title>
         <v-card-text>
           <v-row>
             <v-col class="column" cols="12">
               <v-text-field
-                v-model.trim="paramsFootballFieldType.name"
-                label="Tên loại sân*"
+                v-model.trim="paramsInvoiceType.name"
+                label="Tên loại hóa đơn*"
                 type="text"
                 variant="underlined"
                 :rules="[rules.name]"
@@ -80,14 +74,14 @@ function setFootballFieldTypeToForm() {
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn class="button -default" @click="closeDialogFootballFieldType">
+          <v-btn class="button -default" @click="closeDialogInvoiceType">
             Đóng
           </v-btn>
           <v-btn
             class="button -primary"
             type="submit"
             :loading="isLoading"
-            :disabled="!paramsFootballFieldType.value"
+            :disabled="!paramsInvoiceType.value"
           >
             {{ title }}
           </v-btn>

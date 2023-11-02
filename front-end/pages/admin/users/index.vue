@@ -19,56 +19,62 @@ const headers = [
 const appStore = useAppStore();
 const userStore = useUserStore();
 const dialogStore = useDialogStore();
-const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { accounts } = storeToRefs(userStore);
 app.value.title = "Quản lý tài khoản";
-watch(isConfirm, async () => {
-  await userStore.getAccounts();
-  isConfirm.value = false;
-});
 
-async function openDialogUser(type?: string, id?: string) {
+async function openDialogCreateUser() {
   await dialogStore.showDialog(resolveComponent("admin-user-dialog-user"), {
-    type: type,
-    id,
+    title: "Thêm",
+    action: "createAccount",
   });
 }
+
+async function openDialogUpdateUser(id: string) {
+  await dialogStore.showDialog(resolveComponent("admin-user-dialog-user"), {
+    id,
+    title: "Cập nhật",
+    action: "updateAccount",
+  });
+}
+
 function openDialogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     store: userStore,
-    callback: 'updateStatusAccount',
+    action: "updateStatusAccount",
+    callback: "getAccounts",
     payload: {
       id,
     },
     message: {
-      success: 'Xác nhận tài khoản thành công',
-      error: 'Xác nhận tài khoản thất bại',
+      success: "Xác nhận tài khoản thành công",
+      error: "Xác nhận tài khoản thất bại",
     },
-    title: 'Bạn có chắc chắn muốn xác nhận',
+    title: "Bạn có chắc chắn muốn xác nhận",
     button: {
-      text: 'Xác nhận',
-      class: '-primary'
-    }
+      text: "Xác nhận",
+      class: "-primary",
+    },
   });
 }
 
 function openDialogDelete(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     store: userStore,
-    callback: 'deleteAccount',
+    action: "deleteAccount",
+    callback: "getAccounts",
     payload: {
       id,
     },
     message: {
-      success: 'Xóa tài khoản thành công',
-      error: 'Xóa tài khoản thất bại',
+      success: "Xóa tài khoản thành công",
+      error: "Xóa tài khoản thất bại",
     },
-    title: 'Bạn có chắc chắn muốn xóa',
+    title: "Bạn có chắc chắn muốn xóa",
     button: {
-      text: 'Xóa',
-      class: '-danger'
-    }
+      text: "Xóa",
+      class: "-danger",
+    },
   });
 }
 
@@ -91,7 +97,7 @@ userStore.getAccounts();
   <div class="user-page">
     <v-row class="row">
       <v-col md="12" class="column">
-        <v-btn class="button -success" @click="openDialogUser">
+        <v-btn class="button -success" @click="openDialogCreateUser">
           Thêm tài khoản
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
@@ -119,7 +125,7 @@ userStore.getAccounts();
           <template #[`item.actions`]="{ item }">
             <v-btn
               class="button -warning"
-              @click="openDialogUser('update', item.raw.id)"
+              @click="openDialogUpdateUser(item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
             </v-btn>

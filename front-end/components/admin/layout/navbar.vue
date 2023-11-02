@@ -87,12 +87,12 @@ const menus = ref<Menu>([
       {
         icon: "mdi mdi-receipt-text-edit-outline",
         title: "Loại hóa đơn",
-        url: "/admin/invoice-types",
+        url: "/admin/invoices/type",
       },
       {
         icon: "mdi mdi-receipt-text-plus",
         title: "Hóa đơn",
-        url: "/admin/invoice",
+        url: "/admin/invoices",
       },
     ],
     roleId: 1,

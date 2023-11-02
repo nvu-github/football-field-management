@@ -25,22 +25,27 @@ const headers = [
 const appStore = useAppStore();
 const footballPitchStore = useFootballPitchStore();
 const dialogStore = useDialogStore();
-const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { footballPitches } = storeToRefs(footballPitchStore);
 app.value.title = "Quản lý sân bóng";
 
-watch(isConfirm, async () => {
-  await footballPitchStore.getFootballPitches();
-  isConfirm.value = false;
-});
-
-async function openDiaglogFooballField(type?: string, id?: string) {
+async function openDiaglogCreateFooballField() {
   await dialogStore.showDialog(
     resolveComponent("admin-football-pitch-dialog-football-pitch"),
     {
-      type: type,
+      title: "Thêm",
+      action: "createFootballPitch",
+    }
+  );
+}
+
+async function openDiaglogUpdateFooballField(id: string) {
+  await dialogStore.showDialog(
+    resolveComponent("admin-football-pitch-dialog-football-pitch"),
+    {
       id,
+      title: "Cập nhật",
+      action: "updateFootballPitch",
     }
   );
 }
@@ -48,19 +53,20 @@ async function openDiaglogFooballField(type?: string, id?: string) {
 function openDiaglogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     store: footballPitchStore,
-    callback: 'deleteFootballPitch',
+    action: "deleteFootballPitch",
+    callback: "getFootballPitches",
     payload: {
       id,
     },
     message: {
-      success: 'Xóa sân bóng thành công',
-      error: 'Xóa sân bóng thất bại',
+      success: "Xóa sân bóng thành công",
+      error: "Xóa sân bóng thất bại",
     },
-    title: 'Bạn có chắc chắn muốn xóa',
+    title: "Bạn có chắc chắn muốn xóa",
     button: {
-      text: 'Xóa',
-      class: '-danger'
-    }
+      text: "Xóa",
+      class: "-danger",
+    },
   });
 }
 
@@ -80,7 +86,7 @@ footballPitchStore.getFootballPitches();
   <div class="football-pitch-page">
     <v-row class="row">
       <v-col md="12" class="column">
-        <v-btn class="button -success" @click="openDiaglogFooballField">
+        <v-btn class="button -success" @click="openDiaglogCreateFooballField">
           Thêm sân bóng
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
@@ -109,7 +115,7 @@ footballPitchStore.getFootballPitches();
           <template #[`item.actions`]="{ item }">
             <v-btn
               class="button -warning"
-              @click="openDiaglogFooballField('update', item.raw.id)"
+              @click="openDiaglogUpdateFooballField(item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
             </v-btn>

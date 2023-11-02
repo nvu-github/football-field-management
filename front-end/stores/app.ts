@@ -72,6 +72,24 @@ export const useAppStore = defineStore("appStore", () => {
     return $apis.delete(endpoint);
   }
 
+  function setLoading() {
+    $apis.interceptors.request.use((config: any) => {
+      isLoading.value = true;
+      return config;
+    });
+
+    $apis.interceptors.response.use(
+      (response: any) => {
+        isLoading.value = false;
+        return response;
+      },
+      (error: any) => {
+        isLoading.value = false;
+        return Promise.reject(error);
+      }
+    );
+  }
+
   return {
     app,
     isShowSidebar,
@@ -80,11 +98,11 @@ export const useAppStore = defineStore("appStore", () => {
     uploadImages,
     uploadImage,
     deleteApi,
+    setLoading,
   };
 });
 
 export const useDialogStore = defineStore("dialogStore", () => {
-  const isConfirm = ref<Boolean>(false);
   const defaultDialog = {
     isVisible: false,
     isPersistent: false,
@@ -108,7 +126,7 @@ export const useDialogStore = defineStore("dialogStore", () => {
     dialog.value = defaultDialog;
   }
 
-  return { dialog, isConfirm, showDialog, showPersistentDialog, closeDialog };
+  return { dialog, showDialog, showPersistentDialog, closeDialog };
 });
 
 export const usePaymentStore = defineStore("paymentStore", () => {

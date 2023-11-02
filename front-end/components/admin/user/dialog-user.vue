@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { onBeforeMount, ref } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import { useUserStore, useAppStore, useDialogStore } from "~/stores";
@@ -18,24 +19,23 @@ const rules = {
     return true;
   },
 };
-const defaultTypeBtn = "update";
 const customerRole = "4";
 const { $toast }: any = useNuxtApp();
-const userStore = useUserStore();
+const userStore: any = useUserStore();
 const appStore = useAppStore();
 const { isLoading } = storeToRefs(appStore);
 const { roles, account } = storeToRefs(userStore);
 const { dialog, closeDialog } = useDialogStore();
-const { data }: any = dialog;
-const accountCreate = ref<AccountCreate>({
+const { id, title, action }: any = dialog.data;
+const accountCreate = ref<ParamAccount>({
   email: "",
   password: "",
   roleId: "",
 });
 
 onBeforeMount(async () => {
-  if (data.type === defaultTypeBtn) {
-    await userStore.getAccount(data.id);
+  if (id) {
+    await userStore.getAccount(id);
     setAccountToForm();
   }
 });
@@ -43,16 +43,13 @@ onBeforeMount(async () => {
 function closeDialogUserCreate() {
   closeDialog();
 }
-async function addAccount() {
-  const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
+async function actionAccount() {
   try {
-    isLoading.value = true;
-    const { type, id } = data;
     const { roleId } = accountCreate.value;
 
-    if (type === defaultTypeBtn && typeof roleId === "string") {
+    if (id && typeof roleId === "string") {
       const foundRole = roles.value.find(
-        (role) => role.name.toLowerCase() === roleId.toLowerCase()
+        (role: any) => role.name.toLowerCase() === roleId.toLowerCase()
       );
 
       if (foundRole) {
@@ -60,19 +57,17 @@ async function addAccount() {
       }
     }
 
-    const action =
-      type === defaultTypeBtn
-        ? userStore.updateAccount(id, accountCreate.value)
-        : userStore.createAccount(accountCreate.value);
+    accountCreate.value = id
+      ? { ...accountCreate.value, id }
+      : accountCreate.value;
+    await userStore[action](accountCreate.value);
 
-    await action;
-
-    $toast.success(`${message} tài khoản thành công`);
+    $toast.success(`${title} tài khoản thành công`);
     await userStore.getAccounts();
   } catch (error) {
-    $toast.error(`${message} tài khoản thất bại`);
+    console.log(error);
+    $toast.error(`${title} tài khoản thất bại`);
   } finally {
-    isLoading.value = false;
     closeDialog();
   }
 }
@@ -87,14 +82,10 @@ userStore.getRoles();
 </script>
 <template>
   <div class="dialog-user-create">
-    <v-form v-model="accountCreate.value" @submit.prevent="addAccount">
+    <v-form v-model="accountCreate.value" @submit.prevent="actionAccount">
       <v-card>
         <v-card-title>
-          <span class="text-h5">{{
-            data && data.type === defaultTypeBtn
-              ? "Cập nhật tài khoản"
-              : "Thêm tài khoản"
-          }}</span>
+          <span class="text-h5">{{ title }} tài khoản</span>
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -135,22 +126,12 @@ userStore.getRoles();
             Đóng
           </v-btn>
           <v-btn
-            v-if="data && data.type !== 'update'"
             class="button -primary"
             type="submit"
             :loading="isLoading"
             :disabled="!accountCreate.value"
           >
-            Lưu
-          </v-btn>
-          <v-btn
-            v-else
-            class="button -primary"
-            type="submit"
-            :loading="isLoading"
-            :disabled="!accountCreate.value"
-          >
-            Cập nhật
+            {{ title }}
           </v-btn>
         </v-card-actions>
       </v-card>

@@ -1,4 +1,5 @@
 export interface ParamsAccessoryType {
+  id?: number;
   name: string;
 }
 
@@ -25,8 +26,9 @@ export const useAccessoryStore = defineStore("accessoryStore", () => {
   const accessory = ref<ParamsAccessory>();
 
   function createAccessory(params: ParamsAccessory) {
+    delete params.id;
     return $apis.post("accessories", {
-      ...convertProjectObjToObj({...params, amount: Number(params.amount)}),
+      ...convertProjectObjToObj({ ...params, amount: Number(params.amount) }),
     });
   }
 
@@ -34,14 +36,16 @@ export const useAccessoryStore = defineStore("accessoryStore", () => {
     return $apis.delete(`accessories/images/${id}`);
   }
 
-  function updateAccessory(id: number, params: ParamsAccessory) {
+  function updateAccessory(params: ParamsAccessory) {
+    const { id }: any = params;
+    delete params.id;
     return $apis.patch(`accessories/${id}`, {
       ...convertProjectObjToObj(params),
     });
   }
 
-  function deleteAccessory({ id } : { id: string }) {
-    return $apis.delete(`accessories/${id}`)
+  function deleteAccessory({ id }: { id: string }) {
+    return $apis.delete(`accessories/${id}`);
   }
 
   async function getAccessories() {
@@ -68,55 +72,50 @@ export const useAccessoryStore = defineStore("accessoryStore", () => {
     getAccessories,
     getAccessory,
     deleteImage,
-    getCustomerAccessories
+    getCustomerAccessories,
   };
 });
 
-export const useAccessoryTypeStore = defineStore(
-  "AccessoryTypeStore",
-  () => {
-    const { $apis }: any = useNuxtApp();
-    const accessoryTypes = ref<ParamsAccessoryType[]>([]);
-    const accessoryType = ref<ParamsAccessoryType>();
+export const useAccessoryTypeStore = defineStore("AccessoryTypeStore", () => {
+  const { $apis }: any = useNuxtApp();
+  const accessoryTypes = ref<ParamsAccessoryType[]>([]);
+  const accessoryType = ref<ParamsAccessoryType>();
 
-    function createAccessoryType(params: ParamsAccessoryType) {
-      return $apis.post("accessories/types", {
-        ...convertProjectObjToObj(params),
-      });
-    }
-
-    function updateAccessoryType(
-      id: number,
-      params: ParamsAccessoryType
-    ) {
-      return $apis.patch(`accessories/types/${id}`, {
-        ...convertProjectObjToObj(params),
-      });
-    }
-
-    function deleteAccessoryType({id}: {id: string}) {
-      return $apis.delete(`accessories/types/${id}`)
-    }
-
-    async function getAccessoryTypes() {
-      const AccessoryTypeList = await $apis.get("accessories/types");
-      accessoryTypes.value = AccessoryTypeList.data;
-    }
-
-    async function getAccessoryType(id: number) {
-      const AccessoryTypeSingle = await $apis.get(
-        `accessories/types/${id}`
-      );
-      accessoryType.value = AccessoryTypeSingle.data;
-    }
-    return {
-      accessoryTypes,
-      accessoryType,
-      createAccessoryType,
-      updateAccessoryType,
-      deleteAccessoryType,
-      getAccessoryTypes,
-      getAccessoryType,
-    };
+  function createAccessoryType(params: ParamsAccessoryType) {
+    delete params.id;
+    return $apis.post("accessories/types", {
+      ...convertProjectObjToObj(params),
+    });
   }
-);
+
+  function updateAccessoryType(params: ParamsAccessoryType) {
+    const { id }: any = params;
+    delete params.id;
+    return $apis.patch(`accessories/types/${id}`, {
+      ...convertProjectObjToObj(params),
+    });
+  }
+
+  function deleteAccessoryType({ id }: { id: string }) {
+    return $apis.delete(`accessories/types/${id}`);
+  }
+
+  async function getAccessoryTypes() {
+    const AccessoryTypeList = await $apis.get("accessories/types");
+    accessoryTypes.value = AccessoryTypeList.data;
+  }
+
+  async function getAccessoryType(id: number) {
+    const AccessoryTypeSingle = await $apis.get(`accessories/types/${id}`);
+    accessoryType.value = AccessoryTypeSingle.data;
+  }
+  return {
+    accessoryTypes,
+    accessoryType,
+    createAccessoryType,
+    updateAccessoryType,
+    deleteAccessoryType,
+    getAccessoryTypes,
+    getAccessoryType,
+  };
+});

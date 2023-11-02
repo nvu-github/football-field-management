@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onBeforeMount } from "vue"
+import { ref, onBeforeMount } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { compareTime, parseTime } from "~/utils/string";
 import { storeToRefs } from "pinia";
@@ -19,22 +19,21 @@ const rules = {
     return true;
   },
 };
-const defaultTypeBtn = "update";
-const leasingDurationStore = useLeasingDurationStore();
+const leasingDurationStore: any = useLeasingDurationStore();
 const appStore = useAppStore();
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
 const { leasingDurations, leasingDuration } = storeToRefs(leasingDurationStore);
 const { dialog, closeDialog } = useDialogStore();
-const { data }: any = dialog;
+const { id, title, action }: any = dialog.data;
 const paramsLeasingDuration = ref<ParamsLeasingDuration>({
   startTime: "",
   endTime: "",
 });
 
 onBeforeMount(async () => {
-  if (data.type === defaultTypeBtn) {
-    await leasingDurationStore.getLeasingDuration(data.id);
+  if (id) {
+    await leasingDurationStore.getLeasingDuration(id);
     setLeasingDurationToForm();
   }
 });
@@ -44,39 +43,28 @@ function closeDialogLeasingDuration() {
 }
 
 async function addLeasingDuration() {
-  const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
   try {
-    isLoading.value = true;
     if (isValidTime()) {
       return $toast.error(`Khoảng thời gian thuê này đã tồn tại`);
     }
 
-    const action =
-      data.type === defaultTypeBtn
-        ? leasingDurationStore.updateLeasingDuration(
-            data.id,
-            paramsLeasingDuration.value
-          )
-        : leasingDurationStore.createLeasingDuration(
-            paramsLeasingDuration.value
-          );
-
-    await action;
-
-    $toast.success(`${message} thời gian thuê thành công`);
+    paramsLeasingDuration.value = id
+      ? { ...paramsLeasingDuration.value, id }
+      : paramsLeasingDuration.value;
+    await leasingDurationStore[action](paramsLeasingDuration.value);
+    $toast.success(`${title} thời gian thuê thành công`);
     await leasingDurationStore.getLeasingDurations();
   } catch (error) {
     console.log(error);
-    $toast.error(`${message} thời gian thuê thất bại`);
+    $toast.error(`${title} thời gian thuê thất bại`);
   } finally {
-    isLoading.value = false;
     closeDialog();
   }
 }
 
 function isValidTime() {
   const { startTime, endTime } = paramsLeasingDuration.value;
-  return leasingDurations.value.some((leasingDuration) => {
+  return leasingDurations.value.some((leasingDuration: any) => {
     const currentStartTime = parseTime(startTime);
     const currentEndTime = parseTime(endTime);
     const leasingDurationStartTime = parseTime(leasingDuration.startTime);
@@ -103,11 +91,7 @@ function setLeasingDurationToForm() {
     >
       <v-card>
         <v-card-title>
-          <span class="text-h5">{{
-            data && data.type === defaultTypeBtn
-              ? "Cập nhật thời gian thuê"
-              : "Thêm thời gian thuê"
-          }}</span>
+          <span class="text-h5">{{ title }} thời gian thuê</span>
         </v-card-title>
         <v-card-text>
           <v-container>
@@ -139,22 +123,12 @@ function setLeasingDurationToForm() {
             Đóng
           </v-btn>
           <v-btn
-            v-if="data && data.type !== 'update'"
             class="button -primary"
             type="submit"
             :loading="isLoading"
             :disabled="!paramsLeasingDuration.value"
           >
-            Lưu
-          </v-btn>
-          <v-btn
-            v-else
-            class="button -primary"
-            type="submit"
-            :loading="isLoading"
-            :disabled="!paramsLeasingDuration.value"
-          >
-            Cập nhật
+            {{ title }}
           </v-btn>
         </v-card-actions>
       </v-card>

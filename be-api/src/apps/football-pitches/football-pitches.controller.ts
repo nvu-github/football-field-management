@@ -125,8 +125,8 @@ export class FootballPitchesController {
   @Get('rental/confirm')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getAdminConfirmCustomerRental(): Promise<any> {
-    return await this.footballPitchService.getAdminConfirmCustomerRental();
+  async getCustomerFootballPitchRentals(): Promise<any> {
+    return await this.footballPitchService.getCustomerFootballPitchRentals();
   }
 
   @Get('rental/customer/histories')

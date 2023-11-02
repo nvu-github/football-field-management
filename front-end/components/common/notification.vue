@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import userImg from "~/public/user.jpg";
+import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useRuntimeConfig } from "nuxt/app";
 import { useNotificationStore } from "~/stores";
@@ -68,9 +69,7 @@ onEvent("emit-notification", function (data: any) {
           </v-list-item-content>
         </v-list-item>
       </v-list>
-      <p v-else class="empty">
-        Không có thông báo
-      </p>
+      <p v-else class="empty">Không có thông báo</p>
     </v-card>
   </v-menu>
 </template>

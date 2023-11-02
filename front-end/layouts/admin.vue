@@ -2,26 +2,12 @@
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "~/stores";
-import { useHead, useNuxtApp } from "nuxt/app"
+import { useHead, useNuxtApp } from "nuxt/app";
 
-const { $apis }: any = useNuxtApp();
 const appStore = useAppStore();
 const { app, isShowSidebar, isLoading } = storeToRefs(appStore);
 const { title } = app.value;
-onMounted(() => {
-  $apis.interceptors.request.use((config: any) => {
-    isLoading.value = true
-    return config;
-  });
-
-  $apis.interceptors.response.use((response: any) => {
-    isLoading.value = false
-    return response;
-  }, (error: any) => {
-    isLoading.value = false
-    return Promise.reject(error);
-  });
-})
+onMounted(() => appStore.setLoading());
 useHead({
   title: title || "Sân bóng Hoàng Quân",
 });

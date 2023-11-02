@@ -1,10 +1,7 @@
 <script lang="ts" setup>
+import { resolveComponent } from "vue";
 import { storeToRefs } from "pinia";
-import {
-  useAppStore,
-  useAccessoryTypeStore,
-  useDialogStore,
-} from "~/stores";
+import { useAppStore, useAccessoryTypeStore, useDialogStore } from "~/stores";
 
 const headers = [
   {
@@ -19,22 +16,27 @@ const headers = [
 const appStore = useAppStore();
 const accessoryTypeStore = useAccessoryTypeStore();
 const dialogStore = useDialogStore();
-const { isConfirm } = storeToRefs(dialogStore);
 const { app } = storeToRefs(appStore);
 const { accessoryTypes } = storeToRefs(accessoryTypeStore);
 app.value.title = "Quản lý loại phụ kiện";
 
-watch(isConfirm, async () => {
-  await accessoryTypeStore.getAccessoryTypes();
-  isConfirm.value = false;
-});
-
-async function openDialogAccessoryType(type?: string, id?: string) {
+async function openDialogCreateAccessoryType() {
   await dialogStore.showDialog(
     resolveComponent("admin-accessory-dialog-type"),
     {
-      type: type,
+      title: "Thêm",
+      action: "createAccessoryType",
+    }
+  );
+}
+
+async function openDialogUpdateAccessoryType(id: string) {
+  await dialogStore.showDialog(
+    resolveComponent("admin-accessory-dialog-type"),
+    {
       id,
+      title: "Cập nhật",
+      action: "updateAccessoryType",
     }
   );
 }
@@ -42,19 +44,20 @@ async function openDialogAccessoryType(type?: string, id?: string) {
 function openDialogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     store: accessoryTypeStore,
-    callback: 'deleteAccessoryType',
+    action: "deleteAccessoryType",
+    callback: "getAccessoryTypes",
     payload: {
       id,
     },
     message: {
-      success: 'Xóa loại phụ kiện thành công',
-      error: 'Xóa loại phụ kiện thất bại',
+      success: "Xóa loại phụ kiện thành công",
+      error: "Xóa loại phụ kiện thất bại",
     },
-    title: 'Bạn có chắc chắn muốn xóa',
+    title: "Bạn có chắc chắn muốn xóa",
     button: {
-      text: 'Xóa',
-      class: '-danger'
-    }
+      text: "Xóa",
+      class: "-danger",
+    },
   });
 }
 
@@ -64,7 +67,7 @@ accessoryTypeStore.getAccessoryTypes();
   <div class="accessory-type-page">
     <v-row class="row">
       <v-col md="12" class="column">
-        <v-btn class="button -success" @click="openDialogAccessoryType">
+        <v-btn class="button -success" @click="openDialogCreateAccessoryType">
           Thêm loại phụ kiện
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
@@ -81,7 +84,7 @@ accessoryTypeStore.getAccessoryTypes();
           <template #[`item.actions`]="{ item }">
             <v-btn
               class="button -warning"
-              @click="openDialogAccessoryType('update', item.raw.id)"
+              @click="openDialogUpdateAccessoryType(item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
             </v-btn>

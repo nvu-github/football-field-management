@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onBeforeMount } from "vue"
+import { ref, onBeforeMount } from "vue";
 import { useNuxtApp, useRuntimeConfig } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import {
@@ -29,8 +29,7 @@ const rules = {
     return true;
   },
 };
-const defaultTypeBtn = "update";
-const footballPitchStore = useFootballPitchStore();
+const footballPitchStore: any = useFootballPitchStore();
 const footballPitchTypeStore = useFootballPitchTypeStore();
 const appStore = useAppStore();
 const runtimeConfig = useRuntimeConfig();
@@ -39,7 +38,7 @@ const { isLoading } = storeToRefs(appStore);
 const { footballPitch } = storeToRefs(footballPitchStore);
 const { footballPitchTypes } = storeToRefs(footballPitchTypeStore);
 const { dialog, closeDialog } = useDialogStore();
-const { data }: any = dialog;
+const { id, title, action }: any = dialog.data;
 const paramsFootballPitch = ref<ParamsFootballPitch>({
   name: "",
   description: "",
@@ -50,8 +49,8 @@ const paramsFootballPitch = ref<ParamsFootballPitch>({
 const imagePreviews = ref<ImagePreview[]>([]);
 
 onBeforeMount(async () => {
-  if (data.type === defaultTypeBtn) {
-    await footballPitchStore.getFootballPitch(data.id);
+  if (id) {
+    await footballPitchStore.getFootballPitch(id);
     setFootballPitchToForm();
   }
 });
@@ -61,7 +60,6 @@ function closeDialogFootballPitch() {
 }
 
 async function addFootballPitch() {
-  const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
   try {
     isLoading.value = true;
 
@@ -73,7 +71,7 @@ async function addFootballPitch() {
     };
     const { footballTypeId, status } = paramsFootballPitch.value;
 
-    if (data.type === defaultTypeBtn) {
+    if (id) {
       const foundFootballType = footballPitchTypes.value.find(
         (type) =>
           type.name.toLowerCase() === footballTypeId.toString().toLowerCase()
@@ -91,21 +89,15 @@ async function addFootballPitch() {
       };
     }
 
-    const action =
-      data.type === defaultTypeBtn
-        ? footballPitchStore.updateFootballPitch(
-            data.id,
-            paramsFootballPitchFormatted
-          )
-        : footballPitchStore.createFootballPitch(paramsFootballPitchFormatted);
-
-    await action;
-
-    $toast.success(`${message} sân bóng thành công`);
+    paramsFootballPitchFormatted = id
+      ? { ...paramsFootballPitchFormatted, id }
+      : paramsFootballPitchFormatted;
+    await footballPitchStore[action](paramsFootballPitchFormatted);
+    $toast.success(`${title} sân bóng thành công`);
     await footballPitchStore.getFootballPitches();
   } catch (error) {
     console.log(error);
-    $toast.error(`${message} sân bóng thất bại`);
+    $toast.error(`${title} sân bóng thất bại`);
   } finally {
     isLoading.value = false;
     closeDialog();
@@ -167,11 +159,7 @@ footballPitchTypeStore.getFootballPitchTypes();
     >
       <v-card>
         <v-card-title>
-          <span class="text-h5"
-            >{{
-              data && data.type === defaultTypeBtn ? "Cập nhật " : "Thêm "
-            }}sân bóng</span
-          >
+          <span class="text-h5">{{ title }} sân bóng</span>
         </v-card-title>
         <v-card-text>
           <v-row>
@@ -240,22 +228,12 @@ footballPitchTypeStore.getFootballPitchTypes();
             Đóng
           </v-btn>
           <v-btn
-            v-if="data && data.type !== 'update'"
             class="button -primary"
             type="submit"
             :loading="isLoading"
             :disabled="!paramsFootballPitch.value"
           >
-            Lưu
-          </v-btn>
-          <v-btn
-            v-else
-            class="button -primary"
-            type="submit"
-            :loading="isLoading"
-            :disabled="!paramsFootballPitch.value"
-          >
-            Cập nhật
+            {{ title }}
           </v-btn>
         </v-card-actions>
       </v-card>

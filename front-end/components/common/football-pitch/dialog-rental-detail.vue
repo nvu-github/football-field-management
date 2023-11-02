@@ -5,7 +5,7 @@ import {
   useDialogStore,
   useFootballPitchStore,
   useInvoiceStore,
-  useAuthStore
+  useAuthStore,
 } from "~/stores";
 import { formatPrice } from "~/utils/string";
 
@@ -13,10 +13,10 @@ const dialogStore = useDialogStore();
 const authStore = useAuthStore();
 const invoiceStore = useInvoiceStore();
 const footballPitchStore = useFootballPitchStore();
-const { user } = storeToRefs(authStore)
+const { user } = storeToRefs(authStore);
 const { customerFootballPitchRentalDetail } = storeToRefs(footballPitchStore);
 const { id }: any = dialogStore.dialog.data;
-const CUSTOMER_ROLE = 4
+const CUSTOMER_ROLE = 4;
 
 function closeDetail() {
   dialogStore.closeDialog();
@@ -74,9 +74,14 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
                 }}
               </li>
             </ul>
-            <ul :class="['list -football', {
-              '-bordernone': user?.roleId === CUSTOMER_ROLE
-            }]">
+            <ul
+              :class="[
+                'list -football',
+                {
+                  '-bordernone': user?.roleId === CUSTOMER_ROLE,
+                },
+              ]"
+            >
               <li class="item -title">Sân bóng</li>
               <li class="item -name">
                 <span class="label">Tên sân bóng: </span>
@@ -133,7 +138,7 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
               </li>
               <li class="item -status">
                 <span class="label">Trạng thái đặt sân: </span>
-                  <v-chip
+                <v-chip
                   :color="
                     footballPitchStore.getStatusCustomerFootballPitchRental(
                       customerFootballPitchRentalDetail?.status
@@ -143,7 +148,8 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
                     footballPitchStore.getStatusCustomerFootballPitchRental(
                       customerFootballPitchRentalDetail?.status
                     ).text
-                  }}</v-chip>
+                  }}</v-chip
+                >
               </li>
             </ul>
             <ul v-if="user?.roleId !== CUSTOMER_ROLE" class="list -invoice">
@@ -151,26 +157,32 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
               <li class="item -price">
                 <span class="label">Tổng tiền thuê: </span>
                 {{
-                  customerFootballPitchRentalDetail && customerFootballPitchRentalDetail.invoice
+                  customerFootballPitchRentalDetail &&
+                  customerFootballPitchRentalDetail.invoice
                     ? `${formatPrice(
                         customerFootballPitchRentalDetail.invoice.totalPrice
                       )} VNĐ`
                     : ""
                 }}
               </li>
-              <li class="item -moneypaid">
+              <li class="item -price -moneypaid">
                 <span class="label">Đã thanh toán: </span>
                 {{
-                  customerFootballPitchRentalDetail && customerFootballPitchRentalDetail.invoice
+                  customerFootballPitchRentalDetail &&
+                  customerFootballPitchRentalDetail.invoice
                     ? `${formatPrice(
-                        customerFootballPitchRentalDetail.invoice.totalPrice
+                        customerFootballPitchRentalDetail.invoice.moneyPaid
                       )} VNĐ`
                     : ""
                 }}
               </li>
               <li class="item -status">
                 <span class="label">Trạng thái: </span>
-                <v-chip v-if="customerFootballPitchRentalDetail && customerFootballPitchRentalDetail.invoice"
+                <v-chip
+                  v-if="
+                    customerFootballPitchRentalDetail &&
+                    customerFootballPitchRentalDetail.invoice
+                  "
                   :color="
                     invoiceStore.getStatusInvoice(
                       customerFootballPitchRentalDetail?.invoice.status
@@ -270,6 +282,14 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
       font-size: 20px;
       font-weight: 600;
     }
+
+    &.-price {
+      color: #e60000;
+    }
+  }
+
+  > .list > .item.-price > .label {
+    color: #000;
   }
 
   > .list > .item > .label {

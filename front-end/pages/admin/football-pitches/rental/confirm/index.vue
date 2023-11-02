@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watch, resolveComponent, onBeforeMount } from "vue";
+import { ref, watchEffect, resolveComponent } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore, useFootballPitchStore, useDialogStore } from "~/stores";
 import { format } from "date-fns";
@@ -64,7 +64,6 @@ const statusFootballPitch = [
 const appStore = useAppStore();
 const footballPitchStore = useFootballPitchStore();
 const dialogStore = useDialogStore();
-const { isConfirm } = storeToRefs(dialogStore);
 const { app, isLoading } = storeToRefs(appStore);
 const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
 app.value.title = "Quản lý đặt sân";
@@ -73,10 +72,6 @@ const conditionFilterFootballPitch = ref<any>({
   status: null,
 });
 const footballPitchConfirmFound = ref<any>();
-watch(isConfirm, async () => {
-  await filterFootballConfirm();
-  isConfirm.value = false;
-});
 
 const formatDatePicker = (date: any): string => {
   const day = date.getDate();
@@ -86,14 +81,16 @@ const formatDatePicker = (date: any): string => {
   return `${day}/${month}/${year}`;
 };
 
-onBeforeMount(async () => {
-  await filterFootballConfirm();
+await footballPitchStore.getCustomerFootballPitchRentals();
+watchEffect(async () => {
+  if (customerFootballPitchRentals) await filterFootballConfirm();
 });
 
 function openDialogConfirm(id: number, status: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     store: footballPitchStore,
-    callback: "updateStatusFootballPitchRental",
+    action: "updateStatusFootballPitchRental",
+    callback: "getCustomerFootballPitchRentals",
     payload: {
       id,
       status,
@@ -113,7 +110,8 @@ function openDialogConfirm(id: number, status: string) {
 function openDialogReject(id: number, status: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
     store: footballPitchStore,
-    callback: "updateStatusFootballPitchRental",
+    action: "updateStatusFootballPitchRental",
+    callback: "getCustomerFootballPitchRentals",
     payload: {
       id,
       status,
@@ -144,7 +142,6 @@ async function filterFootballConfirm() {
   isLoading.value = true;
   const { rentalDate, leasingDuration, status } =
     conditionFilterFootballPitch.value;
-  await footballPitchStore.getAdminConfirmCustomerRental();
   if (rentalDate || leasingDuration || status) {
     footballPitchConfirmFound.value = customerFootballPitchRentals.value.filter(
       (footballPitch) => {

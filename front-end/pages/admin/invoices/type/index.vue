@@ -1,11 +1,7 @@
 <script lang="ts" setup>
-import { resolveComponent, watch } from "vue";
+import { resolveComponent } from "vue";
 import { storeToRefs } from "pinia";
-import {
-  useAppStore,
-  useFootballPitchTypeStore,
-  useDialogStore,
-} from "~/stores";
+import { useAppStore, useInvoiceTypeStore, useDialogStore } from "~/stores";
 
 const headers = [
   {
@@ -14,48 +10,42 @@ const headers = [
     sortable: false,
     key: "sno",
   },
-  { title: "Tên loại sân bóng", width: "70%", align: "start", key: "name" },
+  { title: "Tên loại hóa đơn", width: "70%", align: "start", key: "name" },
   { title: "Tác vụ", align: "center", key: "actions", sortable: false },
 ];
 const appStore = useAppStore();
-const footballTypeStore = useFootballPitchTypeStore();
+const invoiceTypeStore = useInvoiceTypeStore();
 const dialogStore = useDialogStore();
 const { app } = storeToRefs(appStore);
-const { footballPitchTypes } = storeToRefs(footballTypeStore);
-app.value.title = "Quản lý loại sân bóng";
+const { invoiceTypes } = storeToRefs(invoiceTypeStore);
+app.value.title = "Quản lý loại hóa đơn";
 
-async function openDialogCreateFootballPitchType() {
-  await dialogStore.showDialog(
-    resolveComponent("admin-football-pitch-dialog-type"),
-    {
-      title: "Thêm",
-      action: "createFootballPitchType",
-    }
-  );
+async function openDialogCreateInvoiceType() {
+  await dialogStore.showDialog(resolveComponent("admin-invoice-dialog-type"), {
+    title: "Thêm",
+    action: "createInvoiceType",
+  });
 }
 
-async function openDialogUpdateFootballPitchType(id: string) {
-  await dialogStore.showDialog(
-    resolveComponent("admin-football-pitch-dialog-type"),
-    {
-      id,
-      title: "Cập nhật",
-      action: "updateFootballPitchType",
-    }
-  );
+async function openDialogUpdateInvoiceType(id: number | null) {
+  await dialogStore.showDialog(resolveComponent("admin-invoice-dialog-type"), {
+    id,
+    title: "Cập nhật",
+    action: "updateInvoiceType",
+  });
 }
 
 function openDialogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
-    store: footballTypeStore,
-    action: "deleteFootballPitchType",
-    callback: "getFootballPitchTypes",
+    store: invoiceTypeStore,
+    action: "deleteInvoiceType",
+    callback: "getInvoiceTypes",
     payload: {
       id,
     },
     message: {
-      success: "Xóa loại sân bóng thành công",
-      error: "Xóa loại sân bóng thất bại",
+      success: "Xóa loại hóa đơn thành công",
+      error: "Xóa loại hóa đơn thất bại",
     },
     title: "Bạn có chắc chắn muốn xóa",
     button: {
@@ -65,17 +55,15 @@ function openDialogConfirm(id: string) {
   });
 }
 
-footballTypeStore.getFootballPitchTypes();
+invoiceTypeStore.getInvoiceTypes();
 </script>
+
 <template>
-  <div class="football-pitch-type-page">
+  <div class="invoice-type-pages">
     <v-row class="row">
       <v-col md="12" class="column">
-        <v-btn
-          class="button -success"
-          @click="openDialogCreateFootballPitchType"
-        >
-          Thêm loại sân
+        <v-btn class="button -success" @click="openDialogCreateInvoiceType">
+          Thêm loại hóa đơn
           <template #prepend>
             <v-icon>mdi mdi-plus-box-outline</v-icon>
           </template>
@@ -84,14 +72,14 @@ footballTypeStore.getFootballPitchTypes();
     </v-row>
     <v-row>
       <v-col md="12">
-        <v-data-table :headers="headers" :items="footballPitchTypes">
+        <v-data-table :headers="headers" :items="invoiceTypes">
           <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
           <template #[`item.actions`]="{ item }">
             <v-btn
               class="button -warning"
-              @click="openDialogUpdateFootballPitchType(item.raw.id)"
+              @click="openDialogUpdateInvoiceType(item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
             </v-btn>
@@ -108,7 +96,7 @@ footballTypeStore.getFootballPitchTypes();
   </div>
 </template>
 <style lang="scss" scoped>
-.football-pitch-type-page {
+.invoice-type-pages {
   .row > .column {
     display: flex;
     justify-content: right;

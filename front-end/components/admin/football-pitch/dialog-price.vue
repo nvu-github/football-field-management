@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onBeforeMount, watch, computed } from 'vue'
+import { onBeforeMount, watch, computed, ref } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import {
@@ -17,20 +17,19 @@ const rules = {
   leasingDuration: (value: string) => !!value || "Vui lòng chọn khung giờ",
   price: (value: string) => !!value || "Vui lòng nhập giá thuê",
 };
-const defaultTypeBtn = "update";
-const footballPitchPriceStore = useFootballPitchPriceStore();
 const leasingDurationStore = useLeasingDurationStore();
 const footballPitchStore = useFootballPitchStore();
+const footballPitchPriceStore: any = useFootballPitchPriceStore();
 const appStore = useAppStore();
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
 const { footballPitchPrice, footballPitchPrices } = storeToRefs(
   footballPitchPriceStore
 );
-const { leasingDurations } = storeToRefs(leasingDurationStore);
-const { footballPitches } = storeToRefs(footballPitchStore);
+const { leasingDurations }: any = storeToRefs(leasingDurationStore);
+const { footballPitches }: any = storeToRefs(footballPitchStore);
 const { dialog, closeDialog } = useDialogStore();
-const { data }: any = dialog;
+const { id, title, action }: any = dialog.data;
 const paramsFootballPitchPrice = ref<ParamsFootballPitchPrice>({
   footballPitchId: null,
   leasingDurationId: null,
@@ -58,8 +57,8 @@ const formattedPrice = computed({
 });
 
 onBeforeMount(async () => {
-  if (data.type === defaultTypeBtn) {
-    await footballPitchPriceStore.getFootballPitchPrice(data.id);
+  if (id) {
+    await footballPitchPriceStore.getFootballPitchPrice(id);
     setFootballPitchPriceToForm();
   }
 });
@@ -71,12 +70,12 @@ watch(
 
     const footballPitchPriceFound = footballPitchPrices.value
       .filter(
-        (priceValue) =>
+        (priceValue: any) =>
           priceValue.footballPitchId === footballPitchId ||
           priceValue.footballPitchName.toLowerCase() ===
             footballPitchId.toString().toLowerCase()
       )
-      .map((priceValue) => priceValue.leasingDurationName);
+      .map((priceValue: any) => priceValue.leasingDurationName);
     formattedLeasingDurations =
       footballPitchPriceFound.length > 0
         ? formattedLeasingDuration(leasingDurations.value).filter(
@@ -93,16 +92,13 @@ function closeDialogFootballPitchPrice() {
 }
 
 async function addFootballPitchPrice() {
-  const message = data.type === defaultTypeBtn ? "Cập nhật" : "Thêm";
   try {
-    isLoading.value = true;
-
-    if (data.type === defaultTypeBtn) {
+    if (id) {
       const { footballPitchId, leasingDurationId } =
         paramsFootballPitchPrice.value;
 
       const footballPitchFound = footballPitches.value.find(
-        (footballPitch) =>
+        (footballPitch: any) =>
           footballPitch.name.toLowerCase() === footballPitchId.toLowerCase()
       )?.id;
       const leasingDurationFound = leasingDurations.value.find(
@@ -122,25 +118,16 @@ async function addFootballPitchPrice() {
       };
     }
 
-    const action =
-      data.type === defaultTypeBtn
-        ? footballPitchPriceStore.updateFootballPitchPrice(
-            data.id,
-            paramsFootballPitchPrice.value
-          )
-        : footballPitchPriceStore.createFootballPitchPrice(
-            paramsFootballPitchPrice.value
-          );
-
-    await action;
-
-    $toast.success(`${message} loại sân bóng thành công`);
+    paramsFootballPitchPrice.value = id
+      ? { ...paramsFootballPitchPrice.value, id }
+      : paramsFootballPitchPrice.value;
+    await footballPitchPriceStore[action](paramsFootballPitchPrice.value);
+    $toast.success(`${title} loại sân bóng thành công`);
     await footballPitchPriceStore.getFootballPitchPrices();
   } catch (error) {
     console.log(error);
-    $toast.error(`${message} loại sân bóng thất bại`);
+    $toast.error(`${title} loại sân bóng thất bại`);
   } finally {
-    isLoading.value = false;
     closeDialog();
   }
 }
@@ -165,11 +152,7 @@ footballPitchStore.getFootballPitches();
     >
       <v-card>
         <v-card-title>
-          <span class="text-h5"
-            >{{
-              data && data.type === defaultTypeBtn ? "Cập nhật " : "Thêm "
-            }}giá thuê sân bóng</span
-          >
+          <span class="text-h5">{{ title }} giá thuê sân bóng</span>
         </v-card-title>
         <v-card-text>
           <v-row>
@@ -211,22 +194,12 @@ footballPitchStore.getFootballPitches();
             Đóng
           </v-btn>
           <v-btn
-            v-if="data && data.type !== 'update'"
             class="button -primary"
             type="submit"
             :loading="isLoading"
             :disabled="!paramsFootballPitchPrice.value"
           >
-            Lưu
-          </v-btn>
-          <v-btn
-            v-else
-            class="button -primary"
-            type="submit"
-            :loading="isLoading"
-            :disabled="!paramsFootballPitchPrice.value"
-          >
-            Cập nhật
+            {{ title }}
           </v-btn>
         </v-card-actions>
       </v-card>
