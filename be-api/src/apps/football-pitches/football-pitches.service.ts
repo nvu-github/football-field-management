@@ -565,6 +565,7 @@ export class FootballPitchesService {
         SELECT  c.id, 
                 c.name, 
                 f.name as footballPitchName,
+                cfpr.id as customerFootballPitchRentalId,
                 cfpr.status, 
                 cfpr.rental_date as rentalDate, 
                 fpl.price, 

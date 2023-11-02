@@ -41,7 +41,7 @@ export const useUserStore = defineStore("userStore", () => {
   const account = ref<Account>();
   const accounts = ref<Account[]>([]);
   const roles = ref<Role[]>([]);
-  const personalInfo = ref<PersonalInfo>({});
+  const personalInfo = ref<PersonalInfo>();
 
   async function getRoles() {
     const roleList = await $apis.get("users/roles");
@@ -85,6 +85,14 @@ export const useUserStore = defineStore("userStore", () => {
     });
   }
 
+  function updateStatusAccount(id: number) {
+    return $apis.patch(`users/account/${id}/accept`);
+  }
+
+  function deleteAccount(id: number) {
+    return $apis.patch(`users/account/${id}`);
+  }
+
   async function getAccounts() {
     const allAccounts = await $apis.get("users/accounts");
     accounts.value = allAccounts.data;
@@ -120,5 +128,7 @@ export const useUserStore = defineStore("userStore", () => {
     getRoles,
     getCustomerInfo,
     getStaffInfo,
+    updateStatusAccount,
+    deleteAccount,
   };
 });

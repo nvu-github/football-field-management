@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { resolveComponent, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore, useFootballPitchStore, useDialogStore } from "~/stores";
 

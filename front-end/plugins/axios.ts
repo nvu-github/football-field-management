@@ -27,7 +27,7 @@ const createInstance = (apiUrl: string) => {
     }
     return config;
   });
-  
+
   return instanceAxios;
 };
 

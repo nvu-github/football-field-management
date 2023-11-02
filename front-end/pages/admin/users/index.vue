@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { resolveComponent, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore, useUserStore, useDialogStore, statuses } from "~/stores";
 
@@ -19,9 +20,10 @@ const appStore = useAppStore();
 const userStore = useUserStore();
 const dialogStore = useDialogStore();
 const { isConfirm } = storeToRefs(dialogStore);
-const { app } = storeToRefs(appStore);
+const { app, isLoading } = storeToRefs(appStore);
 const { accounts } = storeToRefs(userStore);
 app.value.title = "Quản lý tài khoản";
+isLoading.value = true;
 watch(isConfirm, async () => {
   await userStore.getAccounts();
   isConfirm.value = false;
@@ -34,13 +36,41 @@ async function openDialogUser(type?: string, id?: string) {
   });
 }
 
-function openDialogConfirm(id: string, type: string) {
+function openDialogConfirm(id: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
-    id,
-    type,
-    endpoint:
-      type === "accept" ? `users/account/${id}/accept` : `users/account/${id}`,
-    nameObject: "tài khoản",
+    store: userStore,
+    callback: 'updateStatusAccount',
+    payload: {
+      id,
+    },
+    message: {
+      success: 'Xác nhận tài khoản thành công',
+      error: 'Xác nhận tài khoản thất bại',
+    },
+    title: 'Bạn có chắc chắn muốn xác nhận',
+    button: {
+      text: 'Xác nhận',
+      class: '-primary'
+    }
+  });
+}
+
+function openDialogDelete(id: string) {
+  dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
+    store: userStore,
+    callback: 'deleteAccount',
+    payload: {
+      id,
+    },
+    message: {
+      success: 'Xóa tài khoản thành công',
+      error: 'Xóa tài khoản thất bại',
+    },
+    title: 'Bạn có chắc chắn muốn xóa',
+    button: {
+      text: 'Xóa',
+      class: '-danger'
+    }
   });
 }
 
@@ -57,7 +87,8 @@ function getColorStatusAccount(status: string) {
   return color;
 }
 
-userStore.getAccounts();
+await userStore.getAccounts();
+isLoading.value = false;
 </script>
 <template>
   <div class="user-page">
@@ -98,13 +129,13 @@ userStore.getAccounts();
             <v-btn
               class="button -success"
               :disabled="item.raw.status !== 'PENDING'"
-              @click="openDialogConfirm(item.raw.id, 'confirm')"
+              @click="openDialogConfirm(item.raw.id)"
             >
               <v-icon> mdi mdi-check-bold </v-icon>
             </v-btn>
             <v-btn
               class="button -danger"
-              @click="openDialogConfirm(item.raw.id)"
+              @click="openDialogDelete(item.raw.id)"
             >
               <v-icon> mdi-delete </v-icon>
             </v-btn>

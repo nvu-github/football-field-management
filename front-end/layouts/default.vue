@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia";
 import { useAppStore } from "~/stores";
 const appStore = useAppStore();
-const { breadCrumbs } = storeToRefs(appStore);
+const { breadCrumbs, isLoading } = storeToRefs(appStore);
 </script>
 <template>
   <v-app class="layout-default">
@@ -31,6 +31,7 @@ const { breadCrumbs } = storeToRefs(appStore);
       </v-container>
     </div>
     <common-dialog />
+    <common-loading v-if="isLoading" />
   </v-app>
 </template>
 <style lang="scss" scoped>

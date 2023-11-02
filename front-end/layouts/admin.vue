@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia";
 import { useAppStore } from "~/stores";
 const appStore = useAppStore();
-const { app, isShowSidebar } = storeToRefs(appStore);
+const { app, isShowSidebar, isLoading } = storeToRefs(appStore);
 const { title } = app.value;
 useHead({
   title: title || "Sân bóng Hoàng Quân",
@@ -19,6 +19,7 @@ useHead({
       <admin-layout-footer :class="['footer', { '-full': !isShowSidebar }]" />
     </v-main>
     <common-dialog />
+    <common-loading v-if="isLoading" />
   </v-app>
 </template>
 

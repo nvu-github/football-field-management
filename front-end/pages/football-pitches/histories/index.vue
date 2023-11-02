@@ -168,7 +168,7 @@ function openDialogDetail(id: number) {
                   <v-btn
                     v-bind="props"
                     class="button -primary -rental"
-                    @click="openDialogDetail(customerFootballPitchRental.id)"
+                    @click="openDialogDetail(customerFootballPitchRental.customerFootballPitchRentalId)"
                   >
                     <v-icon>mdi mdi-alpha-d-circle-outline</v-icon>
                   </v-btn>
