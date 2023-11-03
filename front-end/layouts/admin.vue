@@ -2,10 +2,10 @@
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore } from "~/stores";
-import { useHead, useNuxtApp } from "nuxt/app";
+import { useHead } from "nuxt/app";
 
 const appStore = useAppStore();
-const { app, isShowSidebar, isLoading } = storeToRefs(appStore);
+const { app, isShowSidebar,  } = storeToRefs(appStore);
 const { title } = app.value;
 onMounted(() => appStore.setLoading());
 useHead({
@@ -23,7 +23,7 @@ useHead({
       <admin-layout-footer :class="['footer', { '-full': !isShowSidebar }]" />
     </v-main>
     <common-dialog />
-    <common-loading v-if="isLoading" />
+    <common-loading />
   </v-app>
 </template>
 

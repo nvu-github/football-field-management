@@ -12,7 +12,15 @@ import {
 } from "~/stores";
 
 const rules = {
-  name: (value: string) => !!value || "Vui lòng nhập tên loại hóa đơn",
+  invoiceTypeId: (value: number) => !!value || "Vui lòng chọn loại hóa đơn",
+  customerName: (value: string) => !!value || "Vui lòng nhập tên khách hàng",
+  customerFootballId: (value: number) => !!value || "Vui lòng chọn khách hàng",
+  totalPrice: (value: number) => {
+    if (!value) return "Vui lòng chọn khách hàng";
+    if (value <= 0) return "Tổng tiền hóa đơn không hợp lệ" 
+    return true
+  },
+  status: (value: string) => !!value || "Vui lòng chọn trạng thái",
 };
 
 const appStore = useAppStore();
@@ -23,12 +31,9 @@ const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
 const { invoiceTypes } = storeToRefs(invoiceTypeStore);
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
-const { invoiceType } = storeToRefs(invoiceStore);
+const { invoiceType, paramInvoice } = storeToRefs(invoiceStore);
 const { dialog, closeDialog } = useDialogStore();
 const { id, title, action }: any = dialog.data;
-const paramInvoice = ref<Invoice>({
-  customerName: "",
-});
 const formattedCustomerFootballPitchRental = ref<any>([]);
 
 watchEffect(() => {
@@ -90,22 +95,28 @@ footballPitchStore.getCustomerFootballPitchRentals();
         <v-card-text>
           <v-row>
             <v-col cols="12">
-              <v-autocomplete
+              <v-row>
+                <v-col md="6">
+                  <v-autocomplete
                 v-model="paramInvoice.invoiceTypeId"
                 label="Chọn loại hóa đơn*"
                 item-value="id"
                 item-title="name"
-                :items="invoiceTypes"
                 variant="underlined"
                 required
+                :items="invoiceTypes"
+                :rules="[rules.invoiceTypeId]"
               ></v-autocomplete>
-              <v-text-field
+                </v-col>
+                <v-col md="6">
+                  <v-text-field
                 v-if="paramInvoice.invoiceTypeId !== 1"
                 v-model="paramInvoice.customerName"
                 label="Tên khách hàng*"
                 type="text"
                 variant="underlined"
                 required
+                :rules="[rules.customerName]"
               />
               <v-autocomplete
                 v-else
@@ -113,28 +124,46 @@ footballPitchStore.getCustomerFootballPitchRentals();
                 label="Chọn khách hàng thuê sân*"
                 item-value="id"
                 item-title="name"
+                variant="underlined"
+                required
                 :items="formattedCustomerFootballPitchRental"
-                variant="underlined"
-                required
+                :rules="[rules.customerFootballId]"
               ></v-autocomplete>
-              <v-text-field
-                v-model="paramInvoice.totalPrice"
-                label="Tổng tiền hóa đơn (VNĐ)*"
-                type="text"
-                variant="underlined"
-                required
-              >
-                <template #append> VNĐ </template>
-              </v-text-field>
-              <v-autocomplete
-                v-model="paramInvoice.status"
-                label="Trạng thái*"
-                item-value="key"
-                item-title="name"
-                :items="invoiceStatuses"
-                variant="underlined"
-                required
-              ></v-autocomplete>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col md="6">
+                  <v-text-field
+                    v-model="paramInvoice.totalPrice"
+                    label="Tổng tiền hóa đơn (VNĐ)*"
+                    type="text"
+                    variant="underlined"
+                    required
+                    class="mr-2"
+                    :rules="[rules.totalPrice]"
+                  >
+                    <template #append> VNĐ </template>
+                  </v-text-field>
+                </v-col>
+                <v-col md="6">
+                  <v-autocomplete
+                    v-model="paramInvoice.status"
+                    label="Trạng thái*"
+                    item-value="key"
+                    item-title="name"
+                    variant="underlined"
+                    required
+                    :items="invoiceStatuses"
+                    :rules="[rules.status]"
+                  ></v-autocomplete>
+                </v-col>
+              </v-row>
+              
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col cols="12">
+              <admin-invoice-detail-table-form />
             </v-col>
           </v-row>
         </v-card-text>
@@ -158,7 +187,7 @@ footballPitchStore.getCustomerFootballPitchRentals();
 </template>
 <style lang="scss" scoped>
 .dialog-invoice-create {
-  width: 500px;
+  width: 60%;
 
   :deep(.v-card) {
     padding: 5px;

@@ -17,6 +17,12 @@ export class InvoicesService {
     });
   }
 
+  createInvoiceDetails(payload: any): Promise<any> { 
+    return this.prisma.invoiceDetail.createMany({
+      data: payload
+    })
+   }
+
   async getInvoices(): Promise<any> {
     const invoices = await this.prisma.invoice.findMany({
       select: {

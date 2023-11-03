@@ -87,8 +87,18 @@ export class InvoicesController {
   @Post()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  createInvoice(@Body() body: PayloadInvoiceDto) {
-    return this.invoicesService.createInvoice(body);
+  async createInvoice(@Body() body: PayloadInvoiceDto) {
+    const { invoiceDetails } = body
+    delete body.invoiceDetails
+    const invoiceCreated = await this.invoicesService.createInvoice(body);
+    if (!invoiceCreated) {
+      throw new HttpException('Tạo hóa đơn thất bại', HttpStatus.BAD_REQUEST)
+    }
+    if (invoiceDetails.length > 0) {
+      await this.invoicesService.createInvoiceDetails(invoiceDetails)
+    }
+
+    return invoiceCreated
   }
 
   @Get()

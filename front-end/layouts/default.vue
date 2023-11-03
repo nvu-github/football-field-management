@@ -1,11 +1,11 @@
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
+import { useHead } from "nuxt/app";
 import { useAppStore } from "~/stores";
-import { useHead, useNuxtApp } from "nuxt/app";
 
 const appStore = useAppStore();
-const { app, breadCrumbs, isLoading } = storeToRefs(appStore);
+const { app, breadCrumbs } = storeToRefs(appStore);
 const { title } = app.value;
 
 onMounted(() => appStore.setLoading());
@@ -40,7 +40,7 @@ useHead({
       </v-container>
     </div>
     <common-dialog />
-    <common-loading v-if="isLoading" />
+    <common-loading />
   </v-app>
 </template>
 <style lang="scss" scoped>

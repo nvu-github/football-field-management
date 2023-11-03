@@ -110,5 +110,8 @@
   "_moduleAliases": {
     "@root": "./",
     "@app": "./src/apps/"
+  },
+  "resolutions": {
+    "jackspeak": "2.1.1"
   }
 }

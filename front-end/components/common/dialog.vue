@@ -4,7 +4,6 @@ import { useDialogStore } from "~/stores";
 const dialogStore = useDialogStore();
 const { dialog } = storeToRefs(dialogStore);
 </script>
-
 <template>
   <v-dialog
     v-model="dialog.isVisible"
@@ -12,7 +11,6 @@ const { dialog } = storeToRefs(dialogStore);
     :persistent="dialog.isPersistent"
     scrollable
   >
-    <!-- eslint-disable vue/no-v-html -->
     <div
       v-if="typeof dialog.content === 'string'"
       class="content"

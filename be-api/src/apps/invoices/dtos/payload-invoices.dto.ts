@@ -1,5 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsNumber, IsString, NotContains, IsOptional } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsNumber,
+  IsString,
+  NotContains,
+  IsOptional,
+  IsArray,
+} from 'class-validator';
 
 export class PayloadInvoiceDto {
   @ApiProperty({
@@ -45,4 +52,29 @@ export class PayloadInvoiceDto {
   @IsNumber()
   @IsNotEmpty()
   readonly customerFootballId: number;
+
+  @ApiProperty({
+    example: [
+      {
+        price: 10000,
+        amount: 10,
+        finalCost: 20000,
+        accessoryId: 1,
+      },
+      {
+        price: 10000,
+        amount: 10,
+        finalCost: 20000,
+        accessoryId: 1,
+      },
+    ],
+  })
+  @IsArray()
+  @IsOptional()
+  invoiceDetails?: Array<{
+    price: number;
+    amount: number;
+    finalCost: number;
+    accessoryId: number;
+  }>;
 }

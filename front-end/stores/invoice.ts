@@ -7,6 +7,15 @@ export interface Invoice {
   staffId: number;
   invoiceTypeId: number;
   customerFootballId?: number;
+  invoiceDetails?: Array<InvoiceDetail>
+}
+
+export interface InvoiceDetail {
+  id?: number;
+  price: number;
+  amount: number;
+  finalCost: number;
+  accessoryId: number;
 }
 
 export interface InvoiceType {
@@ -33,11 +42,35 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   const { $apis }: any = useNuxtApp();
   const invoices = ref<Invoice[]>([]);
   const invoice = ref<Invoice>();
+  const paramInvoice = ref<Invoice>({
+    id: null,
+    customerName: "",
+    totalPrice: null,
+    moneyPaid: null,
+    status: "",
+    staffId: null,
+    invoiceTypeId: null,
+    customerFootballId: null,
+    invoiceDetails: []
+  })
 
   function createInvoice(payload: Invoice) {
+    delete payload.id;
     return $apis.post(`invoices`, {
       ...convertProjectObjToObj(payload),
     });
+  }
+
+  function updateInvoice(payload: Invoice) {
+    const { id } = payload
+    delete payload.id;
+    return $apis.patch(`invoices/${id}`, {
+      ...convertProjectObjToObj(payload),
+    });
+  }
+
+  function deleteInvoice({ id }: { id: number }) {
+    return $apis.delete(`invoices/${id}`);
   }
 
   async function getInvoices() {
@@ -69,9 +102,12 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   }
 
   return {
+    paramInvoice,
     invoices,
     invoice,
     createInvoice,
+    updateInvoice,
+    deleteInvoice,
     getStatusInvoice,
     getInvoices,
     getInvoice,

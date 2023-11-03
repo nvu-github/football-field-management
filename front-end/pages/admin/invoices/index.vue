@@ -2,6 +2,7 @@
 import { resolveComponent } from "vue";
 import { storeToRefs } from "pinia";
 import { useAppStore, useInvoiceStore, useDialogStore } from "~/stores";
+import { formatPrice } from "~/utils/string";
 
 const headers = [
   {
@@ -31,7 +32,7 @@ const invoiceStore = useInvoiceStore();
 const dialogStore = useDialogStore();
 const { app } = storeToRefs(appStore);
 const { invoices } = storeToRefs(invoiceStore);
-app.value.title = "Quản lý loại hóa đơn";
+app.value.title = "Quản lý hóa đơn";
 
 async function openDialogCreateInvoiceType() {
   await dialogStore.showDialog(
@@ -76,7 +77,6 @@ function openDialogConfirm(id: string) {
 
 invoiceStore.getInvoices();
 </script>
-
 <template>
   <div class="invoice-pages">
     <v-row class="row">
@@ -94,6 +94,14 @@ invoiceStore.getInvoices();
         <v-data-table :headers="headers" :items="invoices">
           <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
+          </template>
+          <template #[`item.status`]="{ item }">
+            <v-chip :color="invoiceStore.getStatusInvoice(item.raw.status).color">
+              {{ invoiceStore.getStatusInvoice(item.raw.status).text }}
+            </v-chip>
+          </template>
+          <template #[`item.totalPrice`]="{ item }">
+            {{ formatPrice(item.raw.totalPrice) }} VNĐ
           </template>
           <template #[`item.actions`]="{ item }">
             <v-btn
