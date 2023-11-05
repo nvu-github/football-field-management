@@ -1,13 +1,14 @@
 <script lang="ts" setup>
-import {resolveComponent} from "vue"
+import { resolveComponent, watchEffect } from "vue";
 import { isSameDay, isAfter } from "date-fns";
 import { storeToRefs } from "pinia";
-import { useRoute, useNuxtApp } from "nuxt/app"
+import { useRoute, useNuxtApp } from "nuxt/app";
 import {
   useAppStore,
   useCustomerStore,
   useDialogStore,
   useFootballPitchPriceStore,
+  useFootballPitchStore,
 } from "~/stores";
 
 definePageMeta({
@@ -19,10 +20,12 @@ const route = useRoute();
 const customerStore = useCustomerStore();
 const appStore = useAppStore();
 const dialogStore = useDialogStore();
+const footballPitchStore = useFootballPitchStore();
 const footballPitchPriceStore = useFootballPitchPriceStore();
 const { isLoading } = storeToRefs(appStore);
 const { breadCrumbs } = storeToRefs(appStore);
-const { paramFootballPitchRental } = storeToRefs(customerStore);
+const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
+const { paramFootballPitchRental }: any = storeToRefs(customerStore);
 
 await footballPitchPriceStore.getFootballPitchPrices();
 breadCrumbs.value = [
@@ -38,6 +41,17 @@ breadCrumbs.value = [
   },
 ];
 
+watchEffect(async () => {
+  const { footballPitchId } = paramFootballPitchRental.value;
+  if (footballPitchId) {
+    await footballPitchStore.getFootballPitch(
+      paramFootballPitchRental.value.footballPitchId
+    );
+    paramFootballPitchRental.value.rentalDate = null;
+    paramFootballPitchRental.value.leasingDurationId = null;
+  }
+});
+
 customerStore.resetForm();
 if (route.query && route.query.id) {
   const { id } = route.query;
@@ -45,7 +59,7 @@ if (route.query && route.query.id) {
 }
 
 async function submitRentalInfo() {
-  isLoading.value = true
+  isLoading.value = true;
   const formValidation = validForm();
 
   if (!formValidation.status) {
@@ -53,20 +67,41 @@ async function submitRentalInfo() {
       ? `Vui lòng nhập thông tin ${formValidation.message}`
       : "Thời gian đặt sân phải lớn hơn hoặc bằng ngày hiện tại";
 
-    isLoading.value = false
+    isLoading.value = false;
     return $toast.error(errorMessage);
+  }
+
+  if (
+    customerFootballPitchRentals &&
+    customerFootballPitchRentals.value.length > 0 &&
+    customerFootballPitchRentals.value[0].status !== "REJECT"
+  ) {
+    isLoading.value = false;
+    return $toast.error(
+      "Sân bóng và khung giờ đã có người đặt, vui lòng chọn khung giờ khác"
+    );
   }
 
   dialogStore.showDialog(
     resolveComponent("user-football-pitch-dialog-payment")
   );
-  isLoading.value = false
+  isLoading.value = false;
+}
+
+async function handleFootballPitchLeasngDuration(id: number) {
+  const { footballPitchId } = paramFootballPitchRental.value;
+  if (footballPitchId && id) {
+    await footballPitchStore.getCustomerFootballPitchRentals({
+      footballPitchId,
+      footballPitchLeasingDurationId: id,
+    });
+  }
 }
 
 function validForm() {
   let message = "sân bóng";
   let status = true;
-  const { footballPitchId, rentalDate, leasingDurationId } =
+  const { footballPitchId, rentalDate, leasingDurationId }: any =
     paramFootballPitchRental.value;
   const currentDate = new Date();
 
@@ -94,6 +129,8 @@ function validForm() {
 
   return { status, message };
 }
+
+footballPitchStore.getFootballPitches();
 </script>
 <template>
   <div class="football-pitches-rental-page">
@@ -114,7 +151,11 @@ function validForm() {
           md="7"
           class="info"
         >
-          <user-football-pitch-rental-info />
+          <user-football-pitch-rental-info
+            @football-pitch-leasing-duration-id="
+              handleFootballPitchLeasngDuration
+            "
+          />
         </v-col>
         <div class="action">
           <v-btn
@@ -132,6 +173,7 @@ function validForm() {
 </template>
 <style lang="scss" scoped>
 .football-pitches-rental-page {
+  margin-top: 10px;
   > .form > .row > .info {
     margin-left: 30px;
     width: 100%;

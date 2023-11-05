@@ -1,13 +1,13 @@
 export interface Invoice {
-  id?: number;
+  id?: number | null;
   customerName?: string;
-  totalPrice: number;
-  moneyPaid?: number;
+  totalPrice: number | null;
+  moneyPaid?: number | null;
   status: string;
-  staffId: number;
-  invoiceTypeId: number;
-  customerFootballId?: number;
-  invoiceDetails?: Array<InvoiceDetail>
+  staffId: number | null;
+  invoiceTypeId: number | null;
+  customerFootballId?: number | null;
+  invoiceDetails?: Array<InvoiceDetail>;
 }
 
 export interface InvoiceDetail {
@@ -51,8 +51,8 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     staffId: null,
     invoiceTypeId: null,
     customerFootballId: null,
-    invoiceDetails: []
-  })
+    invoiceDetails: [],
+  });
 
   function createInvoice(payload: Invoice) {
     delete payload.id;
@@ -62,7 +62,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   }
 
   function updateInvoice(payload: Invoice) {
-    const { id } = payload
+    const { id } = payload;
     delete payload.id;
     return $apis.patch(`invoices/${id}`, {
       ...convertProjectObjToObj(payload),

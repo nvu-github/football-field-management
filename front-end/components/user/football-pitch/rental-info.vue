@@ -16,22 +16,18 @@ const footballPitchPriceStore = useFootballPitchPriceStore();
 const paymentStore = usePaymentStore();
 const authStore = useAuthStore();
 const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
-const { footballPitch } = storeToRefs(footballPitchStore);
+const { footballPitch, customerFootballPitchRentals } =
+  storeToRefs(footballPitchStore);
 const { paramFootballPitchRental }: any = storeToRefs(customerStore);
 const { payloadAmountPayment } = storeToRefs(paymentStore);
 const { user }: any = storeToRefs(authStore);
 const footballPitchPriceFound: any = ref<Object>({});
+const emit = defineEmits(["footballPitchLeasingDurationId"]);
 
 watchEffect(async () => {
   const { footballPitchId, leasingDurationId } = paramFootballPitchRental.value;
-  if (footballPitchId) {
-    await footballPitchStore.getFootballPitch(
-      paramFootballPitchRental.value.footballPitchId
-    );
-  }
 
   if (leasingDurationId) {
-    await footballPitchPriceStore.getFootballPitchPrices();
     const leasingDurationRentalId = footballPitchPrices.value.find(
       (footballPitchPrice) => footballPitchPrice.id === leasingDurationId
     );
@@ -41,10 +37,23 @@ watchEffect(async () => {
           leasingDurationRentalId?.leasingDurationId &&
         footballPitchPrice.footballPitchId === footballPitchId
     );
+    emit("footballPitchLeasingDurationId", footballPitchPriceFound.value.id);
     payloadAmountPayment.value.pricePayment =
       footballPitchPriceFound.value.price;
   }
 });
+
+function getStatusCustomerFootballPitchRental(status: string | null) {
+  let color = "primary";
+  let text = "Trống";
+
+  if (status && status !== "REJECT") {
+    color = "red";
+    text = "Đã có người đặt";
+  }
+
+  return { color, text };
+}
 </script>
 <template>
   <div class="rental-info">
@@ -84,6 +93,28 @@ watchEffect(async () => {
                   : ""
               }}
             </p>
+            <p class="status field">
+              <b class="label">Trạng thái: </b>
+              <v-chip
+                v-if="footballPitchPriceFound && footballPitchPriceFound.id"
+                :color="
+                  getStatusCustomerFootballPitchRental(
+                    customerFootballPitchRentals &&
+                      customerFootballPitchRentals.length > 0
+                      ? customerFootballPitchRentals[0].status
+                      : null
+                  ).color
+                "
+                >{{
+                  getStatusCustomerFootballPitchRental(
+                    customerFootballPitchRentals &&
+                      customerFootballPitchRentals.length > 0
+                      ? customerFootballPitchRentals[0].status
+                      : null
+                  ).text
+                }}</v-chip
+              >
+            </p>
             <p class="date field">
               <b class="label">Ngày thuê: </b>
               {{
@@ -110,8 +141,10 @@ watchEffect(async () => {
           </v-col>
         </v-row>
       </div>
-      <div class="accessory-rental">
-        <common-user-accessory-table-form />
+      <v-divider class="mt-2 mb-2"></v-divider>
+      <div class="accessory">
+        <p class="title">Đăng ký thuê phụ kiện</p>
+        <user-accessory-table-form />
       </div>
     </div>
   </div>
@@ -121,11 +154,11 @@ watchEffect(async () => {
   > .title {
     margin: 0 0 20px;
     text-align: center;
-    font-size: 20px;
+    font-size: 25px;
     font-weight: bold;
   }
   > .content > .fooballpitch > .row > .col > .carousel {
-    height: 200px !important;
+    height: 250px !important;
   }
   > .content > .fooballpitch > .row > .col > .description {
     display: flex;
@@ -140,6 +173,10 @@ watchEffect(async () => {
   }
   > .content > .fooballpitch > .row > .col > .field {
     margin-top: 10px;
+  }
+  > .content > .accessory > .title {
+    font-size: 18px;
+    font-weight: bold;
   }
 }
 </style>

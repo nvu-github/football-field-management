@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { watchEffect, ref } from "vue";
 import { storeToRefs } from "pinia";
 import {
   useCustomerStore,
@@ -41,7 +42,6 @@ const format = (date: any): string => {
 
   return `${day}/${month}/${year}`;
 };
-footballPitchStore.getFootballPitches();
 </script>
 <template>
   <div class="rental-form">

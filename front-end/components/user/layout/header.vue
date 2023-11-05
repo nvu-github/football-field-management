@@ -1,9 +1,20 @@
 <script lang="ts" setup>
+import logo from "~/public/logo.png";
+import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "~/stores";
-import logo from "~/public/logo.png";
+import { navigateTo } from "nuxt/app";
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
+const searchText = ref<string>("");
+const isLoading = ref<boolean>(false);
+
+async function handleSearchAccessories() {
+  isLoading.value = true;
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  isLoading.value = false;
+  navigateTo(`/accessories/search?name=${searchText.value}`);
+}
 </script>
 <template>
   <div class="header">
@@ -14,25 +25,20 @@ const { user } = storeToRefs(authStore);
     </div>
     <div class="searchform">
       <common-input
+        v-model="searchText"
         placeholder="Tìm kiếm thông tin phụ kiện"
         hide-details="auto"
         slot="append"
         required
       >
-        <v-btn class="button">
+        <v-btn
+          class="button"
+          :loading="isLoading"
+          @click="handleSearchAccessories"
+        >
           <v-icon> mdi mdi-magnify </v-icon>
         </v-btn>
       </common-input>
-      <!-- <v-text-field
-        :loading="loading"
-        density="compact"
-        variant="solo"
-        label="Search templates"
-        append-inner-icon="mdi-magnify"
-        single-line
-        hide-details
-        @click:append-inner="onClick"
-      ></v-text-field> -->
       <nuxt-link v-if="!user" class="user" to="/auth/login">
         <v-icon class="icon">mdi mdi-account-circle</v-icon>
       </nuxt-link>

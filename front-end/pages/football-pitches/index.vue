@@ -1,7 +1,8 @@
 <script lang="ts" setup>
+import { ref } from "vue";
 import { format, formatISO9075 } from "date-fns";
 import { storeToRefs } from "pinia";
-import { useRuntimeConfig } from "nuxt/app";
+import { useRuntimeConfig, useNuxtApp } from "nuxt/app";
 import {
   useAppStore,
   useFootballPitchStore,

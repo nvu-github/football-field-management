@@ -109,11 +109,6 @@ export class FootballPitchesController {
     );
   }
 
-  @Get('rental')
-  async getFootballPitchRentals(): Promise<any> {
-    return await this.footballPitchService.getFootballPitchRentals();
-  }
-
   @Get('rental/info')
   async getFootballPitchRentalNows(@Query() query: any): Promise<any> {
     const { rentalDate } = query;
@@ -125,8 +120,10 @@ export class FootballPitchesController {
   @Get('rental/confirm')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getCustomerFootballPitchRentals(): Promise<any> {
-    return await this.footballPitchService.getCustomerFootballPitchRentals();
+  async getCustomerFootballPitchRentals(@Query() query?: any): Promise<any> {
+    return await this.footballPitchService.getCustomerFootballPitchRentals(
+      query,
+    );
   }
 
   @Get('rental/customer/histories')

@@ -599,24 +599,47 @@ export class FootballPitchesService {
     });
   }
 
-  async getCustomerFootballPitchRentals(): Promise<any> {
-    const footballPitchRentalCustomers: any[] = await this.prisma.$queryRaw`
-        SELECT  cfpr.id,
-                c.id as customerId, 
-                c.name, 
-                f.name as footballPitchName,
-                cfpr.status, 
-                cfpr.rental_date as rentalDate, 
-                fpl.price, 
-                ld.start_time as startTime, 
-                ld.end_time as endTime 
-        FROM customers c 
-        INNER JOIN customer_football_pitch_rental cfpr on c.id = cfpr.customer_id
-        INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
-        INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
-        INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
-      `;
-    return footballPitchRentalCustomers || [];
+  async getCustomerFootballPitchRentals(query?: any): Promise<any> {
+    const { footballPitchId, footballPitchLeasingDurationId } = query;
+    const footballPitchRentalCustomers: any = await this.prisma.$queryRaw`
+      SELECT  cfpr.id,
+              c.id as customerId, 
+              c.name, 
+              f.id as footballPitchId,
+              f.name as footballPitchName,
+              cfpr.status, 
+              cfpr.rental_date as rentalDate, 
+              fpl.id as footballPitchLeasingDurationId, 
+              fpl.price, 
+              ld.start_time as startTime, 
+              ld.end_time as endTime 
+      FROM customers c 
+      INNER JOIN customer_football_pitch_rental cfpr on c.id = cfpr.customer_id
+      INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
+      INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
+      INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
+    `;
+
+    return (
+      footballPitchRentalCustomers.filter((footballPitchRentalCustomer) => {
+        let condition = true;
+        if (footballPitchId) {
+          condition =
+            condition &&
+            footballPitchRentalCustomer.footballPitchId ===
+              Number(footballPitchId);
+        }
+
+        if (footballPitchLeasingDurationId) {
+          condition =
+            condition &&
+            footballPitchRentalCustomer.footballPitchLeasingDurationId ===
+              Number(footballPitchLeasingDurationId);
+        }
+
+        return condition;
+      }) || []
+    );
   }
 
   async getCustomerFootballPitchRental(

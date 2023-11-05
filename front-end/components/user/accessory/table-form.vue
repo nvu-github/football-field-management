@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, resolveComponent, watch } from "vue";
+import { ref, resolveComponent, watchEffect } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import { useCustomerStore, useAccessoryStore, useDialogStore } from "~/stores";
@@ -60,35 +60,27 @@ const accessoryStore = useAccessoryStore();
 const { accessories } = storeToRefs(accessoryStore);
 const dialogStore = useDialogStore();
 const { paramFootballPitchRental }: any = storeToRefs(customerStore);
-const formattedAccessories = ref<any>([]);
 const priceAccessories = ref<any>({});
 
-watch(
-  () =>
+watchEffect(() => {
+  const accessoryIds =
     paramFootballPitchRental.value.customerAccessoryRentals?.map(
       (customerAccessoryRental: any) => customerAccessoryRental.accessoryId
-    ),
-  (accessoriesValues) => {
-    accessoriesValues?.map((id: number) => {
-      if (id) {
-        const accessoryFound = accessories.value.find(
-          (accessory) => id === accessory.id
-        );
-        const { id: accessoryId, price }: any = accessoryFound;
-        priceAccessories.value = {
-          ...priceAccessories.value,
-          [accessoryId]: { price },
-        };
-      }
-    });
-    formattedAccessories.value = accessories.value;
-    // .filter((accessory) => !accessoriesValues?.includes(accessory.id))
-    // .map((accessory) => convertProxyObjToObj(accessory))
-  },
-  {
-    deep: true,
-  }
-);
+    );
+
+  accessoryIds?.forEach((id: number) => {
+    if (id) {
+      const accessoryFound = accessories.value.find(
+        (accessory) => id === accessory.id
+      );
+      const { id: accessoryId, price }: any = accessoryFound;
+      priceAccessories.value = {
+        ...priceAccessories.value,
+        [accessoryId]: { price },
+      };
+    }
+  });
+});
 
 function addAccessoryRental() {
   const accessory = {
@@ -147,7 +139,7 @@ accessoryStore.getAccessories();
           variant="outlined"
           menu-icon="false"
           class="pt-3"
-          :items="formattedAccessories"
+          :items="accessories"
           :rules="[rules.accessoryId]"
         ></v-autocomplete>
       </template>
@@ -172,6 +164,7 @@ accessoryStore.getAccessories();
           variant="outlined"
           class="pt-3"
           :rules="[rules.amount]"
+          :disabled="!item.raw.accessoryId"
         ></v-text-field>
       </template>
       <template #[`item.actions`]="{ item }">

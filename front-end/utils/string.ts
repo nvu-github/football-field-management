@@ -45,6 +45,7 @@ export const generateId = (length = 8) => {
 };
 
 export const formatPrice = (price: number | string): string => {
+  if (!price) return "";
   if (typeof price === "number") {
     return price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
   } else {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onBeforeMount, watchEffect } from "vue";
+import { ref, onBeforeMount, watchEffect, computed } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import {
@@ -10,15 +10,15 @@ import {
   useFootballPitchStore,
   invoiceStatuses,
 } from "~/stores";
+import { formatPrice } from "~/utils/string";
 
 const rules = {
   invoiceTypeId: (value: number) => !!value || "Vui lòng chọn loại hóa đơn",
   customerName: (value: string) => !!value || "Vui lòng nhập tên khách hàng",
   customerFootballId: (value: number) => !!value || "Vui lòng chọn khách hàng",
   totalPrice: (value: number) => {
-    if (!value) return "Vui lòng chọn khách hàng";
-    if (value <= 0) return "Tổng tiền hóa đơn không hợp lệ" 
-    return true
+    if (!value) return "Vui lòng nhập tổng tiền hóa đơn!";
+    return true;
   },
   status: (value: string) => !!value || "Vui lòng chọn trạng thái",
 };
@@ -36,17 +36,28 @@ const { dialog, closeDialog } = useDialogStore();
 const { id, title, action }: any = dialog.data;
 const formattedCustomerFootballPitchRental = ref<any>([]);
 
+const formattedPrice = computed({
+  get: () => {
+    if (paramInvoice.value.totalPrice) {
+      return formatPrice(paramInvoice.value.totalPrice);
+    }
+    return null;
+  },
+  set: (value) => {
+    if (value) {
+      paramInvoice.value.totalPrice = parseInt(value.replace(/\./g, ""), 10);
+    }
+  },
+});
+
 watchEffect(() => {
-  if (customerFootballPitchRentals) {
-    formattedCustomerFootballPitchRental.value =
-      customerFootballPitchRentals.value.filter(
-        (customerFootballPitchRental) => {
-          const { footballPitchName, name, status } =
-            customerFootballPitchRental;
-          customerFootballPitchRental.name = `${footballPitchName} - ${name}`;
-          return status === "ACCEPT";
-        }
-      );
+  const { customerFootballId } = paramInvoice.value;
+
+  if (customerFootballId) {
+    paramInvoice.value.totalPrice =
+      formattedCustomerFootballPitchRental.value.find(
+        ({ id }: any) => id === customerFootballId
+      ).price;
   }
 });
 
@@ -55,17 +66,27 @@ onBeforeMount(async () => {
     await invoiceStore.getInvoice(id);
     setInvoiceToForm();
   }
+
+  await footballPitchStore.getCustomerFootballPitchRentals();
+  formattedCustomerFootballPitchRental.value =
+    customerFootballPitchRentals.value.filter((customerFootballPitchRental) => {
+      const { footballPitchName, name, status } = customerFootballPitchRental;
+      customerFootballPitchRental.name = `${footballPitchName} - ${name}`;
+      return status === "ACCEPT";
+    });
 });
 
 function closeDialogInvoice() {
   closeDialog();
 }
 
-async function addInvoice() {
+async function actionInvoice() {
   try {
     paramInvoice.value = id
       ? { ...paramInvoice.value, id }
       : paramInvoice.value;
+    console.log(paramInvoice.value);
+    return;
     await invoiceStore[action](paramInvoice.value);
     $toast.success(`${title} hóa đơn thành công`);
     await invoiceStore.getInvoices();
@@ -83,11 +104,10 @@ function setInvoiceToForm() {
 }
 
 invoiceTypeStore.getInvoiceTypes();
-footballPitchStore.getCustomerFootballPitchRentals();
 </script>
 <template>
   <div class="dialog-invoice-create">
-    <v-form v-model="paramInvoice.value" @submit.prevent="addInvoice">
+    <v-form v-model="paramInvoice.value" @submit.prevent="actionInvoice">
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ title }} hóa đơn</span>
@@ -95,9 +115,7 @@ footballPitchStore.getCustomerFootballPitchRentals();
         <v-card-text>
           <v-row>
             <v-col cols="12">
-              <v-row>
-                <v-col md="6">
-                  <v-autocomplete
+              <v-autocomplete
                 v-model="paramInvoice.invoiceTypeId"
                 label="Chọn loại hóa đơn*"
                 item-value="id"
@@ -107,9 +125,7 @@ footballPitchStore.getCustomerFootballPitchRentals();
                 :items="invoiceTypes"
                 :rules="[rules.invoiceTypeId]"
               ></v-autocomplete>
-                </v-col>
-                <v-col md="6">
-                  <v-text-field
+              <v-text-field
                 v-if="paramInvoice.invoiceTypeId !== 1"
                 v-model="paramInvoice.customerName"
                 label="Tên khách hàng*"
@@ -129,12 +145,10 @@ footballPitchStore.getCustomerFootballPitchRentals();
                 :items="formattedCustomerFootballPitchRental"
                 :rules="[rules.customerFootballId]"
               ></v-autocomplete>
-                </v-col>
-              </v-row>
               <v-row>
                 <v-col md="6">
                   <v-text-field
-                    v-model="paramInvoice.totalPrice"
+                    v-model="formattedPrice"
                     label="Tổng tiền hóa đơn (VNĐ)*"
                     type="text"
                     variant="underlined"
@@ -158,7 +172,6 @@ footballPitchStore.getCustomerFootballPitchRentals();
                   ></v-autocomplete>
                 </v-col>
               </v-row>
-              
             </v-col>
           </v-row>
           <v-row>

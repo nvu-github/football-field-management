@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, resolveComponent, watch } from "vue";
+import { ref, resolveComponent, watchEffect } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import {
@@ -17,6 +17,7 @@ const rules = {
   },
   amount: (value: number) => {
     if (!value) return "Vui lòng nhập số lượng!";
+    if (Number(value) <= 0) "Số lượng phải lớn hơn 0!";
     return true;
   },
 };
@@ -30,7 +31,7 @@ const headers = [
     key: "sno",
   },
   {
-    title: "Tên phụ kiện",
+    title: "Phụ kiện",
     width: "23%",
     align: "start",
     sortable: false,
@@ -52,7 +53,7 @@ const headers = [
   },
   {
     title: "Thành tiền",
-    width: "23%",
+    width: "20%",
     align: "start",
     sortable: false,
     key: "finalCost",
@@ -67,41 +68,56 @@ const headers = [
 ];
 
 const { $toast }: any = useNuxtApp();
-const customerStore = useCustomerStore();
 const accessoryStore = useAccessoryStore();
 const dialogStore = useDialogStore();
 const invoiceStore = useInvoiceStore();
 const { accessories } = storeToRefs(accessoryStore);
 const { paramInvoice }: any = storeToRefs(invoiceStore);
-const formattedAccessories = ref<any>([]);
+const formattedAccessories = ref<ParamsAccessory[]>([]);
 const priceAccessories = ref<any>({});
 
-watch(
-  () =>
-    paramInvoice.value.invoiceDetails?.map(
-      (invoiceDetail: any) => invoiceDetail.accessoryId
-    ),
-  (accessoriesValues) => {
-    accessoriesValues?.map((id: number) => {
-      if (id) {
-        const accessoryFound = accessories.value.find(
-          (accessory) => id === accessory.id
-        );
-        const { id: accessoryId, price }: any = accessoryFound;
-        priceAccessories.value = {
-          ...priceAccessories.value,
-          [accessoryId]: { price },
-        };
-      }
-    });
-    formattedAccessories.value = accessories.value;
-    // .filter((accessory) => !accessoriesValues?.includes(accessory.id))
-    // .map((accessory) => convertProxyObjToObj(accessory))
-  },
-  {
-    deep: true,
+watchEffect(() => {
+  const invoiceDetails = paramInvoice.value.invoiceDetails;
+  if (!invoiceDetails) return;
+
+  const accessoryIds = invoiceDetails.map(
+    (invoiceDetail) => invoiceDetail.accessoryId
+  );
+  const amounts = invoiceDetails.map((invoiceDetail) => invoiceDetail.amount);
+  const isNotNullAccessoryId = accessoryIds.every((accessoryId) => accessoryId);
+  const isNotNullAmount = amounts.every((amount) => amount);
+
+  if (!isNotNullAccessoryId) return;
+
+  accessoryIds.forEach((id) => {
+    if (id) {
+      const accessoryFound = accessories.value.find(
+        (accessory) => id === accessory.id
+      );
+      const { id: accessoryId, price }: any = accessoryFound;
+      priceAccessories.value = {
+        ...priceAccessories.value,
+        [accessoryId]: { price },
+      };
+    }
+  });
+
+  if (!isNotNullAmount) return;
+  invoiceDetails.forEach((invoiceDetail) => {
+    invoiceDetail.price =
+      priceAccessories.value[invoiceDetail.accessoryId].price;
+    invoiceDetail.finalCost =
+      invoiceDetail.price * Number(invoiceDetail.amount);
+  });
+  const { totalPrice } = paramInvoice.value;
+  if (totalPrice > 0) {
+    paramInvoice.value.totalPrice =
+      Number(totalPrice) +
+      invoiceDetails.reduce((total, invoiceDetail) => {
+        return (total += invoiceDetail.finalCost);
+      }, 0);
   }
-);
+});
 
 function addInvoiceDetail() {
   const invoiceDetail = {
@@ -115,28 +131,14 @@ function addInvoiceDetail() {
 }
 
 function deleteInvoiceDetail(id: string) {
-  const { invoiceDetails } = paramInvoice.value;
-  paramInvoice.value.invoiceDetails =
-    invoiceDetails.filter(
-      (invoiceDetail: any) => invoiceDetail.id !== id
-    );
-}
-
-async function getAccessoryDetail(id: string) {
-  const { invoiceDetails } = paramInvoice.value;
-  const accessoryFound = invoiceDetails.find(
-    (accessoryRental: any) => accessoryRental.id === id
+  const { invoiceDetails, totalPrice } = paramInvoice.value;
+  const invoiceDetailFound = invoiceDetails.find(
+    (invoiceDetail: any) => invoiceDetail.id === id
   );
-
-  if (!accessoryFound.accessoryId) {
-    return $toast.error("Vui lòng chọn phụ kiện!");
-  }
-
-  await dialogStore.showDialog(
-    resolveComponent("user-accessory-dialog-detail"),
-    {
-      id: accessoryFound.accessoryId,
-    }
+  paramInvoice.value.totalPrice =
+    Number(totalPrice) - invoiceDetailFound.finalCost;
+  paramInvoice.value.invoiceDetails = invoiceDetails.filter(
+    (invoiceDetail: any) => invoiceDetail.id !== id
   );
 }
 
@@ -151,7 +153,7 @@ accessoryStore.getAccessories();
       :items="paramInvoice.invoiceDetails"
     >
       <template #[`item.sno`]="{ item }">
-        {{ item.index + 1 }}
+        <span class="sno">{{ item.index + 1 }}</span>
       </template>
       <template #[`item.accessory`]="{ item }">
         <v-autocomplete
@@ -162,7 +164,7 @@ accessoryStore.getAccessories();
           variant="outlined"
           menu-icon="false"
           class="pt-3"
-          :items="formattedAccessories"
+          :items="accessories"
           :rules="[rules.accessoryId]"
         ></v-autocomplete>
       </template>
@@ -189,14 +191,13 @@ accessoryStore.getAccessories();
           :rules="[rules.amount]"
         ></v-text-field>
       </template>
+      <template #[`item.finalCost`]="{ item }">
+        <span v-if="item.raw.finalCost" class="finalcost">
+          {{ formatPrice(item.raw.finalCost) }} VNĐ
+        </span>
+      </template>
       <template #[`item.actions`]="{ item }">
-        <v-btn class="button -warning" @click="getAccessoryDetail(item.raw.id)">
-          <v-icon> mdi mdi-list-box-outline </v-icon>
-        </v-btn>
-        <v-btn
-          class="button -danger"
-          @click="deleteInvoiceDetail(item.raw.id)"
-        >
+        <v-btn class="button -danger" @click="deleteInvoiceDetail(item.raw.id)">
           <v-icon> mdi-delete </v-icon>
         </v-btn>
       </template>
@@ -228,6 +229,10 @@ accessoryStore.getAccessories();
     padding: 0;
   }
   :deep(.price) {
+    position: relative;
+    top: -5px;
+  }
+  :deep(.finalcost) {
     position: relative;
     top: -5px;
   }

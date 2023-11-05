@@ -1,23 +1,18 @@
 <script lang="ts" setup>
 import defaultFootballImage from "~/public/logo.png";
-import { ref } from "vue";
+import { ref, watchEffect } from "vue";
 import { storeToRefs } from "pinia";
-import {
-  useAppStore,
-  useAccessoryStore,
-  useAccessoryTypeStore,
-} from "~/stores";
-import { useRuntimeConfig } from "nuxt/app";
+import { useAppStore, useAccessoryStore } from "~/stores";
+import { useRuntimeConfig, useRoute } from "nuxt/app";
+import { watch } from "fs";
 
 const appStore = useAppStore();
 const accessoryStore = useAccessoryStore();
 const runtimeConfig = useRuntimeConfig();
-const accessoryTypeStore = useAccessoryTypeStore();
 const { breadCrumbs } = storeToRefs(appStore);
 const { accessories } = storeToRefs(accessoryStore);
-const { accessoryTypes } = storeToRefs(accessoryTypeStore);
+const route = useRoute();
 
-const accessoryTypeId = ref<number>();
 const formattedAccessories = ref<ParamsAccessory>();
 
 breadCrumbs.value = [
@@ -31,40 +26,31 @@ breadCrumbs.value = [
     disabled: true,
     href: "/accessories",
   },
+  {
+    title: route.query.name,
+    disabled: true,
+    href: "/search",
+  },
 ];
 
-formattedAccessories.value = accessories.value;
-function filterAccessory() {
-  formattedAccessories.value = accessoryTypeId.value
-    ? accessories.value.filter(
-        (accessory) => accessory.accessoryTypeId === accessoryTypeId.value
-      )
-    : accessories.value;
-}
-
-accessoryTypeStore.getAccessoryTypes();
-accessoryStore.getAccessories();
+await accessoryStore.getAccessories();
+watchEffect(async () => {
+  const { name } = route.query;
+  if (name) {
+    formattedAccessories.value = accessories.value.filter((accessory) => {
+      return (
+        name &&
+        accessory.name.toLowerCase().includes(name.toString().toLowerCase())
+      );
+    });
+  }
+});
 </script>
 <template>
   <div class="accessory-page">
-    <v-row class="row ml-1">
-      <v-col md="3">
-        <v-autocomplete
-          v-model="accessoryTypeId"
-          label="Loại phụ kiện"
-          item-value="id"
-          item-title="name"
-          :items="accessoryTypes"
-          variant="underlined"
-        ></v-autocomplete>
-      </v-col>
-      <v-col class="action" md="2">
-        <v-btn class="button -success" @click="filterAccessory">
-          <template #prepend>
-            <v-icon>mdi mdi-magnify</v-icon>
-          </template>
-          Tìm kiếm
-        </v-btn>
+    <v-row>
+      <v-col md="12 mt-3">
+        <h2>Kết quả tìm kiếm phụ kiện: {{ route.query.name }}</h2>
       </v-col>
     </v-row>
     <v-row v-if="formattedAccessories && formattedAccessories.length > 0">

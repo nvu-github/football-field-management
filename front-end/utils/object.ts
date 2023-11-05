@@ -1,5 +1,5 @@
 export const convertProjectObjToObj = (obj: Object) => {
-  const convertedObj = { ...obj };
+  const convertedObj: any = { ...obj };
   delete convertedObj.value;
   return convertedObj;
 };
@@ -11,8 +11,8 @@ export const convertProxyObjToObj = (obj: any) => {
     regularObject[key] = obj[key];
   }
 
-  return regularObject
-}
+  return regularObject;
+};
 
 export const formattedLeasingDuration = (leasingDurationList: any) => {
   return (
@@ -22,4 +22,13 @@ export const formattedLeasingDuration = (leasingDurationList: any) => {
       name: `${leasingDuration.startTime} - ${leasingDuration.endTime}`,
     }))
   );
+};
+
+export const removeNullAndEmptyValues = (obj: any) => {
+  for (const key in obj) {
+    if (obj[key] === null || obj[key] === "") {
+      delete obj[key];
+    }
+  }
+  return obj;
 };

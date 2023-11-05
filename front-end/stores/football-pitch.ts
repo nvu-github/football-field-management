@@ -180,14 +180,18 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     )?.name;
   }
 
-  async function getFootballPitchRental() {
-    const footballPitchRentalList = await $apis.get(`football-pitches/rental`);
-    footballPitchRental.value = footballPitchRentalList.data;
-  }
-
-  async function getCustomerFootballPitchRentals() {
+  async function getCustomerFootballPitchRentals(query?: any) {
+    const queryParams = {
+      footballPitchId: query ? query.footballPitchId : "",
+      footballPitchLeasingDurationId: query
+        ? query.footballPitchLeasingDurationId
+        : "",
+    };
     const customerFootballPitchRentalList = await $apis.get(
-      `football-pitches/rental/confirm`
+      `football-pitches/rental/confirm`,
+      {
+        params: removeNullAndEmptyValues(queryParams),
+      }
     );
     customerFootballPitchRentals.value = customerFootballPitchRentalList.data;
   }
@@ -232,7 +236,6 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     deleteImage,
     deleteFootballPitch,
     getFootballPitchRentalInfo,
-    getFootballPitchRental,
     getCustomerFootballPitchRentals,
     getCustomerFootballPitchRentalDetail,
     getStatusCustomerFootballPitchRental,
