@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref, watchEffect } from "vue";
-import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import { useAccessoryStore, useInvoiceStore } from "~/stores";
 import { generateId, formatPrice } from "~/utils/string";
@@ -62,16 +61,15 @@ const headers = [
   },
 ];
 
-const { $toast }: any = useNuxtApp();
 const accessoryStore = useAccessoryStore();
 const invoiceStore = useInvoiceStore();
 const { accessories } = storeToRefs(accessoryStore);
-const { paramInvoice }: any = storeToRefs(invoiceStore);
+const { payloadInvoice }: any = storeToRefs(invoiceStore);
 const priceAccessories = ref<any>({});
 const totalInvoiceDetail = ref<number>(0);
 
 watchEffect(() => {
-  const invoiceDetails = paramInvoice.value.invoiceDetails;
+  const invoiceDetails = payloadInvoice.value.invoiceDetails;
   if (!invoiceDetails) return;
 
   const accessoryIds = invoiceDetails.map(
@@ -92,11 +90,13 @@ watchEffect(() => {
       const accessoryFound = accessories.value.find(
         (accessory) => id === accessory.id
       );
-      const { id: accessoryId, price }: any = accessoryFound;
-      priceAccessories.value = {
-        ...priceAccessories.value,
-        [accessoryId]: { price },
-      };
+      if (accessoryFound) {
+        const { id: accessoryId, price }: any = accessoryFound;
+        priceAccessories.value = {
+          ...priceAccessories.value,
+          [accessoryId]: { price },
+        };
+      }
     }
   });
 
@@ -107,15 +107,16 @@ watchEffect(() => {
     invoiceDetail.finalCost =
       invoiceDetail.price * Number(invoiceDetail.amount);
   });
-  const { totalPrice } = paramInvoice.value;
-  paramInvoice.value.totalPrice = Number(totalPrice) - totalInvoiceDetail.value;
+  const { totalPrice } = payloadInvoice.value;
+  payloadInvoice.value.totalPrice =
+    Number(totalPrice) - totalInvoiceDetail.value;
   totalInvoiceDetail.value = invoiceDetails.reduce(
     (total: number, invoiceDetail: any) => {
       return (total += invoiceDetail.finalCost);
     },
     0
   );
-  paramInvoice.value.totalPrice += totalInvoiceDetail.value;
+  payloadInvoice.value.totalPrice += totalInvoiceDetail.value;
 });
 
 function addInvoiceDetail() {
@@ -126,13 +127,13 @@ function addInvoiceDetail() {
     finalCost: null,
     accessoryId: null,
   };
-  paramInvoice.value.invoiceDetails?.push(invoiceDetail);
+  payloadInvoice.value.invoiceDetails?.push(invoiceDetail);
 }
 
-function deleteInvoiceDetail(id: string) {
-  const { invoiceDetails } = paramInvoice.value;
-  paramInvoice.value.invoiceDetails = invoiceDetails.filter(
-    (invoiceDetail: any) => invoiceDetail.id !== id
+async function deleteInvoiceDetail(id: any) {
+  const { invoiceDetails } = payloadInvoice.value;
+  payloadInvoice.value.invoiceDetails = invoiceDetails.filter(
+    (invoiceDetail: any) => invoiceDetail.id != id
   );
 }
 
@@ -144,7 +145,7 @@ accessoryStore.getAccessories();
     <v-data-table
       class="table"
       :headers="headers"
-      :items="paramInvoice.invoiceDetails"
+      :items="payloadInvoice.invoiceDetails"
     >
       <template #[`item.sno`]="{ item }">
         <span class="sno">{{ item.index + 1 }}</span>
@@ -199,7 +200,10 @@ accessoryStore.getAccessories();
         <div class="action">
           <v-btn
             class="button -primary btnadd"
-            :disabled="!paramInvoice.invoiceTypeId || !!paramInvoice.totalPrice === false"
+            :disabled="
+              !payloadInvoice.invoiceTypeId ||
+              !!payloadInvoice.totalPrice === false
+            "
             @click="addInvoiceDetail"
             >Thêm chi tiết
             <template #prepend>

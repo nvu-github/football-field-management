@@ -186,11 +186,12 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
       footballPitchLeasingDurationId: query
         ? query.footballPitchLeasingDurationId
         : "",
+      rentalDate: query ? query.rentalDate : "",
     };
     const customerFootballPitchRentalList = await $apis.get(
       `football-pitches/rental/confirm`,
       {
-        params: removeNullAndEmptyValues(queryParams),
+        params: queryParams,
       }
     );
     customerFootballPitchRentals.value = customerFootballPitchRentalList.data;

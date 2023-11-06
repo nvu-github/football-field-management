@@ -42,7 +42,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   const { $apis }: any = useNuxtApp();
   const invoices = ref<Invoice[]>([]);
   const invoice = ref<Invoice>();
-  const paramInvoice = ref<Invoice>({
+  const payloadInvoice = ref<Invoice>({
     id: null,
     customerName: "",
     totalPrice: null,
@@ -53,11 +53,12 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     customerFootballId: null,
     invoiceDetails: [],
   });
+  const invoiceDetail = ref<any>();
 
   function createInvoice(payload: Invoice) {
     delete payload.id;
     return $apis.post(`invoices`, {
-      ...removeNullAndEmptyValues(convertProjectObjToObj(payload)),
+      ...convertProjectObjToObj(payload),
     });
   }
 
@@ -73,6 +74,10 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     return $apis.delete(`invoices/${id}`);
   }
 
+  function deleteInvoiceDetail(id: number) {
+    return $apis.delete(`invoices/${id}/detail`);
+  }
+
   async function getInvoices() {
     const invoiceList = await $apis.get(`invoices`);
     invoices.value = invoiceList.data;
@@ -81,6 +86,11 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   async function getInvoice(id: number) {
     const invoiceSingle = await $apis.get(`invoices/${id}`);
     invoice.value = invoiceSingle.data;
+  }
+
+  async function getInvoiceDetail(id: number) {
+    const invoiceDetailSingle = await $apis.get(`invoices/${id}/detail`);
+    invoiceDetail.value = invoiceDetailSingle.data;
   }
 
   function getStatusInvoice(status: string | any) {
@@ -101,16 +111,34 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     return { text, color };
   }
 
+  function resetFormInvoice() {
+    payloadInvoice.value = {
+      id: null,
+      customerName: "",
+      totalPrice: null,
+      moneyPaid: null,
+      status: "",
+      staffId: null,
+      invoiceTypeId: null,
+      customerFootballId: null,
+      invoiceDetails: [],
+    };
+  }
+
   return {
-    paramInvoice,
+    payloadInvoice,
     invoices,
     invoice,
+    invoiceDetail,
     createInvoice,
     updateInvoice,
     deleteInvoice,
+    deleteInvoiceDetail,
     getStatusInvoice,
     getInvoices,
     getInvoice,
+    getInvoiceDetail,
+    resetFormInvoice,
   };
 });
 

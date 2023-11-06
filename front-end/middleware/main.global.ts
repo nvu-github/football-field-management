@@ -1,4 +1,5 @@
-import { useAuthStore } from '~/stores';
+import { storeToRefs } from "pinia";
+import { useAuthStore } from "~/stores";
 const CUSTOMER_ROLE = 4;
 
 export default defineNuxtRouteMiddleware((to, from) => {
@@ -6,8 +7,11 @@ export default defineNuxtRouteMiddleware((to, from) => {
   const authStore = useAuthStore(app.$pinia);
   const { user } = storeToRefs(authStore);
   const userInfo: any = user.value;
-  const { loggedIn, roleId }: any = userInfo || { loggedIn: false, roleId: null };
-  if (to.path.includes('admin')) {
+  const { loggedIn, roleId }: any = userInfo || {
+    loggedIn: false,
+    roleId: null,
+  };
+  if (to.path.includes("admin")) {
     if (!loggedIn) {
       return navigateTo("/auth/login");
     }
@@ -15,8 +19,12 @@ export default defineNuxtRouteMiddleware((to, from) => {
       return navigateTo("/");
     }
   } else {
-    const includedEndpointLogin = ['football-pitches-rental', 'football-pitches-histories', 'football-pitches-thanks']
-    const { name }: any = to; 
+    const includedEndpointLogin = [
+      "football-pitches-rental",
+      "football-pitches-histories",
+      "football-pitches-thanks",
+    ];
+    const { name }: any = to;
     if (includedEndpointLogin.includes(name)) {
       if (!loggedIn) return navigateTo("/auth/login");
       if (loggedIn && roleId !== CUSTOMER_ROLE) return navigateTo("/admin");

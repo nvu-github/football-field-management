@@ -18,14 +18,15 @@ const authStore = useAuthStore();
 const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
 const { footballPitch, customerFootballPitchRentals } =
   storeToRefs(footballPitchStore);
-const { paramFootballPitchRental }: any = storeToRefs(customerStore);
+const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 const { payloadAmountPayment } = storeToRefs(paymentStore);
 const { user }: any = storeToRefs(authStore);
 const footballPitchPriceFound: any = ref<Object>({});
 const emit = defineEmits(["footballPitchLeasingDurationId"]);
 
 watchEffect(async () => {
-  const { footballPitchId, leasingDurationId } = paramFootballPitchRental.value;
+  const { footballPitchId, leasingDurationId } =
+    payloadCustomerFootballPitchRental.value;
 
   if (leasingDurationId) {
     const leasingDurationRentalId = footballPitchPrices.value.find(
@@ -118,9 +119,10 @@ function getStatusCustomerFootballPitchRental(status: string | null) {
             <p class="date field">
               <b class="label">Ngày thuê: </b>
               {{
-                paramFootballPitchRental && paramFootballPitchRental.rentalDate
+                payloadCustomerFootballPitchRental &&
+                payloadCustomerFootballPitchRental.rentalDate
                   ? format(
-                      new Date(paramFootballPitchRental.rentalDate),
+                      new Date(payloadCustomerFootballPitchRental.rentalDate),
                       "dd/MM/yyyy"
                     )
                   : ""

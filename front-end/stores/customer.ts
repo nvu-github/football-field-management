@@ -26,7 +26,7 @@ export interface CustomerAccessoryRentalHistory {
 
 export const useCustomerStore = defineStore("customerStore", () => {
   const { $apis }: any = useNuxtApp();
-  const paramFootballPitchRental = ref<CustomerFootballPitchRental>({
+  const payloadCustomerFootballPitchRental = ref<CustomerFootballPitchRental>({
     footballPitchId: null,
     rentalDate: null,
     leasingDurationId: null,
@@ -58,12 +58,14 @@ export const useCustomerStore = defineStore("customerStore", () => {
       "customerFootballPitchRental"
     );
     if (customerFootballPitchRental) {
-      paramFootballPitchRental.value = JSON.parse(customerFootballPitchRental);
+      payloadCustomerFootballPitchRental.value = JSON.parse(
+        customerFootballPitchRental
+      );
     }
   }
 
   function resetForm() {
-    paramFootballPitchRental.value = {
+    payloadCustomerFootballPitchRental.value = {
       footballPitchId: null,
       rentalDate: null,
       leasingDurationId: null,
@@ -74,7 +76,7 @@ export const useCustomerStore = defineStore("customerStore", () => {
   }
 
   return {
-    paramFootballPitchRental,
+    payloadCustomerFootballPitchRental,
     customerFootballPitchRentalHistories,
     setFootballPitchRentalFromLocalStorage,
     createCustomerFootballPitchRental,

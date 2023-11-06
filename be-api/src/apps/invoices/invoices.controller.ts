@@ -90,17 +90,111 @@ export class InvoicesController {
   @UseGuards(JwtAuthGuard)
   async createInvoice(@Body() body: PayloadInvoiceDto, @Request() req: any) {
     const { staffId } = req.user;
-    const { invoiceDetails, staffId: staffBody } = body
-    if (!staffBody) body.staffId = staffId
+    const { invoiceDetails, staffId: staffBody } = body;
+
+    if (!staffBody) body.staffId = staffId;
+
+    delete body.invoiceDetails;
     const invoiceCreated = await this.invoicesService.createInvoice(body);
-    if (!invoiceCreated) {
-      throw new HttpException('Tạo hóa đơn thất bại', HttpStatus.BAD_REQUEST)
-    }
+
+    if (!invoiceCreated)
+      throw new HttpException('Tạo hóa đơn thất bại', HttpStatus.BAD_REQUEST);
+
     if (invoiceDetails && invoiceDetails.length > 0) {
-      await this.invoicesService.createInvoiceDetails(invoiceDetails)
+      const formattedPayloadInvoiceDetails = invoiceDetails.map(
+        ({ amount, price, finalCost, accessoryId }) => ({
+          amount: Number(amount),
+          price,
+          finalCost,
+          accessoryId,
+          invoiceId: invoiceCreated.id,
+        }),
+      );
+      await this.invoicesService.createInvoiceDetails(
+        formattedPayloadInvoiceDetails,
+      );
     }
 
-    return invoiceCreated
+    return invoiceCreated;
+  }
+
+  @Patch(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async updateInvoice(
+    @Param('id') id: string,
+    @Body() body: PayloadInvoiceDto,
+    @Request() req: any,
+  ) {
+    const { staffId } = req.user;
+    const { invoiceDetails, staffId: staffBody } = body;
+    const invoice = await this.invoicesService.getInvoice(+id);
+
+    if (!invoice)
+      throw new HttpException('Không tìm thấy hóa đơn', HttpStatus.BAD_REQUEST);
+
+    if (!staffBody) body.staffId = staffId;
+
+    delete body.invoiceDetails;
+    const invoiceCreated = await this.invoicesService.updateInvoice(+id, body);
+
+    if (!invoiceCreated)
+      throw new HttpException('Cập nhật đơn thất bại', HttpStatus.BAD_REQUEST);
+
+    if (invoiceDetails && invoiceDetails.length > 0) {
+      const formattedPayloadInvoiceDetails = invoiceDetails.map(
+        ({ amount, price, finalCost, accessoryId }: any) => ({
+          amount: Number(amount),
+          price,
+          finalCost,
+          accessoryId,
+          invoiceId: invoiceCreated.id,
+        }),
+      );
+      await this.invoicesService.deleteInvoiceDetails(+id);
+      await this.invoicesService.createInvoiceDetails(
+        formattedPayloadInvoiceDetails,
+      );
+    }
+
+    return invoiceCreated;
+  }
+
+  @Delete(':id/detail')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async deleteInvoiceDetail(@Param('id') id: string) {
+    return this.invoicesService.deleteInvoiceDetail(+id);
+  }
+
+  @Delete(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async deleteInvoice(@Param('id') id: string) {
+    const invoice = await this.invoicesService.getInvoice(+id);
+    if (!invoice)
+      throw new HttpException('Không tìm thấy hóa đơn', HttpStatus.BAD_REQUEST);
+
+    await this.invoicesService.deleteInvoiceDetails(+id);
+    return this.invoicesService.deleteInvoice(+id);
+  }
+
+  @Get(':id/detail')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getInvoiceDetail(@Param('id') id: string) {
+    return this.invoicesService.getInvoiceDetail(+id);
+  }
+
+  @Get(':id')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async getInvoice(@Param('id') id: string) {
+    const invoice = await this.invoicesService.getInvoice(+id);
+    if (!invoice)
+      throw new HttpException('Không tìm thấy hóa đơn', HttpStatus.BAD_REQUEST);
+
+    return invoice;
   }
 
   @Get()

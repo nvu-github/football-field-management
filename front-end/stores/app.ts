@@ -46,7 +46,7 @@ export const useAppStore = defineStore("appStore", () => {
   const app = reactive<App>({
     title: "",
   });
-  const isShowSidebar = ref<boolean>(false);
+  const isShowSidebar = ref<boolean>(true);
   const isLoading = ref<boolean>(false);
   const breadCrumbs = ref<BreadCrumb[]>([]);
 

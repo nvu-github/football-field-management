@@ -1,13 +1,13 @@
 <script lang="ts" setup>
-import { ref, computed } from "vue"
+import { ref, computed } from "vue";
 import { storeToRefs } from "pinia";
-import { useNuxtApp } from "nuxt/app"
+import { useNuxtApp } from "nuxt/app";
 import {
   useDialogStore,
   usePaymentStore,
   useCustomerStore,
   useAccessoryStore,
-  useAppStore
+  useAppStore,
 } from "~/stores";
 import { formatPrice } from "~/utils/string";
 
@@ -24,7 +24,7 @@ const appStore = useAppStore();
 const { isLoading } = storeToRefs(appStore);
 const { accessories } = storeToRefs(accessoryStore);
 const { payloadAmountPayment } = storeToRefs(paymentStore);
-const { paramFootballPitchRental } = storeToRefs(customerStore);
+const { payloadCustomerFootballPitchRental } = storeToRefs(customerStore);
 let rentalPrice = 0;
 let subRentalPrice = 0;
 
@@ -47,13 +47,13 @@ const formattedPrice = computed<any>({
   },
 });
 
-const { customerAccessoryRentals } = paramFootballPitchRental.value;
+const { customerAccessoryRentals } = payloadCustomerFootballPitchRental.value;
 const accessoryTotalPrice = customerAccessoryRentals?.reduce(
   (total, accessory) => {
     const accessoryFound: any = accessories.value.find(
       (accessoryVal: any) => accessoryVal.id === accessory.accessoryId
     );
-    return (total += accessoryFound.price * accessoryFound.amount);
+    return (total += accessoryFound.price * accessory.amount);
   },
   0
 );
@@ -65,16 +65,16 @@ subRentalPrice =
     Number(accessoryTotalPrice)) *
   0.3;
 
-paramFootballPitchRental.value.rentalPrice = rentalPrice;
+payloadCustomerFootballPitchRental.value.rentalPrice = rentalPrice;
 payloadAmountPayment.value.amount = subRentalPrice;
 
 async function confirmPayment() {
-  isLoading.value = true
   try {
-    const { amount, pricePayment } = payloadAmountPayment.value;
-    const priceValue = Number(pricePayment) * 0.3;
-    if (Number(amount) < priceValue) {
-      return $toast.error("Số tiền thanh toán không được nhỏ hơn tiền cọc");
+    const { amount } = payloadAmountPayment.value;
+    if (Number(amount) < subRentalPrice) {
+      return $toast.warning(
+        "Số tiền thanh toán không được nhỏ hơn tiền cọc. Qúy khách vui lòng nhập lại"
+      );
     }
     const paymentUrl = await paymentStore.createPaymentUrl({
       amount,
@@ -82,14 +82,13 @@ async function confirmPayment() {
     const { paymentRedirect } = paymentUrl.data;
     localStorage.setItem(
       "customerFootballPitchRental",
-      JSON.stringify(paramFootballPitchRental.value)
+      JSON.stringify(payloadCustomerFootballPitchRental.value)
     );
     window.location.href = paymentRedirect;
   } catch (err) {
     console.log(err);
     $toast.error("Có lỗi xảy ra trong quá trình đặt sân");
   }
-  isLoading.value = false
 }
 
 function cancelPayment() {

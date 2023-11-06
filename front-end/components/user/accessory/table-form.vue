@@ -26,7 +26,7 @@ const headers = [
   },
   {
     title: "Tên phụ kiện",
-    width: "23%",
+    width: "25%",
     align: "start",
     sortable: false,
     key: "accessory",
@@ -40,7 +40,7 @@ const headers = [
   },
   {
     title: "Số lượng",
-    width: "23%",
+    width: "20%",
     align: "start",
     sortable: false,
     key: "amount",
@@ -59,12 +59,12 @@ const customerStore = useCustomerStore();
 const accessoryStore = useAccessoryStore();
 const { accessories } = storeToRefs(accessoryStore);
 const dialogStore = useDialogStore();
-const { paramFootballPitchRental }: any = storeToRefs(customerStore);
+const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 const priceAccessories = ref<any>({});
 
 watchEffect(() => {
   const accessoryIds =
-    paramFootballPitchRental.value.customerAccessoryRentals?.map(
+    payloadCustomerFootballPitchRental.value.customerAccessoryRentals?.map(
       (customerAccessoryRental: any) => customerAccessoryRental.accessoryId
     );
 
@@ -88,19 +88,21 @@ function addAccessoryRental() {
     accessoryId: null,
     amount: null,
   };
-  paramFootballPitchRental.value.customerAccessoryRentals.push(accessory);
+  payloadCustomerFootballPitchRental.value.customerAccessoryRentals.push(
+    accessory
+  );
 }
 
 function deleteAccessoryRental(id: string) {
-  const { customerAccessoryRentals } = paramFootballPitchRental.value;
-  paramFootballPitchRental.value.customerAccessoryRentals =
+  const { customerAccessoryRentals } = payloadCustomerFootballPitchRental.value;
+  payloadCustomerFootballPitchRental.value.customerAccessoryRentals =
     customerAccessoryRentals.filter(
       (accessoryRental: any) => accessoryRental.id !== id
     );
 }
 
 async function getAccessoryDetail(id: string) {
-  const { customerAccessoryRentals } = paramFootballPitchRental.value;
+  const { customerAccessoryRentals } = payloadCustomerFootballPitchRental.value;
   const accessoryFound = customerAccessoryRentals.find(
     (accessoryRental: any) => accessoryRental.id === id
   );
@@ -125,7 +127,7 @@ accessoryStore.getAccessories();
     <v-data-table
       class="table"
       :headers="headers"
-      :items="paramFootballPitchRental.customerAccessoryRentals"
+      :items="payloadCustomerFootballPitchRental.customerAccessoryRentals"
     >
       <template #[`item.sno`]="{ item }">
         {{ item.index + 1 }}

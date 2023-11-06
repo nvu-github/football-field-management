@@ -35,6 +35,7 @@ const { invoices } = storeToRefs(invoiceStore);
 app.value.title = "Quản lý hóa đơn";
 
 async function openDialogCreateInvoiceType() {
+  invoiceStore.resetFormInvoice();
   await dialogStore.showDialog(
     resolveComponent("admin-invoice-dialog-create"),
     {
@@ -96,7 +97,9 @@ invoiceStore.getInvoices();
             {{ item.index + 1 }}
           </template>
           <template #[`item.status`]="{ item }">
-            <v-chip :color="invoiceStore.getStatusInvoice(item.raw.status).color">
+            <v-chip
+              :color="invoiceStore.getStatusInvoice(item.raw.status).color"
+            >
               {{ invoiceStore.getStatusInvoice(item.raw.status).text }}
             </v-chip>
           </template>
@@ -105,10 +108,17 @@ invoiceStore.getInvoices();
           </template>
           <template #[`item.actions`]="{ item }">
             <v-btn
-              class="button -warning"
+              class="button -primary"
               @click="openDialogUpdateInvoiceType(item.raw.id)"
             >
               <v-icon> mdi-pencil </v-icon>
+            </v-btn>
+            <v-btn
+              :href="`/admin/invoices/${item.raw.id}/detail`"
+              target="_blank"
+              class="button -warning"
+            >
+              <v-icon>mdi mdi-receipt-text</v-icon>
             </v-btn>
             <v-btn
               class="button -danger"

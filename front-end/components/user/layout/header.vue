@@ -2,8 +2,8 @@
 import logo from "~/public/logo.png";
 import { ref } from "vue";
 import { storeToRefs } from "pinia";
-import { useAuthStore } from "~/stores";
 import { navigateTo } from "nuxt/app";
+import { useAuthStore } from "~/stores";
 const authStore = useAuthStore();
 const { user } = storeToRefs(authStore);
 const searchText = ref<string>("");

@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { formatISO9075 } from 'date-fns';
+import { formatISO9075, format } from 'date-fns';
 
 import { PrismaService } from '@src/prisma.service';
 
@@ -18,8 +18,6 @@ import {
   IFootballPitchRental,
   IFootballPitchRentalNow,
 } from './interfaces';
-
-import { format } from 'date-fns';
 
 @Injectable()
 export class FootballPitchesService {
@@ -600,7 +598,8 @@ export class FootballPitchesService {
   }
 
   async getCustomerFootballPitchRentals(query?: any): Promise<any> {
-    const { footballPitchId, footballPitchLeasingDurationId } = query;
+    const { footballPitchId, footballPitchLeasingDurationId, rentalDate } =
+      query;
     const footballPitchRentalCustomers: any = await this.prisma.$queryRaw`
       SELECT  cfpr.id,
               c.id as customerId, 
@@ -635,6 +634,16 @@ export class FootballPitchesService {
             condition &&
             footballPitchRentalCustomer.footballPitchLeasingDurationId ===
               Number(footballPitchLeasingDurationId);
+        }
+
+        if (rentalDate) {
+          condition =
+            condition &&
+            format(new Date(rentalDate), 'dd/MM/yyyy') ===
+              format(
+                new Date(footballPitchRentalCustomer.rentalDate),
+                'dd/MM/yyyy',
+              );
         }
 
         return condition;

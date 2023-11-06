@@ -21,18 +21,18 @@ const footballPitchStore = useFootballPitchStore();
 const footballPitchPriceStore = useFootballPitchPriceStore();
 const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
 const { footballPitches } = storeToRefs(footballPitchStore);
-const { paramFootballPitchRental } = storeToRefs(customerStore);
+const { payloadCustomerFootballPitchRental } = storeToRefs(customerStore);
 const leasingDurationFound = ref<any>([]);
 
 watchEffect(async () => {
-  const { footballPitchId } = paramFootballPitchRental.value;
+  const { footballPitchId } = payloadCustomerFootballPitchRental.value;
 
   if (footballPitchId) {
     leasingDurationFound.value = footballPitchPrices.value.filter(
       (leasingDuration) => leasingDuration.footballPitchId === footballPitchId
     );
-    // paramFootballPitchRental.value.leasingDurationId = null;
-    // paramFootballPitchRental.value.rentalDate = null;
+    // payloadCustomerFootballPitchRental.value.leasingDurationId = null;
+    // payloadCustomerFootballPitchRental.value.rentalDate = null;
   }
 });
 const format = (date: any): string => {
@@ -46,7 +46,7 @@ const format = (date: any): string => {
 <template>
   <div class="rental-form">
     <v-autocomplete
-      v-model="paramFootballPitchRental.footballPitchId"
+      v-model="payloadCustomerFootballPitchRental.footballPitchId"
       label="Chọn sân bóng*"
       item-value="id"
       item-title="name"
@@ -55,14 +55,14 @@ const format = (date: any): string => {
       :items="footballPitches"
     ></v-autocomplete>
     <common-date-picker
-      v-model="paramFootballPitchRental.rentalDate"
+      v-model="payloadCustomerFootballPitchRental.rentalDate"
       message-error="Vui lòng chọn thời than thuê"
       placeholder="Chọn thời gian thuê"
       :format="format"
-      :disabled="!paramFootballPitchRental.footballPitchId"
+      :disabled="!payloadCustomerFootballPitchRental.footballPitchId"
     />
     <v-autocomplete
-      v-model="paramFootballPitchRental.leasingDurationId"
+      v-model="payloadCustomerFootballPitchRental.leasingDurationId"
       label="Chọn khung giờ*"
       item-value="id"
       item-title="leasingDurationName"
@@ -70,12 +70,12 @@ const format = (date: any): string => {
       class="mt-2"
       :items="leasingDurationFound"
       :disabled="
-        !paramFootballPitchRental.footballPitchId ||
-        !paramFootballPitchRental.rentalDate
+        !payloadCustomerFootballPitchRental.footballPitchId ||
+        !payloadCustomerFootballPitchRental.rentalDate
       "
     ></v-autocomplete>
     <v-textarea
-      v-model="paramFootballPitchRental.note"
+      v-model="payloadCustomerFootballPitchRental.note"
       label="Ghi chú"
       type="text"
       variant="underlined"

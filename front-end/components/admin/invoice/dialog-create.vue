@@ -31,48 +31,63 @@ const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
 const { invoiceTypes } = storeToRefs(invoiceTypeStore);
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
-const { invoiceType, paramInvoice } = storeToRefs(invoiceStore);
+const { invoices, invoice, payloadInvoice } = storeToRefs(invoiceStore);
 const { dialog, closeDialog } = useDialogStore();
 const { id, title, action }: any = dialog.data;
 const formattedCustomerFootballPitchRental = ref<any>([]);
-const RENTAL_INVOICE = 1
+const RENTAL_INVOICE = 1;
+const customInvoiceStatuses = ref<any>();
 
 const formattedPrice = computed({
   get: () => {
-    if (paramInvoice.value.totalPrice) {
-      return formatPrice(paramInvoice.value.totalPrice);
+    const totalPrice = payloadInvoice.value.totalPrice;
+    if (totalPrice !== null && totalPrice !== "") {
+      return formatPrice(totalPrice);
     }
     return null;
   },
   set: (value) => {
     if (value) {
-      paramInvoice.value.totalPrice = parseInt(value.replace(/\./g, ""), 10);
+      const numericValue = parseInt(value.replace(/\./g, ""), 10);
+      if (!isNaN(numericValue)) {
+        payloadInvoice.value.totalPrice = numericValue;
+      }
     }
   },
 });
 
 await footballPitchStore.getCustomerFootballPitchRentals();
+customInvoiceStatuses.value = invoiceStatuses;
 formattedCustomerFootballPitchRental.value =
   customerFootballPitchRentals.value.filter((customerFootballPitchRental) => {
     const { footballPitchName, name, status } = customerFootballPitchRental;
+    const invoiceFound = invoices.value.find(
+      (invoice: any) =>
+        invoice.customerFootballPitchRentalId === customerFootballPitchRental.id
+    );
+
     customerFootballPitchRental.name = `${footballPitchName} - ${name}`;
-    return status === "ACCEPT";
+    return id ? status === "ACCEPT" : !invoiceFound && status === "ACCEPT";
   });
 
 watchEffect(() => {
-  const { customerFootballId, invoiceTypeId } = paramInvoice.value;
+  const { customerFootballId, invoiceTypeId, totalPrice } =
+    payloadInvoice.value;
 
   if (customerFootballId) {
-    paramInvoice.value.totalPrice =
-      formattedCustomerFootballPitchRental.value.find(
-        ({ id }: any) => id === customerFootballId
-      ).price;
+    const customerFootballPitchRentalFound =
+      formattedCustomerFootballPitchRental.value.find(({ id }: any) => {
+        return typeof customerFootballId === "string"
+          ? id === invoice.value.customerFootballPitchRentalId
+          : id === customerFootballId;
+      });
+    payloadInvoice.value.totalPrice = customerFootballPitchRentalFound
+      ? customerFootballPitchRentalFound.price
+      : null;
   }
 
-  if (invoiceTypeId && invoiceTypeId !== RENTAL_INVOICE) {
-    paramInvoice.value.customerFootballId = null;
-    paramInvoice.value.totalPrice = 0;
-  }
+  if (invoiceTypeId && invoiceTypeId !== RENTAL_INVOICE)
+    customInvoiceStatuses.value = [invoiceStatuses[0], invoiceStatuses[2]];
 });
 
 onBeforeMount(async () => {
@@ -88,13 +103,18 @@ function closeDialogInvoice() {
 
 async function actionInvoice() {
   try {
-    paramInvoice.value = id
-      ? { ...paramInvoice.value, id }
-      : paramInvoice.value;
-    
-    await invoiceStore[action](paramInvoice.value);
+    payloadInvoice.value = id
+      ? { ...payloadInvoice.value, id }
+      : payloadInvoice.value;
+
+    if (typeof payloadInvoice.value.customerFootballId === "string")
+      payloadInvoice.value.customerFootballId =
+        invoice.value.customerFootballPitchRentalId;
+
+    await invoiceStore[action](payloadInvoice.value);
     $toast.success(`${title} hóa đơn thành công`);
     await invoiceStore.getInvoices();
+    invoiceStore.resetFormInvoice();
   } catch (error) {
     console.log(error);
     $toast.error(`${title} hóa đơn thất bại`);
@@ -103,16 +123,42 @@ async function actionInvoice() {
   }
 }
 
+function handleInvoiceType() {
+  const { invoiceTypeId } = payloadInvoice.value;
+
+  if (invoiceTypeId && invoiceTypeId !== RENTAL_INVOICE) {
+    customInvoiceStatuses.value = [invoiceStatuses[0], invoiceStatuses[2]];
+    payloadInvoice.value.customerFootballId = null;
+    payloadInvoice.value.totalPrice = 0;
+  }
+}
+
 function setInvoiceToForm() {
-  const { name }: any = invoiceType.value;
-  paramInvoice.value.name = name;
+  const {
+    invoiceTypeId,
+    totalPrice,
+    status,
+    footballPitchName,
+    customerName,
+    invoiceDetails,
+  }: any = invoice.value;
+  payloadInvoice.value.invoiceTypeId = invoiceTypeId;
+  payloadInvoice.value.customerName =
+    invoiceTypeId !== RENTAL_INVOICE ? customerName : "";
+  payloadInvoice.value.customerFootballId =
+    invoiceTypeId === RENTAL_INVOICE
+      ? `${footballPitchName} - ${customerName}`
+      : null;
+  payloadInvoice.value.totalPrice = totalPrice;
+  payloadInvoice.value.status = status;
+  payloadInvoice.value.invoiceDetails = invoiceDetails;
 }
 
 invoiceTypeStore.getInvoiceTypes();
 </script>
 <template>
   <div class="dialog-invoice-create">
-    <v-form v-model="paramInvoice.value" @submit.prevent="actionInvoice">
+    <v-form v-model="payloadInvoice.value" @submit.prevent="actionInvoice">
       <v-card>
         <v-card-title>
           <span class="text-h5">{{ title }} hóa đơn</span>
@@ -120,8 +166,8 @@ invoiceTypeStore.getInvoiceTypes();
         <v-card-text>
           <v-row>
             <v-col cols="12">
-              <v-autocomplete
-                v-model="paramInvoice.invoiceTypeId"
+              <v-select
+                v-model="payloadInvoice.invoiceTypeId"
                 label="Chọn loại hóa đơn*"
                 item-value="id"
                 item-title="name"
@@ -129,10 +175,11 @@ invoiceTypeStore.getInvoiceTypes();
                 required
                 :items="invoiceTypes"
                 :rules="[rules.invoiceTypeId]"
-              ></v-autocomplete>
+                @update:modelValue="handleInvoiceType"
+              ></v-select>
               <v-text-field
-                v-if="paramInvoice.invoiceTypeId !== RENTAL_INVOICE"
-                v-model="paramInvoice.customerName"
+                v-if="payloadInvoice.invoiceTypeId !== RENTAL_INVOICE"
+                v-model="payloadInvoice.customerName"
                 label="Tên khách hàng*"
                 type="text"
                 variant="underlined"
@@ -141,7 +188,7 @@ invoiceTypeStore.getInvoiceTypes();
               />
               <v-autocomplete
                 v-else
-                v-model="paramInvoice.customerFootballId"
+                v-model="payloadInvoice.customerFootballId"
                 label="Chọn khách hàng thuê sân*"
                 item-value="id"
                 item-title="name"
@@ -165,16 +212,16 @@ invoiceTypeStore.getInvoiceTypes();
                   </v-text-field>
                 </v-col>
                 <v-col md="6">
-                  <v-autocomplete
-                    v-model="paramInvoice.status"
+                  <v-select
+                    v-model="payloadInvoice.status"
                     label="Trạng thái*"
                     item-value="key"
                     item-title="name"
                     variant="underlined"
                     required
-                    :items="invoiceStatuses"
+                    :items="customInvoiceStatuses"
                     :rules="[rules.status]"
-                  ></v-autocomplete>
+                  ></v-select>
                 </v-col>
               </v-row>
             </v-col>
@@ -194,7 +241,7 @@ invoiceTypeStore.getInvoiceTypes();
             class="button -primary"
             type="submit"
             :loading="isLoading"
-            :disabled="!paramInvoice.value"
+            :disabled="!payloadInvoice.value"
           >
             {{ title }}
           </v-btn>

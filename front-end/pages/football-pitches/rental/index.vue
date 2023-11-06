@@ -25,7 +25,7 @@ const footballPitchPriceStore = useFootballPitchPriceStore();
 const { isLoading } = storeToRefs(appStore);
 const { breadCrumbs } = storeToRefs(appStore);
 const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
-const { paramFootballPitchRental }: any = storeToRefs(customerStore);
+const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 
 await footballPitchPriceStore.getFootballPitchPrices();
 breadCrumbs.value = [
@@ -42,20 +42,20 @@ breadCrumbs.value = [
 ];
 
 watchEffect(async () => {
-  const { footballPitchId } = paramFootballPitchRental.value;
+  const { footballPitchId } = payloadCustomerFootballPitchRental.value;
   if (footballPitchId) {
     await footballPitchStore.getFootballPitch(
-      paramFootballPitchRental.value.footballPitchId
+      payloadCustomerFootballPitchRental.value.footballPitchId
     );
-    paramFootballPitchRental.value.rentalDate = null;
-    paramFootballPitchRental.value.leasingDurationId = null;
+    payloadCustomerFootballPitchRental.value.rentalDate = null;
+    payloadCustomerFootballPitchRental.value.leasingDurationId = null;
   }
 });
 
 customerStore.resetForm();
 if (route.query && route.query.id) {
   const { id } = route.query;
-  paramFootballPitchRental.value.footballPitchId = Number(id);
+  payloadCustomerFootballPitchRental.value.footballPitchId = Number(id);
 }
 
 async function submitRentalInfo() {
@@ -77,7 +77,7 @@ async function submitRentalInfo() {
     customerFootballPitchRentals.value[0].status !== "REJECT"
   ) {
     isLoading.value = false;
-    return $toast.error(
+    return $toast.warning(
       "Sân bóng và khung giờ đã có người đặt, vui lòng chọn khung giờ khác"
     );
   }
@@ -89,11 +89,13 @@ async function submitRentalInfo() {
 }
 
 async function handleFootballPitchLeasngDuration(id: number) {
-  const { footballPitchId } = paramFootballPitchRental.value;
+  const { footballPitchId, rentalDate } =
+    payloadCustomerFootballPitchRental.value;
   if (footballPitchId && id) {
     await footballPitchStore.getCustomerFootballPitchRentals({
       footballPitchId,
       footballPitchLeasingDurationId: id,
+      rentalDate,
     });
   }
 }
@@ -102,7 +104,7 @@ function validForm() {
   let message = "sân bóng";
   let status = true;
   const { footballPitchId, rentalDate, leasingDurationId }: any =
-    paramFootballPitchRental.value;
+    payloadCustomerFootballPitchRental.value;
   const currentDate = new Date();
 
   if (!footballPitchId) {
@@ -135,19 +137,19 @@ footballPitchStore.getFootballPitches();
 <template>
   <div class="football-pitches-rental-page">
     <v-form
-      v-model="paramFootballPitchRental.value"
+      v-model="payloadCustomerFootballPitchRental.value"
       class="form"
       @submit.prevent="submitRentalInfo"
     >
       <v-row class="row">
         <v-col
-          :md="paramFootballPitchRental.footballPitchId ? 4 : 12"
+          :md="payloadCustomerFootballPitchRental.footballPitchId ? 4 : 12"
           class="form"
         >
           <user-football-pitch-rental-form />
         </v-col>
         <v-col
-          v-if="paramFootballPitchRental.footballPitchId"
+          v-if="payloadCustomerFootballPitchRental.footballPitchId"
           md="7"
           class="info"
         >
@@ -162,7 +164,7 @@ footballPitchStore.getFootballPitches();
             class="button -success"
             type="submit"
             :loading="isLoading"
-            :disabled="!paramFootballPitchRental.value"
+            :disabled="!payloadCustomerFootballPitchRental.value"
           >
             Đặt sân
           </v-btn>
