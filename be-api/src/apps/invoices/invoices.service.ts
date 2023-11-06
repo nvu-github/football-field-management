@@ -24,6 +24,7 @@ export class InvoicesService {
    }
 
   async getInvoices(): Promise<any> {
+    const RENTAL_INVOICE = 1
     const invoices = await this.prisma.invoice.findMany({
       select: {
         id: true,
@@ -64,7 +65,6 @@ export class InvoicesService {
         invoiceType,
         customerFootballPitchRental,
       } = invoice;
-      const { customer, footballPitch } = customerFootballPitchRental;
       return {
         id,
         totalPrice,
@@ -72,8 +72,8 @@ export class InvoicesService {
         status,
         invoiceTypeId: invoiceType.id,
         invoiceTypeName: invoiceType.name,
-        customerName: invoiceType.id === 1 ? customer.name : customerName,
-        footballPitchName: footballPitch.name,
+        customerName: invoiceType.id === RENTAL_INVOICE ? customerFootballPitchRental.customer.name : customerName,
+        footballPitchName: invoiceType.id === RENTAL_INVOICE ? customerFootballPitchRental.footballPitch.name : '',
       };
     });
   }

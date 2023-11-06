@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, onBeforeMount, watchEffect, computed } from "vue";
+import { ref, onBeforeMount, watchEffect, computed, watch } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
 import {
@@ -35,6 +35,7 @@ const { invoiceType, paramInvoice } = storeToRefs(invoiceStore);
 const { dialog, closeDialog } = useDialogStore();
 const { id, title, action }: any = dialog.data;
 const formattedCustomerFootballPitchRental = ref<any>([]);
+const RENTAL_INVOICE = 1
 
 const formattedPrice = computed({
   get: () => {
@@ -50,14 +51,27 @@ const formattedPrice = computed({
   },
 });
 
+await footballPitchStore.getCustomerFootballPitchRentals();
+formattedCustomerFootballPitchRental.value =
+  customerFootballPitchRentals.value.filter((customerFootballPitchRental) => {
+    const { footballPitchName, name, status } = customerFootballPitchRental;
+    customerFootballPitchRental.name = `${footballPitchName} - ${name}`;
+    return status === "ACCEPT";
+  });
+
 watchEffect(() => {
-  const { customerFootballId } = paramInvoice.value;
+  const { customerFootballId, invoiceTypeId } = paramInvoice.value;
 
   if (customerFootballId) {
     paramInvoice.value.totalPrice =
       formattedCustomerFootballPitchRental.value.find(
         ({ id }: any) => id === customerFootballId
       ).price;
+  }
+
+  if (invoiceTypeId && invoiceTypeId !== RENTAL_INVOICE) {
+    paramInvoice.value.customerFootballId = null;
+    paramInvoice.value.totalPrice = 0;
   }
 });
 
@@ -66,14 +80,6 @@ onBeforeMount(async () => {
     await invoiceStore.getInvoice(id);
     setInvoiceToForm();
   }
-
-  await footballPitchStore.getCustomerFootballPitchRentals();
-  formattedCustomerFootballPitchRental.value =
-    customerFootballPitchRentals.value.filter((customerFootballPitchRental) => {
-      const { footballPitchName, name, status } = customerFootballPitchRental;
-      customerFootballPitchRental.name = `${footballPitchName} - ${name}`;
-      return status === "ACCEPT";
-    });
 });
 
 function closeDialogInvoice() {
@@ -85,8 +91,7 @@ async function actionInvoice() {
     paramInvoice.value = id
       ? { ...paramInvoice.value, id }
       : paramInvoice.value;
-    console.log(paramInvoice.value);
-    return;
+    
     await invoiceStore[action](paramInvoice.value);
     $toast.success(`${title} hóa đơn thành công`);
     await invoiceStore.getInvoices();
@@ -126,7 +131,7 @@ invoiceTypeStore.getInvoiceTypes();
                 :rules="[rules.invoiceTypeId]"
               ></v-autocomplete>
               <v-text-field
-                v-if="paramInvoice.invoiceTypeId !== 1"
+                v-if="paramInvoice.invoiceTypeId !== RENTAL_INVOICE"
                 v-model="paramInvoice.customerName"
                 label="Tên khách hàng*"
                 type="text"

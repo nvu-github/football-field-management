@@ -36,8 +36,8 @@ export class PayloadInvoiceDto {
     example: 1,
   })
   @IsNumber()
-  @IsNotEmpty()
-  readonly staffId: number;
+  @IsOptional()
+  staffId: number;
 
   @ApiProperty({
     example: 1,
@@ -50,7 +50,7 @@ export class PayloadInvoiceDto {
     example: 1,
   })
   @IsNumber()
-  @IsNotEmpty()
+  @IsOptional()
   readonly customerFootballId: number;
 
   @ApiProperty({

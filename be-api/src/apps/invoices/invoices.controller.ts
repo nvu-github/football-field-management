@@ -10,6 +10,7 @@ import {
   HttpException,
   Patch,
   Delete,
+  Request,
 } from '@nestjs/common';
 
 import { InvoicesService } from './invoices.service';
@@ -87,14 +88,15 @@ export class InvoicesController {
   @Post()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async createInvoice(@Body() body: PayloadInvoiceDto) {
-    const { invoiceDetails } = body
-    delete body.invoiceDetails
+  async createInvoice(@Body() body: PayloadInvoiceDto, @Request() req: any) {
+    const { staffId } = req.user;
+    const { invoiceDetails, staffId: staffBody } = body
+    if (!staffBody) body.staffId = staffId
     const invoiceCreated = await this.invoicesService.createInvoice(body);
     if (!invoiceCreated) {
       throw new HttpException('Tạo hóa đơn thất bại', HttpStatus.BAD_REQUEST)
     }
-    if (invoiceDetails.length > 0) {
+    if (invoiceDetails && invoiceDetails.length > 0) {
       await this.invoicesService.createInvoiceDetails(invoiceDetails)
     }
 

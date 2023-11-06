@@ -12,65 +12,66 @@ export class MailService {
   private readonly refreshToken: string;
   private readonly address: string;
 
-  // constructor(private readonly mailerService: MailerService) {
-  //   const { mail } = configuration();
-  //   this.clientId = mail.clientId
-  //   this.clientSecret = mail.clientSecret
-  //   this.refreshToken = mail.refreshToken
-  //   this.address = mail.address
-  // }
+  constructor(private readonly mailerService: MailerService) {
+    const { mail } = configuration();
+    this.clientId = mail.clientId
+    this.clientSecret = mail.clientSecret
+    this.refreshToken = mail.refreshToken
+    this.address = mail.address
+  }
 
-  // private async setTransport() {
-  //   const OAuth2 = google.auth.OAuth2;
-  //   const oauth2Client = new OAuth2(
-  //     this.clientId,
-  //     this.clientSecret,
-  //     'https://developers.google.com/oauthplayground',
-  //   );
+  private async setTransport() {
+    const OAuth2 = google.auth.OAuth2;
+    const oauth2Client = new OAuth2(
+      this.clientId,
+      this.clientSecret,
+      'https://developers.google.com/oauthplayground',
+    );
 
-  //   oauth2Client.setCredentials({
-  //     refresh_token: this.refreshToken,
-  //   });
+    oauth2Client.setCredentials({
+      refresh_token: this.refreshToken,
+    });
 
-  //   const accessToken: string = await new Promise((resolve, reject) => {
-  //     oauth2Client.getAccessToken((err, token) => {
-  //       if (err) {
-  //         reject('Failed to create access token');
-  //       }
-  //       resolve(token);
-  //     });
-  //   });
+    const accessToken: string = await new Promise((resolve, reject) => {
+      oauth2Client.getAccessToken((err, token) => {
+        if (err) {
+          console.log(err)
+          reject('Failed to create access token');
+        }
+        resolve(token);
+      });
+    });
 
-  //   const config: Options = {
-  //     service: 'gmail',
-  //     auth: {
-  //       type: 'OAuth2',
-  //       user: this.address,
-  //       clientId: this.clientId,
-  //       clientSecret: this.clientSecret,
-  //       accessToken,
-  //     },
-  //   };
-  //   this.mailerService.addTransporter('gmail', config);
-  // }
+    const config: Options = {
+      service: 'gmail',
+      auth: {
+        type: 'OAuth2',
+        user: this.address,
+        clientId: this.clientId,
+        clientSecret: this.clientSecret,
+        accessToken,
+      },
+    };
+    this.mailerService.addTransporter('gmail', config);
+  }
 
-  // async sendMail(mailParam: any) {
-  //   const { to, from, subject, template, data } = mailParam
-  //   await this.setTransport();
-  //   this.mailerService
-  //     .sendMail({
-  //       transporterName: 'gmail',
-  //       to,
-  //       from,
-  //       subject,
-  //       template,
-  //       context: data,
-  //     })
-  //     .then((success) => {
-  //       console.log(success);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // }
+  async sendMail(mailParam: any) {
+    const { to, from, subject, template, data } = mailParam
+    await this.setTransport();
+    this.mailerService
+      .sendMail({
+        transporterName: 'gmail',
+        to,
+        from,
+        subject,
+        template,
+        context: data,
+      })
+      .then((success) => {
+        console.log(success);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  }
 }

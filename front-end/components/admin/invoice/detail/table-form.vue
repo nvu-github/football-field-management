@@ -1,13 +1,8 @@
 <script lang="ts" setup>
-import { ref, resolveComponent, watchEffect } from "vue";
+import { ref, watchEffect } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
-import {
-  useCustomerStore,
-  useAccessoryStore,
-  useDialogStore,
-  useInvoiceStore,
-} from "~/stores";
+import { useAccessoryStore, useInvoiceStore } from "~/stores";
 import { generateId, formatPrice } from "~/utils/string";
 
 const rules = {
@@ -69,27 +64,30 @@ const headers = [
 
 const { $toast }: any = useNuxtApp();
 const accessoryStore = useAccessoryStore();
-const dialogStore = useDialogStore();
 const invoiceStore = useInvoiceStore();
 const { accessories } = storeToRefs(accessoryStore);
 const { paramInvoice }: any = storeToRefs(invoiceStore);
-const formattedAccessories = ref<ParamsAccessory[]>([]);
 const priceAccessories = ref<any>({});
+const totalInvoiceDetail = ref<number>(0);
 
 watchEffect(() => {
   const invoiceDetails = paramInvoice.value.invoiceDetails;
   if (!invoiceDetails) return;
 
   const accessoryIds = invoiceDetails.map(
-    (invoiceDetail) => invoiceDetail.accessoryId
+    (invoiceDetail: any) => invoiceDetail.accessoryId
   );
-  const amounts = invoiceDetails.map((invoiceDetail) => invoiceDetail.amount);
-  const isNotNullAccessoryId = accessoryIds.every((accessoryId) => accessoryId);
-  const isNotNullAmount = amounts.every((amount) => amount);
+  const amounts = invoiceDetails.map(
+    (invoiceDetail: any) => invoiceDetail.amount
+  );
+  const isNotNullAccessoryId = accessoryIds.every(
+    (accessoryId: number) => accessoryId
+  );
+  const isNotNullAmount = amounts.every((amount: number) => amount);
 
   if (!isNotNullAccessoryId) return;
 
-  accessoryIds.forEach((id) => {
+  accessoryIds.forEach((id: number) => {
     if (id) {
       const accessoryFound = accessories.value.find(
         (accessory) => id === accessory.id
@@ -103,20 +101,21 @@ watchEffect(() => {
   });
 
   if (!isNotNullAmount) return;
-  invoiceDetails.forEach((invoiceDetail) => {
+  invoiceDetails.forEach((invoiceDetail: any) => {
     invoiceDetail.price =
       priceAccessories.value[invoiceDetail.accessoryId].price;
     invoiceDetail.finalCost =
       invoiceDetail.price * Number(invoiceDetail.amount);
   });
   const { totalPrice } = paramInvoice.value;
-  if (totalPrice > 0) {
-    paramInvoice.value.totalPrice =
-      Number(totalPrice) +
-      invoiceDetails.reduce((total, invoiceDetail) => {
-        return (total += invoiceDetail.finalCost);
-      }, 0);
-  }
+  paramInvoice.value.totalPrice = Number(totalPrice) - totalInvoiceDetail.value;
+  totalInvoiceDetail.value = invoiceDetails.reduce(
+    (total: number, invoiceDetail: any) => {
+      return (total += invoiceDetail.finalCost);
+    },
+    0
+  );
+  paramInvoice.value.totalPrice += totalInvoiceDetail.value;
 });
 
 function addInvoiceDetail() {
@@ -131,12 +130,7 @@ function addInvoiceDetail() {
 }
 
 function deleteInvoiceDetail(id: string) {
-  const { invoiceDetails, totalPrice } = paramInvoice.value;
-  const invoiceDetailFound = invoiceDetails.find(
-    (invoiceDetail: any) => invoiceDetail.id === id
-  );
-  paramInvoice.value.totalPrice =
-    Number(totalPrice) - invoiceDetailFound.finalCost;
+  const { invoiceDetails } = paramInvoice.value;
   paramInvoice.value.invoiceDetails = invoiceDetails.filter(
     (invoiceDetail: any) => invoiceDetail.id !== id
   );
@@ -203,7 +197,10 @@ accessoryStore.getAccessories();
       </template>
       <template #bottom>
         <div class="action">
-          <v-btn class="button -primary btnadd" @click="addInvoiceDetail"
+          <v-btn
+            class="button -primary btnadd"
+            :disabled="!paramInvoice.invoiceTypeId || !!paramInvoice.totalPrice === false"
+            @click="addInvoiceDetail"
             >Thêm chi tiết
             <template #prepend>
               <v-icon>mdi mdi-plus-box-outline</v-icon>

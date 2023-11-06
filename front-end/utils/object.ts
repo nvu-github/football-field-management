@@ -26,7 +26,7 @@ export const formattedLeasingDuration = (leasingDurationList: any) => {
 
 export const removeNullAndEmptyValues = (obj: any) => {
   for (const key in obj) {
-    if (obj[key] === null || obj[key] === "") {
+    if (obj[key] === null || obj[key] === "" || obj[key].length === 0) {
       delete obj[key];
     }
   }

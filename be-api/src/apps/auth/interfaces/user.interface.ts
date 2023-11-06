@@ -7,5 +7,6 @@ export interface IUser {
   readonly roleId?: number;
   readonly roleName?: string;
   readonly customerId?: number;
+  readonly staffId?: number;
   readonly avatar?: string;
 }

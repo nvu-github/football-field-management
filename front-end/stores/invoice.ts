@@ -57,7 +57,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   function createInvoice(payload: Invoice) {
     delete payload.id;
     return $apis.post(`invoices`, {
-      ...convertProjectObjToObj(payload),
+      ...removeNullAndEmptyValues(convertProjectObjToObj(payload)),
     });
   }
 

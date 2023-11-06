@@ -39,7 +39,7 @@ async function openDialogCreateInvoiceType() {
     resolveComponent("admin-invoice-dialog-create"),
     {
       title: "Tạo",
-      action: "createInvoiceType",
+      action: "createInvoice",
     }
   );
 }
@@ -50,7 +50,7 @@ async function openDialogUpdateInvoiceType(id: number | null) {
     {
       id,
       title: "Cập nhật",
-      action: "updateInvoiceType",
+      action: "updateInvoice",
     }
   );
 }

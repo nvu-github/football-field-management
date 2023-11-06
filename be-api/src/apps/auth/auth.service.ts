@@ -96,7 +96,7 @@ export class AuthService {
         email: true,
         password: true,
         role: { select: { name: true } },
-        staff: { select: { name: true } },
+        staff: { select: { id: true, name: true } },
         customer: { select: { id: true, name: true } },
       },
     });
@@ -114,6 +114,7 @@ export class AuthService {
       name,
       role: account.role.name,
       customerId: account.customer ? account.customer.id : null,
+      staffId: account.staff ? account.staff.id : null,
     };
   }
 

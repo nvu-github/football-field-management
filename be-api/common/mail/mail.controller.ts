@@ -11,6 +11,6 @@ export class MailController {
 
   @Post('test')
   testMail() {
-    // return this.mailService.sendMail({ to: 'nguyenuc09112000@gmail.com', from: 'nguyenuc0911@gmail.com', subject: 'Demo', template: 'demo', data: { hello: 'Hello world' } })
+    return this.mailService.sendMail({ to: 'nguyenuc09112000@gmail.com', from: 'nguyenuc0911@gmail.com', subject: 'Demo', template: 'demo', data: { hello: 'Hello world' } })
   }
 }
