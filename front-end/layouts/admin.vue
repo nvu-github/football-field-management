@@ -5,7 +5,7 @@ import { useAppStore } from "~/stores";
 import { useHead } from "nuxt/app";
 
 const appStore = useAppStore();
-const { app, isShowSidebar,  } = storeToRefs(appStore);
+const { app, isShowSidebar } = storeToRefs(appStore);
 const { title } = app.value;
 onMounted(() => appStore.setLoading());
 useHead({
@@ -22,6 +22,7 @@ useHead({
       </div>
       <admin-layout-footer :class="['footer', { '-full': !isShowSidebar }]" />
     </v-main>
+    <common-chat />
     <common-dialog />
     <common-loading />
   </v-app>

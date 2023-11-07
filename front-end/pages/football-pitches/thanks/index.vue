@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { formatISO } from "date-fns";
 import { navigateTo, useRoute } from "nuxt/app";
+import { storeToRefs } from "pinia";
 import {
   useCustomerStore,
   useFootballPitchStore,
@@ -9,7 +10,6 @@ import {
   useAccessoryStore,
 } from "~/stores";
 import { sendMessage } from "~/services/socket";
-import { storeToRefs } from "pinia";
 
 definePageMeta({
   middleware: [

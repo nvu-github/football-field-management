@@ -39,6 +39,7 @@ useHead({
         <user-layout-footer class="footer" />
       </v-container>
     </div>
+    <common-chat />
     <common-dialog />
     <common-loading />
   </v-app>
