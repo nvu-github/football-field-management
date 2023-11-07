@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `contacts` ADD COLUMN `active` ENUM('ADMIN', 'CUSTOMER') NOT NULL DEFAULT 'ADMIN';

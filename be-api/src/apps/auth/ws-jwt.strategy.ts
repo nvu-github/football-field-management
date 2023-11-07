@@ -8,9 +8,7 @@ import { IUserJWT } from './interfaces';
 
 @Injectable()
 export class WsJwtStrategy extends PassportStrategy(Strategy, 'wsjwt') {
-  constructor(
-    private readonly authService: AuthService
-  ) {
+  constructor(private readonly authService: AuthService) {
     super({
       jwtFromRequest: ExtractJwt.fromHeader('authorization'),
       ignoreExpiration: false,
@@ -30,6 +28,7 @@ export class WsJwtStrategy extends PassportStrategy(Strategy, 'wsjwt') {
       name: user.name,
       role: user.role,
       customerId: user.customerId,
+      staffId: user.staffId,
     };
   }
 }

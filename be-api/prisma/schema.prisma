@@ -192,13 +192,14 @@ model FootballPitchLeasingDuration {
 }
 
 model Contact {
-  id         Int      @id @default(autoincrement())
-  content    String   @db.Text
+  id         Int           @id @default(autoincrement())
+  content    String        @db.Text
   image      Json?
-  staffId    Int      @map("staff_id")
-  customerId Int      @map("customer_id")
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt @map("updated_at")
+  staffId    Int           @map("staff_id")
+  customerId Int           @map("customer_id")
+  active     ActiveContact @default(ADMIN)
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
 
   staff    Staff    @relation(fields: [staffId], references: [id])
   customer Customer @relation(fields: [customerId], references: [id])
@@ -338,4 +339,11 @@ enum InvoiceStatus {
   UNPAID
 
   @@map("invoice_status")
+}
+
+enum ActiveContact {
+  ADMIN
+  CUSTOMER
+
+  @@map("active_contact")
 }

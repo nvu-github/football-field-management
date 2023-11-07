@@ -18,6 +18,7 @@ import { AccessoriesModule } from '@app/accessories/accessories.module';
 import { SocketsModule } from '@app/sockets/sockets.module';
 import { NotificationsModule } from './apps/notifications/notifications.module';
 import { InvoicesModule } from './apps/invoices/invoices.module';
+import { ChatsModule } from './apps/chats/chats.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { InvoicesModule } from './apps/invoices/invoices.module';
     SocketsModule,
     NotificationsModule,
     InvoicesModule,
+    ChatsModule,
   ],
   controllers: [AppController],
   providers: [

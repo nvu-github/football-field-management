@@ -8,7 +8,7 @@ import {
 import { Request, UseGuards, HttpStatus, HttpException } from '@nestjs/common';
 
 import { SocketsService } from './sockets.service';
-import { ContactService } from './contact.service';
+import { ChatsService } from '@app/chats/chats.service';
 import { NotificationsService } from '@app/notifications/notifications.service';
 import { WsJwtAuthGuard } from '@app/auth/ws-jwt.guard';
 
@@ -37,7 +37,7 @@ export class SocketsGateway implements OnGatewayConnection {
   constructor(
     private readonly socketsService: SocketsService,
     private readonly notificationService: NotificationsService,
-    private readonly contactService: ContactService,
+    private readonly chatService: ChatsService,
   ) {}
 
   handleConnection(client) {
@@ -48,7 +48,7 @@ export class SocketsGateway implements OnGatewayConnection {
 
   @UseGuards(WsJwtAuthGuard)
   @SubscribeMessage('notification')
-  async create(
+  async gatewayNotification(
     @MessageBody() body: PayloadNotificationDto,
     @Request() req: any,
   ) {
@@ -71,23 +71,27 @@ export class SocketsGateway implements OnGatewayConnection {
     return this.server.emit('emit-notification', createdNotification);
   }
 
-  @SubscribeMessage('findAllSockets')
-  findAll() {
-    return this.socketsService.findAll();
-  }
+  @UseGuards(WsJwtAuthGuard)
+  @SubscribeMessage('chat')
+  async gatewayChat(@MessageBody() body: any, @Request() req: any) {
+    const { customerId: customerIdReq, staffId: staffIdReq } =
+      req.handshake.user;
+    const { content, staffId, customerId, active } = body;
 
-  @SubscribeMessage('findOneSocket')
-  findOne(@MessageBody() id: number) {
-    return this.socketsService.findOne(id);
-  }
+    if (!customerId) body.customerId = customerIdReq;
+    if (!staffId) body.staffId = staffIdReq;
 
-  @SubscribeMessage('updateSocket')
-  update(@MessageBody() updateSocketDto: any) {
-    return this.socketsService.update(updateSocketDto.id, updateSocketDto);
-  }
+    if (!content || !body.staffId || !body.customerId || !active) {
+      throw new HttpException(
+        'Vui lòng nhập đầy đủ thông tin',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
 
-  @SubscribeMessage('removeSocket')
-  remove(@MessageBody() id: number) {
-    return this.socketsService.remove(id);
+    const createdNotification = await this.chatService.createChat({
+      ...body,
+      staffId,
+    });
+    return this.server.emit('emit-chat', createdNotification);
   }
 }
