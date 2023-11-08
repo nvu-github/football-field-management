@@ -88,10 +88,7 @@ export class SocketsGateway implements OnGatewayConnection {
       );
     }
 
-    const createdNotification = await this.chatService.createChat({
-      ...body,
-      staffId,
-    });
+    const createdNotification = await this.chatService.createChat(body);
     return this.server.emit('emit-chat', createdNotification);
   }
 }
