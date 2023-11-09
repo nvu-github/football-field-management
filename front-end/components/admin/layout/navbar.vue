@@ -97,6 +97,24 @@ const menus = ref<Menu>([
     ],
     roleId: 1,
   },
+  {
+    icon: "mdi mdi-chart-bar",
+    title: "Thống kê",
+    url: "#",
+    subMenus: [
+      {
+        icon: "mdi mdi-chart-pie",
+        title: "Phụ kiện",
+        url: "#",
+      },
+      {
+        icon: "mdi mdi-finance",
+        title: "Doanh thu",
+        url: "#",
+      },
+    ],
+    roleId: 1,
+  },
 ]);
 function closeNavbar() {
   // drawer.value = false;

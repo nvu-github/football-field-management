@@ -16,7 +16,7 @@ export interface ChatCustomerInfoForAdmin {
 export const useChatStore = defineStore("chatStore", () => {
   const { $apis }: any = useNuxtApp();
   const chats = ref<Chat[]>([]);
-  const chatCustomerInfForAdmin = ref<ChatCustomerInfoForAdmin[]>([]);
+  const chatCustomerInForAdmin = ref<ChatCustomerInfoForAdmin[]>([]);
 
   async function getChatForCustomer() {
     const chatForCustomerList = await $apis.get(`chats/customer`);
@@ -30,12 +30,12 @@ export const useChatStore = defineStore("chatStore", () => {
 
   async function getChatCustomerInfoForAdmin() {
     const chatCustomerInfoList = await $apis.get(`chats/customer/info`);
-    chatCustomerInfForAdmin.value = chatCustomerInfoList.data;
+    chatCustomerInForAdmin.value = chatCustomerInfoList.data;
   }
 
   return {
     chats,
-    chatCustomerInfForAdmin,
+    chatCustomerInForAdmin,
     getChatForCustomer,
     getChatForAdmin,
     getChatCustomerInfoForAdmin,

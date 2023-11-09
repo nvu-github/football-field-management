@@ -7,7 +7,7 @@ import { sendMessage, onEvent } from "~/services/socket";
 const authStore = useAuthStore();
 const chatStore = useChatStore();
 const { user }: any = storeToRefs(authStore);
-const { chats, chatCustomerInfForAdmin }: any = storeToRefs(chatStore);
+const { chats, chatCustomerInForAdmin }: any = storeToRefs(chatStore);
 const menu = ref(false);
 const message = ref<any>(null);
 const CUSTOMER_ROLE = 4;
@@ -17,25 +17,28 @@ const CUSTOMER_CHAT_ACTIVE = "CUSTOMER";
 const isLoading = ref(false);
 const tab = ref(null);
 const customerId = ref<number>();
+const titleAdmin = "ban quản lý sân";
+const titleCustomer = "khách hàng";
 
 if (user.value && user.value.roleId === CUSTOMER_ROLE)
   await chatStore.getChatForCustomer();
+
 if (user.value && user.value.roleId === ADMIN_ROLE) {
   await chatStore.getChatCustomerInfoForAdmin();
   tab.value =
-    chatCustomerInfForAdmin.value && chatCustomerInfForAdmin.value.length > 0
-      ? chatCustomerInfForAdmin.value[0].id
+    chatCustomerInForAdmin.value && chatCustomerInForAdmin.value.length > 0
+      ? chatCustomerInForAdmin.value[0].id
       : null;
 
-  if (chatCustomerInfForAdmin.value && chatCustomerInfForAdmin.value.length > 0)
-    getChatContent(chatCustomerInfForAdmin.value[0].id);
+  if (chatCustomerInForAdmin.value && chatCustomerInForAdmin.value.length > 0)
+    handleChangeTab(chatCustomerInForAdmin.value[0].id);
 }
 
 watchEffect(async () => {
   if (menu.value || tab.value) {
     await nextTick();
     const messageItems: any = document.querySelectorAll(".message");
-    const messageContainer: any = document.querySelector(".v-card-text");
+    const messageContainer: any = document.querySelector(".box-message");
     if (messageItems.length > 0) {
       const lastMessage = messageItems[messageItems.length - 1];
       messageContainer.scrollTop =
@@ -45,24 +48,23 @@ watchEffect(async () => {
 });
 
 onEvent("emit-chat", async (data: any) => {
-  const { customerId } = data;
-  const foundCustomer = chatCustomerInfForAdmin.value.find(({id}: any) => id === customerId)
+  const { customerId, id: idChat } = data;
+  const foundCustomer = chatCustomerInForAdmin.value.find(
+    ({ id }: any) => id === customerId
+  );
 
   if (!foundCustomer) await chatStore.getChatCustomerInfoForAdmin();
 
-  if (user.value && user.value.roleId === CUSTOMER_ROLE) {
+  if (user.value.roleId === CUSTOMER_ROLE || customerId === tab.value) {
+    const foundChat = chats.value.find(({ id }: any) => id === idChat);
+    if (foundChat) return;
     chats.value = [...chats.value, data];
-  } else {
-    console.log(data)
-    console.log(customerId)
-    console.log(tab.value)
-    if (customerId === tab.value) chats.value = [...chats.value, data];
   }
 });
 
-function send() {
+function send(message: string) {
   sendMessage("chat", {
-    content: message.value,
+    content: message,
     staffId:
       user.value && user.value.roleId === CUSTOMER_ROLE ? ADMIN_ROLE : null,
     customerId:
@@ -74,10 +76,9 @@ function send() {
         ? CUSTOMER_CHAT_ACTIVE
         : ADMIN_CHAT_ACTIVE,
   });
-  message.value = null;
 }
 
-async function getChatContent(id: number) {
+async function handleChangeTab(id: number) {
   isLoading.value = true;
   customerId.value = id;
   await chatStore.getChatForAdmin(id);
@@ -93,14 +94,14 @@ async function getChatContent(id: number) {
   >
     <template #activator="{ props }">
       <v-btn
+        v-bind="props"
+        active-class="false"
         :class="[
           'btn',
           {
             '-admin': user && user.roleId === ADMIN_ROLE,
           },
         ]"
-        v-bind="props"
-        active-class="false"
         :disabled="!user.loggedIn"
       >
         <v-icon>mdi mdi-chat-processing-outline</v-icon>
@@ -118,101 +119,37 @@ async function getChatContent(id: number) {
       <v-card-title
         >Liên hệ với
         {{
-          user && user.roleId === CUSTOMER_ROLE
-            ? "ban quản lý sân"
-            : "khách hàng"
+          user && user.roleId === CUSTOMER_ROLE ? titleAdmin : titleCustomer
         }}</v-card-title
       >
       <v-divider></v-divider>
       <div v-if="user && user.roleId === CUSTOMER_ROLE" class="customer">
-        <v-card-text>
-          <common-chat-item
-            v-for="(chat, index) in chats"
-            :key="index"
-            :class="[
-              'message',
-              {
-                '-active': chat.active === CUSTOMER_CHAT_ACTIVE,
-              },
-            ]"
-            :message="chat.content"
-            :timer="chat.createdAt"
-            :is-active="chat.active === CUSTOMER_CHAT_ACTIVE"
-          />
-        </v-card-text>
-        <v-card-actions v-if="user && user.roleId === CUSTOMER_ROLE">
-          <v-textarea
-            v-model="message"
-            label="Nội dung tin nhắn..."
-            hide-details="auto"
-            variant="underlined"
-            rows="1"
-          >
-            <template #append>
-              <v-btn :disabled="!message" @click="send">
-                <v-icon>mdi mdi-send-variant-outline</v-icon>
-              </v-btn>
-            </template>
-          </v-textarea>
-        </v-card-actions>
+        <common-chat-customer
+          :chats="chats"
+          :admin-chat-active="ADMIN_CHAT_ACTIVE"
+          :customer-chat-active="CUSTOMER_CHAT_ACTIVE"
+          @handle-message="send"
+        />
       </div>
-      <v-card-text class="chat-admin" v-else>
+      <div class="chat-admin" v-else>
         <div class="tab">
-          <v-tabs v-model="tab" direction="vertical" color="primary">
-            <v-tab
-              v-for="(customer, index) in chatCustomerInfForAdmin"
-              :key="index"
-              :value="customer.id"
-              @click="getChatContent(customer.id)"
-            >
-              <v-icon start> mdi-account </v-icon>
-              {{ customer.name }}
-            </v-tab>
-          </v-tabs>
+          <common-chat-tabs
+            v-model="tab"
+            :tabs="chatCustomerInForAdmin"
+            @handle-change-tab="handleChangeTab"
+          />
         </div>
         <div class="window">
-          <v-window v-model="tab">
-            <v-window-item
-              v-for="(customer, index) in chatCustomerInfForAdmin"
-              :key="index"
-              :value="customer.id"
-            >
-              <v-card flat>
-                <v-card-text>
-                  <common-chat-item
-                    v-for="(chat, index) in chats"
-                    :key="index"
-                    :class="[
-                      'message',
-                      {
-                        '-active': chat.active === ADMIN_CHAT_ACTIVE,
-                      },
-                    ]"
-                    :message="chat.content"
-                    :timer="chat.createdAt"
-                    :is-active="chat.active === ADMIN_CHAT_ACTIVE"
-                  />
-                </v-card-text>
-                <v-card-actions>
-                  <v-textarea
-                    v-model="message"
-                    label="Nội dung tin nhắn..."
-                    hide-details="auto"
-                    variant="underlined"
-                    rows="1"
-                  >
-                    <template #append>
-                      <v-btn :disabled="!message" @click="send">
-                        <v-icon>mdi mdi-send-variant-outline</v-icon>
-                      </v-btn>
-                    </template>
-                  </v-textarea>
-                </v-card-actions>
-              </v-card>
-            </v-window-item>
-          </v-window>
+          <common-chat-window
+            v-model="tabs"
+            :tabs="chatCustomerInForAdmin"
+            :chats="chats"
+            :admin-chat-active="ADMIN_CHAT_ACTIVE"
+            :customer-chat-active="CUSTOMER_CHAT_ACTIVE"
+            @handle-message="send"
+          />
         </div>
-      </v-card-text>
+      </div>
     </v-card>
   </v-menu>
 </template>
@@ -229,21 +166,15 @@ async function getChatContent(id: number) {
   > .v-card-title {
     font-weight: bold;
   }
-  > .customer > .v-card-text {
-    height: 290px;
-    overflow-y: scroll;
-    &::-webkit-scrollbar {
-      width: 0;
-    }
-  }
 }
 
 .chat-admin {
   display: flex;
   overflow: hidden;
+  padding-right: 5px;
   > .tab {
     width: 45%;
-    height: 100%;
+    height: 450px;
     overflow-y: scroll;
     border-right: 1px solid #d6d6d6;
     &::-webkit-scrollbar {
@@ -254,10 +185,6 @@ async function getChatContent(id: number) {
   > .window {
     width: 100%;
     height: 370px;
-    overflow-y: scroll;
-    &::-webkit-scrollbar {
-      width: 0;
-    }
     :deep(.v-card-actions) {
       width: 67%;
     }
@@ -269,36 +196,6 @@ async function getChatContent(id: number) {
     }
   }
 }
-
-.message {
-  width: 100%;
-  margin-top: 30px;
-  &:first-child {
-    margin-top: 0;
-  }
-  &:last-child {
-    margin-bottom: 25px;
-  }
-  &.-active {
-    float: right;
-  }
-}
-
-.v-card-actions {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  margin-bottom: 10px;
-  border-top: 1px solid #d6d6d6;
-  background: #fff;
-  :deep(.v-field__input) {
-    overflow-y: scroll;
-    &::-webkit-scrollbar {
-      width: 0;
-    }
-  }
-}
-
 .btn {
   position: fixed;
   right: 20px;
