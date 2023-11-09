@@ -9,13 +9,12 @@ import { MailService } from './mail.service';
   imports: [
     MailerModule.forRoot({
       transport: {
-        host: 'smtp.gmail.com',
+        host: 'smtp.mailtrap.io',
         port: 465,
-        ignoreTLS: true,
-        secure: true,
+        secure: false,
         auth: {
-          user: 'nguyenuc0911@gmail.com',
-          pass: 'nvu201200',
+          user: '819fef5135d014',
+          pass: 'd53a2f277cc31d',
         },
       },
       defaults: {

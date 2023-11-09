@@ -25,6 +25,11 @@ export default defineNuxtRouteMiddleware((to, from) => {
       "football-pitches-thanks",
     ];
     const { name }: any = to;
+
+    if (loggedIn && roleId !== CUSTOMER_ROLE) {
+      return navigateTo("/admin");
+    }
+
     if (includedEndpointLogin.includes(name)) {
       if (!loggedIn) return navigateTo("/auth/login");
       if (loggedIn && roleId !== CUSTOMER_ROLE) return navigateTo("/admin");

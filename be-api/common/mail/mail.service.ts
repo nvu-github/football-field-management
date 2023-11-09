@@ -57,10 +57,8 @@ export class MailService {
 
   async sendMail(mailParam: any) {
     const { to, from, subject, template, data } = mailParam
-    await this.setTransport();
-    this.mailerService
+    await this.mailerService
       .sendMail({
-        transporterName: 'gmail',
         to,
         from,
         subject,

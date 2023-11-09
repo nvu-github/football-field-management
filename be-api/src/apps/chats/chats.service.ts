@@ -21,6 +21,7 @@ export class ChatsService {
         createdAt: true,
         customer: {
           select: {
+            name: true,
             account: {
               select: {
                 email: true,
@@ -46,6 +47,7 @@ export class ChatsService {
       image,
       staffId,
       customerId,
+      customerName: customer.name,
       active,
       createdAt,
       email: customer.account.email,

@@ -75,9 +75,9 @@ export const useAppStore = defineStore("appStore", () => {
   function setLoading() {
     $apis.interceptors.request.use((config: any) => {
       isLoading.value =
-        !config.url.includes("chats") || !config.url.includes("notification")
-          ? true
-          : false;
+        config.url.includes("chats") || config.url.includes("notification")
+          ? false
+          : true;
       return config;
     });
 
