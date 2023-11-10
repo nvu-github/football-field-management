@@ -1,4 +1,4 @@
-import { ref, onUnmounted } from "vue";
+import { onUnmounted } from "vue";
 import io from "socket.io-client";
 
 const config = useRuntimeConfig();
@@ -17,18 +17,18 @@ const configSocket = {
     authorization: token,
   },
 };
-const socket = io(`${config.public.SOCKET_URL}sockets`, configSocket);
-const messages = ref({});
 
-socket.on("message", (message) => {
-  messages.value = message;
-});
+let socket: any = null
 
-const sendMessage = (event: string, message: object) => {
+export const initialSocketIo = async () => {
+  socket = await io(`${config.public.SOCKET_URL}sockets`, configSocket);
+}
+initialSocketIo()
+export const sendMessage = (event: string, message: object) => {
   socket.emit(event, message);
 };
 
-const onEvent = (event: string, callback: any) => {
+export const onEvent = (event: string, callback: any) => {
   socket.on(event, callback);
 };
 
@@ -37,5 +37,3 @@ const disconnect = () => {
 };
 
 onUnmounted(disconnect);
-
-export { messages, sendMessage, onEvent };

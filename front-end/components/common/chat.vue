@@ -9,7 +9,6 @@ const chatStore = useChatStore();
 const { user }: any = storeToRefs(authStore);
 const { chats, chatCustomerInForAdmin }: any = storeToRefs(chatStore);
 const menu = ref(false);
-const message = ref<any>(null);
 const CUSTOMER_ROLE = 4;
 const ADMIN_ROLE = 1;
 const ADMIN_CHAT_ACTIVE = "ADMIN";
@@ -19,11 +18,13 @@ const tab = ref(null);
 const customerId = ref<number>();
 const titleAdmin = "ban quản lý sân";
 const titleCustomer = "khách hàng";
+const isCustomer = user.value && user.value.roleId === CUSTOMER_ROLE;
+const isAdmin = user.value && user.value.roleId === ADMIN_ROLE;
 
-if (user.value && user.value.roleId === CUSTOMER_ROLE)
+if (user.value && isCustomer)
   await chatStore.getChatForCustomer();
 
-if (user.value && user.value.roleId === ADMIN_ROLE) {
+if (user.value && isAdmin) {
   await chatStore.getChatCustomerInfoForAdmin();
   tab.value =
     chatCustomerInForAdmin.value && chatCustomerInForAdmin.value.length > 0
@@ -52,10 +53,12 @@ onEvent("emit-chat", async (data: any) => {
   const foundCustomer = chatCustomerInForAdmin.value.find(
     ({ id }: any) => id === customerId
   );
+  const isRoleCustomer = user.value.roleId === CUSTOMER_ROLE;
+  const isTabActive = customerId === tab.value;
 
   if (!foundCustomer) await chatStore.getChatCustomerInfoForAdmin();
 
-  if (user.value.roleId === CUSTOMER_ROLE || customerId === tab.value) {
+  if (isRoleCustomer || isTabActive) {
     const foundChat = chats.value.find(({ id }: any) => id === idChat);
     if (foundChat) return;
     chats.value = [...chats.value, data];
@@ -63,18 +66,13 @@ onEvent("emit-chat", async (data: any) => {
 });
 
 function send(message: string) {
+  const isAdmin = user.value && user.value.roleId !== CUSTOMER_ROLE;
+
   sendMessage("chat", {
     content: message,
-    staffId:
-      user.value && user.value.roleId === CUSTOMER_ROLE ? ADMIN_ROLE : null,
-    customerId:
-      user.value && user.value.roleId !== CUSTOMER_ROLE
-        ? customerId.value
-        : null,
-    active:
-      user.value && user.value.roleId === CUSTOMER_ROLE
-        ? CUSTOMER_CHAT_ACTIVE
-        : ADMIN_CHAT_ACTIVE,
+    staffId: isCustomer ? ADMIN_ROLE : null,
+    customerId: isAdmin ? customerId.value : null,
+    active: isCustomer ? CUSTOMER_CHAT_ACTIVE : ADMIN_CHAT_ACTIVE,
   });
 }
 

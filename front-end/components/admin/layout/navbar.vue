@@ -100,17 +100,17 @@ const menus = ref<Menu>([
   {
     icon: "mdi mdi-chart-bar",
     title: "Thống kê",
-    url: "#",
+    url: "/report",
     subMenus: [
       {
         icon: "mdi mdi-chart-pie",
         title: "Phụ kiện",
-        url: "#",
+        url: "/report/accessory",
       },
       {
         icon: "mdi mdi-finance",
         title: "Doanh thu",
-        url: "#",
+        url: "/report",
       },
     ],
     roleId: 1,

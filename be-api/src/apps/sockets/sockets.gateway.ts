@@ -41,7 +41,7 @@ export class SocketsGateway implements OnGatewayConnection {
   ) {}
 
   handleConnection(client) {
-    console.log(`New WebSocket connection established with ID: ${client.id}`);
+    console.log(`Connected with ID: ${client.id}`);
   }
 
   @WebSocketServer() server;
