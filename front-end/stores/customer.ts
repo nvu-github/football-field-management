@@ -1,4 +1,4 @@
-export interface CustomerFootballPitchRental {
+export interface PayloadCustomerFootballPitchRental {
   footballPitchId: number | null;
   rentalDate: String | null | Date;
   leasingDurationId: number | null;
@@ -26,18 +26,19 @@ export interface CustomerAccessoryRentalHistory {
 
 export const useCustomerStore = defineStore("customerStore", () => {
   const { $apis }: any = useNuxtApp();
-  const payloadCustomerFootballPitchRental = ref<CustomerFootballPitchRental>({
-    footballPitchId: null,
-    rentalDate: null,
-    leasingDurationId: null,
-    customerAccessoryRentals: [],
-    note: "",
-  });
+  const payloadCustomerFootballPitchRental =
+    ref<PayloadCustomerFootballPitchRental>({
+      footballPitchId: null,
+      rentalDate: null,
+      leasingDurationId: null,
+      customerAccessoryRentals: [],
+      note: "",
+    });
   const customerFootballPitchRentalHistories =
     ref<CustomerAccessoryRentalHistory[]>();
 
   async function createCustomerFootballPitchRental(
-    params: CustomerFootballPitchRental
+    params: PayloadCustomerFootballPitchRental
   ) {
     delete params.rentalPrice;
     return await $apis.post("football-pitches/customer/rental", {

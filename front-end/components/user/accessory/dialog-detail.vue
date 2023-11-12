@@ -2,15 +2,16 @@
 import { useDialogStore, useAccessoryStore } from "~/stores";
 import { formatPrice } from "~/utils/string";
 import { storeToRefs } from "pinia";
+
 const dialogStore = useDialogStore();
 const accessoryStore = useAccessoryStore();
 const { accessory } = storeToRefs(accessoryStore);
-const { data } = dialogStore.dialog;
+const { id }: any = dialogStore.dialog.data;
 
 function closeDetail() {
   dialogStore.closeDialog();
 }
-accessoryStore.getAccessory(data.id);
+accessoryStore.getAccessory(id);
 </script>
 
 <template>

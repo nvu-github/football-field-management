@@ -11,6 +11,7 @@ const isLoading = ref<boolean>(false);
 
 async function handleSearchAccessories() {
   isLoading.value = true;
+  if (!searchText.value) return (isLoading.value = false);
   await new Promise((resolve) => setTimeout(resolve, 1000));
   isLoading.value = false;
   navigateTo(`/accessories/search?name=${searchText.value}`);

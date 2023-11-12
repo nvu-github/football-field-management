@@ -11,12 +11,21 @@ export interface Chat {
 export interface ChatCustomerInfoForAdmin {
   id: number;
   name: string;
+  totalUnread: number;
 }
 
 export const useChatStore = defineStore("chatStore", () => {
   const { $apis }: any = useNuxtApp();
   const chats = ref<Chat[]>([]);
-  const chatCustomerInForAdmin = ref<ChatCustomerInfoForAdmin[]>([]);
+  const chatCustomerInFo = ref<ChatCustomerInfoForAdmin[]>([]);
+
+  async function updateChatStatus(customerId: number) {
+    return $apis.patch(`chats/customer/${customerId}`);
+  }
+
+  async function updateChatStatusForCustomer() {
+    return $apis.patch(`chats/customer/status`);
+  }
 
   async function getChatForCustomer() {
     const chatForCustomerList = await $apis.get(`chats/customer`);
@@ -28,16 +37,18 @@ export const useChatStore = defineStore("chatStore", () => {
     chats.value = chatForCustomerList.data;
   }
 
-  async function getChatCustomerInfoForAdmin() {
+  async function getChatCustomerInfo() {
     const chatCustomerInfoList = await $apis.get(`chats/customer/info`);
-    chatCustomerInForAdmin.value = chatCustomerInfoList.data;
+    chatCustomerInFo.value = chatCustomerInfoList.data;
   }
 
   return {
     chats,
-    chatCustomerInForAdmin,
+    chatCustomerInFo,
+    updateChatStatus,
+    updateChatStatusForCustomer,
     getChatForCustomer,
     getChatForAdmin,
-    getChatCustomerInfoForAdmin,
+    getChatCustomerInfo,
   };
 });

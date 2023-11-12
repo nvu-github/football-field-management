@@ -1,11 +1,16 @@
 <script lang="ts" setup>
 import { format } from "date-fns";
+
 const props = defineProps({
   message: {
     type: String,
     required: true,
   },
-  timer: {
+  createdAt: {
+    type: String,
+    required: true,
+  },
+  prevCreatedAt: {
     type: String,
     required: true,
   },
@@ -13,70 +18,108 @@ const props = defineProps({
     type: Boolean,
     required: true,
   },
+  avatar: {
+    type: String,
+    required: true,
+  },
 });
+
+const isCratedDateNow = props.prevCreatedAt
+  ? format(new Date(props.createdAt), "dd/MM/yyyy") !==
+    format(new Date(props.prevCreatedAt), "dd/MM/yyyy")
+  : false;
 </script>
 <template>
-  <div class="chat-item">
-    <div
-      :class="[
-        'message',
-        {
-          '-active': isActive,
-        },
-      ]"
-    >
-      <p
+  <div>
+    <div class="chat-item">
+      <p v-if="isCratedDateNow" class="senddate">
+        {{ format(new Date(props.createdAt), "dd/MM/yyyy") }}
+      </p>
+      <div
         :class="[
           'content',
           {
-            '-active': isActive,
+            '-active': props.isActive,
           },
         ]"
       >
-        {{ props.message }}
-      </p>
-      <p
+        <img class="icon" :src="avatar" />
+        <div
+          :class="[
+            'message',
+            {
+              '-active': props.isActive,
+            },
+          ]"
+        >
+          {{ props.message }}
+        </div>
+      </div>
+      <span
         :class="[
-          'timer',
+          'timmer',
           {
             '-active': isActive,
           },
         ]"
       >
-        {{ format(new Date(props.timer), "HH:mm") }}
-      </p>
+        {{ format(new Date(props.createdAt), "HH:mm") }}</span
+      >
     </div>
   </div>
 </template>
 <style lang="scss" scoped>
 .chat-item {
-  > .message {
-    position: relative;
-    display: inline-block;
-    max-width: 90%;
+  padding: 10px 10px;
+  display: flex;
+  justify-content: flex-end;
+  flex-direction: column;
+  align-self: flex-end;
+
+  > .senddate {
+    text-align: center;
+    padding: 0 0 15px;
+    opacity: 0.7;
+    font-weight: bold;
+  }
+
+  > .content {
+    display: inline-flex;
     &.-active {
-      float: right;
+      flex-direction: row-reverse;
     }
   }
 
-  > .message > .content {
-    padding: 5px 10px;
-    border-radius: 20px;
-    background: #dbdbdb;
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+  > .content > .icon {
+    width: 20px;
+    object-fit: contain;
+  }
+
+  > .content > .message {
+    min-width: 60px;
+    max-width: 700px;
+    padding: 14px 18px;
+    margin: 6px 8px;
+    background-color: #dbdbdb;
+    border-radius: 16px 16px 16px 0;
+    border: 1px solid #dbdbdb;
+    color: #000;
+
     &.-active {
-      background: #a9ca31;
+      background-color: #a9ca31;
+      border-radius: 16px 16px 0 16px;
+      border: 1px solid #a9ca31;
     }
   }
 
-  > .message > .timer {
-    position: absolute;
-    margin: 0 5px;
+  > .timmer {
+    align-self: flex-start;
+    margin-left: 30px;
+    font-size: 14px;
+    color: grey;
     &.-active {
-      right: 0;
-      text-align: end;
+      align-self: flex-end;
+      margin-right: 30px;
     }
   }
 }

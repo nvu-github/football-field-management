@@ -23,6 +23,8 @@ const { payloadAmountPayment } = storeToRefs(paymentStore);
 const { user }: any = storeToRefs(authStore);
 const footballPitchPriceFound: any = ref<Object>({});
 const emit = defineEmits(["footballPitchLeasingDurationId"]);
+const sizeColumnWithImage = 12;
+const sizeColumnNotImage = 6;
 
 watchEffect(async () => {
   const { footballPitchId, leasingDurationId } =
@@ -71,7 +73,11 @@ function getStatusCustomerFootballPitchRental(status: string | null) {
           </v-col>
           <v-col
             class="col"
-            :md="footballPitch && footballPitch.images.length > 0 ? 6 : 12"
+            :md="
+              footballPitch && footballPitch.images.length > 0
+                ? sizeColumnNotImage
+                : sizeColumnWithImage
+            "
           >
             <p class="name field">
               <b class="label">Tên sân bóng:</b>

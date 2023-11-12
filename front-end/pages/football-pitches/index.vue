@@ -153,6 +153,9 @@ leasingDurationStore.getLeasingDurationPublics();
           :price="rentalInfo.price"
           :status="rentalInfo.status"
           :football-pitch-type="rentalInfo.footballPitchTypeName"
+          :football-pitch-leasing-duration-id="
+            rentalInfo.footballPitchLeasingDurationId
+          "
           :avatar="
             rentalInfo.images.length > 0
               ? `${runtimeConfig.public.API_URL}public/${rentalInfo.images[0].url}`

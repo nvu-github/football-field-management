@@ -47,17 +47,11 @@ watchEffect(async () => {
     await footballPitchStore.getFootballPitch(
       payloadCustomerFootballPitchRental.value.footballPitchId
     );
-    payloadCustomerFootballPitchRental.value.rentalDate = null;
-    payloadCustomerFootballPitchRental.value.leasingDurationId = null;
   }
 });
 
-customerStore.resetForm();
-if (route.query && route.query.id) {
-  const { id } = route.query;
-  payloadCustomerFootballPitchRental.value.footballPitchId = Number(id);
-}
-
+const { type } = route.query;
+if (!type) customerStore.resetForm();
 async function submitRentalInfo() {
   isLoading.value = true;
   const formValidation = validForm();

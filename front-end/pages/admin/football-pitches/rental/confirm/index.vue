@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 import { ref, watchEffect, resolveComponent } from "vue";
 import { storeToRefs } from "pinia";
+import { format, parse } from "date-fns";
 import { useAppStore, useFootballPitchStore, useDialogStore } from "~/stores";
-import { format } from "date-fns";
 import { formatPrice } from "~/utils/string";
 
 const headers = [
@@ -82,9 +82,7 @@ const formatDatePicker = (date: any): string => {
 };
 
 await footballPitchStore.getCustomerFootballPitchRentals();
-watchEffect(async () => {
-  if (customerFootballPitchRentals) await filterFootballConfirm();
-});
+if (customerFootballPitchRentals) filterFootballConfirm();
 
 function openDialogConfirm(id: number, status: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
@@ -138,7 +136,7 @@ function openDialogDetail(id: number) {
   );
 }
 
-async function filterFootballConfirm() {
+function filterFootballConfirm() {
   isLoading.value = true;
   const { rentalDate, leasingDuration, status } =
     conditionFilterFootballPitch.value;
@@ -148,6 +146,11 @@ async function filterFootballConfirm() {
         let condition = true;
 
         if (rentalDate) {
+          console.log(
+            new Date(footballPitch.rentalDate).toLocaleString("en-US", {
+              timeZone: "Asia/Bangkok",
+            })
+          );
           condition =
             condition &&
             format(new Date(rentalDate), "dd/MM/yyyy") ===

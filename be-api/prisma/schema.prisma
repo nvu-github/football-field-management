@@ -71,6 +71,7 @@ model Customer {
 
   contact                     Contact[]
   notification                Notification[]
+  evalueation                 Evaluation[]
   customerFootballPitchRental CustomerFootballPitchRental[]
   account                     Account                       @relation(fields: [accountId], references: [id])
 
@@ -142,6 +143,7 @@ model FootballPitch {
   createdAt      DateTime       @default(now()) @map("created_at")
   updatedAt      DateTime       @updatedAt @map("updated_at")
 
+  evaluation                   Evaluation[]
   footballImage                FootballImage[]
   customerFootballPitchRental  CustomerFootballPitchRental[]
   footballPitchLeasingDuration FootballPitchLeasingDuration[]
@@ -198,6 +200,7 @@ model Contact {
   staffId    Int           @map("staff_id")
   customerId Int           @map("customer_id")
   active     ActiveContact @default(ADMIN)
+  status     StatusContact @default(UNREAD)
   createdAt  DateTime      @default(now()) @map("created_at")
   updatedAt  DateTime      @updatedAt @map("updated_at")
 
@@ -221,6 +224,22 @@ model Notification {
   customer Customer @relation(fields: [customerId], references: [id])
 
   @@map("notifications")
+}
+
+model Evaluation {
+  id              Int      @id @default(autoincrement())
+  score           Int
+  content         String   @db.Text
+  image           Json?
+  customerId      Int
+  footballPitchId Int
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  footballPitch FootballPitch @relation(fields: [footballPitchId], references: [id])
+  customer      Customer      @relation(fields: [customerId], references: [id])
+
+  @@map("evaluations")
 }
 
 model CustomerFootballPitchRental {
@@ -346,4 +365,11 @@ enum ActiveContact {
   CUSTOMER
 
   @@map("active_contact")
+}
+
+enum StatusContact {
+  SEEN
+  UNREAD
+
+  @@map("status_contact")
 }

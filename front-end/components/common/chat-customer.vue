@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import adminAvatar from "~/public/admin.png";
+import userAvatar from "~/public/user-avatar.png";
 import { ref } from "vue";
 
 const props: any = defineProps({
@@ -16,29 +18,30 @@ const props: any = defineProps({
   },
 });
 
-const emit = defineEmits(["handleMessage"]);
+const emit = defineEmits(["handleMessage", "handleScroll"]);
 const message = ref();
 
 function handleMessage() {
   emit("handleMessage", message.value);
   message.value = null;
 }
+
+function handleScroll() {
+  emit("handleScroll");
+}
 </script>
 <template>
   <div class="chat-customer-component">
-    <v-card-text class="box-message">
+    <v-card-text class="box-message" @scroll="handleScroll">
       <common-chat-item
         v-for="(chat, index) in chats"
         :key="index"
-        :class="[
-          'message',
-          {
-            '-active': chat.active === props.customerChatActive,
-          },
-        ]"
         :message="chat.content"
-        :timer="chat.createdAt"
+        :created-at="chat.createdAt"
         :is-active="chat.active === props.customerChatActive"
+        :avatar="
+          chat.active === props.customerChatActive ? userAvatar : adminAvatar
+        "
       />
     </v-card-text>
     <v-card-actions>
@@ -65,9 +68,11 @@ function handleMessage() {
   }
   > .box-message {
     overflow-y: auto;
+    padding-right: 0;
+    padding-left: 0;
     height: 350px;
     &::-webkit-scrollbar {
-      width: 5px;
+      width: 8px;
     }
     &::-webkit-scrollbar-track {
       -webkit-box-shadow: inset 0 0 6px #d8d7d7;
@@ -79,20 +84,6 @@ function handleMessage() {
     &::-webkit-scrollbar-button {
       display: none;
     }
-  }
-}
-
-.message {
-  width: 100%;
-  margin-top: 30px;
-  &:first-child {
-    margin-top: 0;
-  }
-  &:last-child {
-    margin-bottom: 25px;
-  }
-  &.-active {
-    float: right;
   }
 }
 

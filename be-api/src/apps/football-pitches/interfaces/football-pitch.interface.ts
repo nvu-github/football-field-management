@@ -6,4 +6,6 @@ export interface IFootballPitch {
   images?: string[];
   footballTypeId?: number;
   footballTypeName: string;
+  footballPitchLeasingDuration?: any;
+  evaluation?: any;
 }

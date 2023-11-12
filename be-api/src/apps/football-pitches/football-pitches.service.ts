@@ -123,12 +123,46 @@ export class FootballPitchesService {
             url: true,
           },
         },
+        footballPitchLeasingDuration: {
+          select: {
+            id: true,
+            price: true,
+            leasingDuration: {
+              select: {
+                startTime: true,
+                endTime: true,
+              },
+            },
+          },
+        },
+        evaluation: {
+          select: {
+            id: true,
+            score: true,
+            content: true,
+            image: true,
+            createdAt: true,
+            customer: {
+              select: {
+                name: true,
+              },
+            },
+          },
+        },
       },
     });
 
-    const { id, name, description, status, footballImage, footballType } =
-      footballPitch;
-    const formattedFootballPitch = {
+    const {
+      id,
+      name,
+      description,
+      status,
+      footballImage,
+      footballType,
+      footballPitchLeasingDuration,
+      evaluation,
+    } = footballPitch;
+    return {
       id,
       name,
       description,
@@ -136,9 +170,9 @@ export class FootballPitchesService {
       footballTypeId: footballType.id,
       footballTypeName: footballType.name,
       images: footballImage.map((image: any) => ({ ...image })),
+      footballPitchLeasingDuration,
+      evaluation,
     };
-
-    return formattedFootballPitch;
   }
 
   async getFootballPitches(): Promise<IFootballPitch[]> {

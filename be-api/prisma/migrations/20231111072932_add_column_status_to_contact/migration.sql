@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `contacts` ADD COLUMN `status` ENUM('SEEN', 'UNREAD') NOT NULL DEFAULT 'UNREAD';

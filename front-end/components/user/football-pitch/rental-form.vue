@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { watchEffect, ref } from "vue";
 import { storeToRefs } from "pinia";
+import {useRouter} from "nuxt/app"
 import {
   useCustomerStore,
   useFootballPitchStore,
@@ -16,6 +17,7 @@ const rules = {
   },
 };
 
+const router = useRouter()
 const customerStore = useCustomerStore();
 const footballPitchStore = useFootballPitchStore();
 const footballPitchPriceStore = useFootballPitchPriceStore();
@@ -31,8 +33,6 @@ watchEffect(async () => {
     leasingDurationFound.value = footballPitchPrices.value.filter(
       (leasingDuration) => leasingDuration.footballPitchId === footballPitchId
     );
-    // payloadCustomerFootballPitchRental.value.leasingDurationId = null;
-    // payloadCustomerFootballPitchRental.value.rentalDate = null;
   }
 });
 const format = (date: any): string => {
@@ -42,6 +42,11 @@ const format = (date: any): string => {
 
   return `${day}/${month}/${year}`;
 };
+function handleSelectedFootballPitch() {
+  payloadCustomerFootballPitchRental.value.rentalDate = null;
+  payloadCustomerFootballPitchRental.value.leasingDurationId = null;
+  router.push('/football-pitches/rental')
+}
 </script>
 <template>
   <div class="rental-form">
@@ -53,6 +58,7 @@ const format = (date: any): string => {
       variant="underlined"
       :rules="[rules.footballPitch]"
       :items="footballPitches"
+      @update:modelValue="handleSelectedFootballPitch"
     ></v-autocomplete>
     <common-date-picker
       v-model="payloadCustomerFootballPitchRental.rentalDate"
@@ -61,7 +67,7 @@ const format = (date: any): string => {
       :format="format"
       :disabled="!payloadCustomerFootballPitchRental.footballPitchId"
     />
-    <v-autocomplete
+    <v-select
       v-model="payloadCustomerFootballPitchRental.leasingDurationId"
       label="Chọn khung giờ*"
       item-value="id"
@@ -69,11 +75,8 @@ const format = (date: any): string => {
       variant="underlined"
       class="mt-2"
       :items="leasingDurationFound"
-      :disabled="
-        !payloadCustomerFootballPitchRental.footballPitchId ||
-        !payloadCustomerFootballPitchRental.rentalDate
-      "
-    ></v-autocomplete>
+      :disabled="!payloadCustomerFootballPitchRental.footballPitchId"
+    ></v-select>
     <v-textarea
       v-model="payloadCustomerFootballPitchRental.note"
       label="Ghi chú"
@@ -84,18 +87,3 @@ const format = (date: any): string => {
     ></v-textarea>
   </div>
 </template>
-<style lang="scss" scoped>
-.rental-form {
-  // > .form {
-  //   display: flex;
-  //   flex-direction: column;
-  // }
-  // > .form > .action {
-  //   display: flex;
-  //   justify-content: center;
-  // }
-  // > .form > .action > .button {
-  //   width: 50%;
-  // }
-}
-</style>

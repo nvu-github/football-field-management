@@ -17,6 +17,8 @@ const { user } = storeToRefs(authStore);
 const { customerFootballPitchRentalDetail } = storeToRefs(footballPitchStore);
 const { id }: any = dialogStore.dialog.data;
 const CUSTOMER_ROLE = 4;
+const columnSizeWithImage = 5;
+const columnSizeNotImage = 12;
 
 function closeDetail() {
   dialogStore.closeDialog();
@@ -50,8 +52,8 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
             :md="
               customerFootballPitchRentalDetail &&
               customerFootballPitchRentalDetail?.footballPitchImages.length > 0
-                ? 5
-                : 12
+                ? columnSizeWithImage
+                : columnSizeNotImage
             "
             class="rental-info"
           >

@@ -70,16 +70,6 @@ function openDiaglogConfirm(id: string) {
   });
 }
 
-function getColorStatusFootballPitch(status: string) {
-  let color = "success";
-  switch (status) {
-    case "MAINTENANCE":
-      color = "orange";
-      break;
-  }
-  return color;
-}
-
 footballPitchStore.getFootballPitches();
 </script>
 <template>
@@ -106,7 +96,9 @@ footballPitchStore.getFootballPitches();
           <template #[`item.status`]="{ item }">
             <v-chip
               class="ma-2"
-              :color="getColorStatusFootballPitch(item.raw.status)"
+              :color="
+                footballPitchStore.getColorStatusFootballPitch(item.raw.status)
+              "
               text-color="white"
             >
               {{ footballPitchStore.getStatusFootballPitch(item.raw.status) }}

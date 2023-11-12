@@ -7,10 +7,7 @@ const props: any = defineProps({
     default: "",
   },
   tabs: {
-    type: Array<{
-      id: number;
-      name: string;
-    }>,
+    type: Array<ChatCustomerInfoForAdmin>,
     required: true,
   },
 });
@@ -26,7 +23,12 @@ function handleChangeTab(id: number) {
 }
 </script>
 <template>
-  <v-tabs v-model="vModel" direction="vertical" color="primary">
+  <v-tabs
+    class="tab-component"
+    v-model="vModel"
+    direction="vertical"
+    color="primary"
+  >
     <v-tab
       v-for="(tab, index) in tabs"
       :key="index"
@@ -35,7 +37,20 @@ function handleChangeTab(id: number) {
     >
       <v-icon start> mdi-account </v-icon>
       {{ tab.name }}
+      <v-badge
+        v-if="tab.totalUnread"
+        color="error"
+        :content="tab.totalUnread > 9 ? '9+' : tab.totalUnread"
+        end
+        inline
+      ></v-badge>
     </v-tab>
   </v-tabs>
 </template>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.tab-component {
+  :deep(.v-btn__content) {
+    text-transform: none;
+  }
+}
+</style>

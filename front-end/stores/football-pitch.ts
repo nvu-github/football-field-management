@@ -221,6 +221,16 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     return { color, text };
   }
 
+  function getColorStatusFootballPitch(status: string) {
+    let color = "success";
+    switch (status) {
+      case "MAINTENANCE":
+        color = "orange";
+        break;
+    }
+    return color;
+  }
+
   return {
     footballPitches,
     footballPitch,
@@ -240,6 +250,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     getCustomerFootballPitchRentals,
     getCustomerFootballPitchRentalDetail,
     getStatusCustomerFootballPitchRental,
+    getColorStatusFootballPitch,
   };
 });
 

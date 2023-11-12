@@ -33,6 +33,7 @@ breadCrumbs.value = [
   },
 ];
 
+await accessoryStore.getAccessories();
 formattedAccessories.value = accessories.value;
 function filterAccessory() {
   formattedAccessories.value = accessoryTypeId.value
@@ -43,7 +44,6 @@ function filterAccessory() {
 }
 
 accessoryTypeStore.getAccessoryTypes();
-accessoryStore.getAccessories();
 </script>
 <template>
   <div class="accessory-page">

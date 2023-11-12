@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { resolveComponent } from "vue";
 import { useDialogStore } from "~/stores";
 
 const props = defineProps({
@@ -30,7 +31,7 @@ const props = defineProps({
 
 const dialogStore = useDialogStore();
 
-async function getAccessoryDetail(id: number) {
+async function openDialogAccessoryDetail(id: number) {
   await dialogStore.showDialog(
     resolveComponent("user-accessory-dialog-detail"),
     {
@@ -43,8 +44,7 @@ const accessoryId = props.id;
 
 <template>
   <v-card class="card-info mx-auto" max-width="344">
-    <v-img :src="props.avatar" height="200px" cover></v-img>
-
+    <v-img :src="props.avatar" height="200px" cover />
     <v-card-title class="name"> {{ props.name }} </v-card-title>
     <v-card-text class="content">
       <div class="status">
@@ -63,7 +63,7 @@ const accessoryId = props.id;
           <v-btn
             v-bind="props"
             class="button -warning -rental"
-            @click="getAccessoryDetail(accessoryId)"
+            @click="openDialogAccessoryDetail(accessoryId)"
           >
             <v-icon>mdi mdi-alpha-d-circle-outline</v-icon>
           </v-btn>
@@ -90,6 +90,10 @@ const accessoryId = props.id;
     display: flex;
     justify-content: flex-end;
     padding: 10px;
+  }
+  > .action > .button {
+    padding: 0;
+    min-width: 45px;
   }
 }
 </style>

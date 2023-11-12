@@ -3,12 +3,6 @@ export interface ParamsAccessoryType {
   name: string;
 }
 
-export interface ParamsFootballPitchImage {
-  url: string;
-  title: string;
-  accessoryId: number;
-}
-
 export interface ParamsAccessory {
   id?: number;
   name: string;

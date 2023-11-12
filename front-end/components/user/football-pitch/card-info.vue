@@ -1,8 +1,10 @@
 <script lang="ts" setup>
+import { storeToRefs } from "pinia";
+import { resolveComponent } from "vue";
 import { format, isAfter, isSameDay } from "date-fns";
-import { useNuxtApp } from "nuxt/app";
+import { useNuxtApp, navigateTo } from "nuxt/app";
+import { useCustomerStore } from "~/stores";
 import { formatPrice } from "~/utils/string";
-const { $toast }: any = useNuxtApp();
 
 const props = defineProps({
   id: {
@@ -37,11 +39,18 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  footballPitchLeasingDurationId: {
+    type: Number,
+    required: true,
+  },
   avatar: {
     type: String,
     required: true,
   },
 });
+const { $toast }: any = useNuxtApp();
+const customerStore = useCustomerStore();
+const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 
 function getStatusFootball(status: string) {
   let message = "Đã đặt";
@@ -72,7 +81,14 @@ function navigateToRental(id: number) {
   if (!validDate) {
     return $toast.error("Quý khách không thể đặt sân trước ngày hiện tại!");
   }
-  navigateTo(`football-pitches/rental?id=${id}`);
+  payloadCustomerFootballPitchRental.value.footballPitchId = Number(id);
+  payloadCustomerFootballPitchRental.value.leasingDurationId = Number(
+    props.footballPitchLeasingDurationId
+  );
+  payloadCustomerFootballPitchRental.value.rentalDate = new Date(
+    props.rentalDate
+  );
+  return navigateTo(`/football-pitches/rental?type=now`);
 }
 </script>
 <template>
@@ -123,7 +139,11 @@ function navigateToRental(id: number) {
         </v-tooltip>
         <v-tooltip location="bottom" text="Chi tiết">
           <template #activator="{ props }">
-            <v-btn v-bind="props" class="button -warning -rental">
+            <v-btn
+              v-bind="props"
+              class="button -warning -rental"
+              :to="`/football-pitches/${id}/detail`"
+            >
               <v-icon>mdi mdi-alpha-d-circle-outline</v-icon>
             </v-btn>
           </template>
@@ -175,7 +195,7 @@ function navigateToRental(id: number) {
   }
   > .action > .button {
     padding: 0;
-    width: 45px;
+    min-width: 45px;
     &:first-child {
       margin-right: 8px;
     }

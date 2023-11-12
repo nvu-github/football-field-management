@@ -19,6 +19,7 @@ import { SocketsModule } from '@app/sockets/sockets.module';
 import { NotificationsModule } from './apps/notifications/notifications.module';
 import { InvoicesModule } from './apps/invoices/invoices.module';
 import { ChatsModule } from './apps/chats/chats.module';
+import { EvaluationsModule } from './apps/evaluations/evaluations.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ChatsModule } from './apps/chats/chats.module';
     NotificationsModule,
     InvoicesModule,
     ChatsModule,
+    EvaluationsModule,
   ],
   controllers: [AppController],
   providers: [

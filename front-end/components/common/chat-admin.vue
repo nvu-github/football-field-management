@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import adminAvatar from "~/public/admin.png";
+import userAvatar from "~/public/user-avatar.png";
 import { computed, ref } from "vue";
 
 const props: any = defineProps({
@@ -27,7 +29,11 @@ const props: any = defineProps({
   },
 });
 
-const emit = defineEmits(["update:modelValue", "handleMessage"]);
+const emit = defineEmits([
+  "update:modelValue",
+  "handleMessage",
+  "handleScroll",
+]);
 const vModel = computed({
   get: () => props.modelValue,
   set: (value) => emit("update:modelValue", value),
@@ -38,24 +44,26 @@ function handleMessage() {
   emit("handleMessage", message.value);
   message.value = null;
 }
+
+function handleScroll() {
+  emit("handleScroll");
+}
 </script>
 <template>
   <v-window v-model="vModel">
     <v-window-item v-for="(tab, index) in tabs" :key="index" :value="tab.id">
       <v-card flat>
-        <v-card-text class="box-message">
+        <v-card-text class="box-message" @scroll="handleScroll">
           <common-chat-item
             v-for="(chat, index) in chats"
             :key="index"
-            :class="[
-              'message',
-              {
-                '-active': chat.active === props.adminChatActive,
-              },
-            ]"
             :message="chat.content"
-            :timer="chat.createdAt"
+            :created-at="chat.createdAt"
+            :prev-created-at="index > 0 ? chats[index - 1].createdAt : ''"
             :is-active="chat.active === props.adminChatActive"
+            :avatar="
+              chat.active === props.adminChatActive ? adminAvatar : userAvatar
+            "
           />
         </v-card-text>
         <v-card-actions>
@@ -80,8 +88,10 @@ function handleMessage() {
 <style lang="scss" scoped>
 .box-message {
   overflow-y: auto;
+  padding-right: 0;
+  padding-left: 0;
   &::-webkit-scrollbar {
-    width: 5px;
+    width: 8px;
   }
   &::-webkit-scrollbar-track {
     -webkit-box-shadow: inset 0 0 6px #d8d7d7;
@@ -92,20 +102,6 @@ function handleMessage() {
   }
   &::-webkit-scrollbar-button {
     display: none;
-  }
-}
-
-.message {
-  width: 100%;
-  margin-top: 30px;
-  &:first-child {
-    margin-top: 0;
-  }
-  &:last-child {
-    margin-bottom: 25px;
-  }
-  &.-active {
-    float: right;
   }
 }
 
