@@ -16,12 +16,14 @@ const footballPitchStore = useFootballPitchStore();
 const leasingDurationStore = useLeasingDurationStore();
 const appStore = useAppStore();
 const { breadCrumbs }: any = storeToRefs(appStore);
-const { footballPitchRentalInfo } = storeToRefs(footballPitchStore);
+const { footballPitchRentalInfo, footballPitches } =
+  storeToRefs(footballPitchStore);
 const { leasingDurations } = storeToRefs(leasingDurationStore);
 const conditionFilterFootballPitch = ref<any>({
   rentalDate: new Date(),
   leasingDuration: null,
   status: null,
+  footballPitchId: null,
 });
 const footballPitchInfoFound = ref<any>();
 await footballPitchStore.getFootballPitchRentalInfo(
@@ -66,7 +68,7 @@ const formatDatePicker = (date: any): string => {
 
 footballPitchInfoFound.value = footballPitchRentalInfo.value;
 async function filterFootballInfo() {
-  const { rentalDate, leasingDuration, status } =
+  const { rentalDate, leasingDuration, status, footballPitchId } =
     conditionFilterFootballPitch.value;
 
   if (rentalDate || leasingDuration || status) {
@@ -78,8 +80,13 @@ async function filterFootballInfo() {
     }
 
     footballPitchInfoFound.value = footballPitchRentalInfo.value.filter(
-      (footballPitch) => {
+      (footballPitch: any) => {
         let condition = true;
+
+        if (footballPitchId) {
+          condition =
+            condition && footballPitch.footballPitchId === footballPitchId;
+        }
 
         if (leasingDuration) {
           const footballLeasingDuration = `${footballPitch.startTime} - ${footballPitch.endTime}`;
@@ -96,12 +103,23 @@ async function filterFootballInfo() {
   }
 }
 
+footballPitchStore.getFootballPitches();
 leasingDurationStore.getLeasingDurationPublics();
 </script>
 <template>
   <div class="football-pitch-page">
     <v-row class="row">
-      <v-col class="col" lg="4" xs="12">
+      <v-col lg="4" xs="12">
+        <v-autocomplete
+          v-model="conditionFilterFootballPitch.footballPitchId"
+          label="Sân bóng"
+          item-value="id"
+          item-title="name"
+          :items="footballPitches"
+          variant="underlined"
+        ></v-autocomplete>
+      </v-col>
+      <v-col class="col" lg="2" xs="12">
         <common-date-picker
           v-model="conditionFilterFootballPitch.rentalDate"
           class="datepicker"
@@ -109,7 +127,7 @@ leasingDurationStore.getLeasingDurationPublics();
           :format="formatDatePicker"
         />
       </v-col>
-      <v-col lg="3" xs="12">
+      <v-col lg="2" xs="12">
         <v-autocomplete
           v-model="conditionFilterFootballPitch.leasingDuration"
           label="Khung giờ"
@@ -119,7 +137,7 @@ leasingDurationStore.getLeasingDurationPublics();
           variant="underlined"
         ></v-autocomplete>
       </v-col>
-      <v-col lg="3" xs="12">
+      <v-col lg="2" xs="12">
         <v-autocomplete
           v-model="conditionFilterFootballPitch.status"
           label="Trạng thái"
@@ -129,7 +147,7 @@ leasingDurationStore.getLeasingDurationPublics();
           variant="underlined"
         ></v-autocomplete>
       </v-col>
-      <v-col class="action" md="lg" xs="12">
+      <v-col class="action" md="2" xs="12">
         <v-btn class="button -success" @click="filterFootballInfo">
           <template #prepend>
             <v-icon>mdi mdi-magnify</v-icon>

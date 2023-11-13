@@ -13,7 +13,6 @@ function closeDetail() {
 }
 accessoryStore.getAccessory(id);
 </script>
-
 <template>
   <div class="accessory-detail">
     <v-card>

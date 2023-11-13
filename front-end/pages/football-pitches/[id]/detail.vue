@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import userImg from "~/public/user.jpg";
 import { resolveComponent } from "vue";
-import { useRoute, navigateTo } from "nuxt/app";
+import { useRoute, navigateTo, useRuntimeConfig } from "nuxt/app";
+
 import { storeToRefs } from "pinia";
 import { format } from "date-fns";
 import {
@@ -9,18 +10,24 @@ import {
   useFootballPitchStore,
   useCustomerStore,
   useDialogStore,
+  useAuthStore,
+  useEvaluationStore,
 } from "~/stores";
 import { formatPrice } from "~/utils/string";
 
+const authStore = useAuthStore();
 const appStore = useAppStore();
 const dialogStore = useDialogStore();
+const evaluationStore = useEvaluationStore();
 const footballPitchStore = useFootballPitchStore();
 const customerStore = useCustomerStore();
+const runtimeConfig = useRuntimeConfig();
 const { breadCrumbs } = storeToRefs(appStore);
-const { footballPitch } = storeToRefs(footballPitchStore);
+const { user } = storeToRefs(authStore);
+const { footballPitch }: any = storeToRefs(footballPitchStore);
 const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 const route = useRoute();
-const { id } = route.params;
+const { id }: any = route.params;
 
 await footballPitchStore.getFootballPitch(id);
 breadCrumbs.value = [
@@ -62,6 +69,17 @@ async function openDialogUpdateEvaluation(id: number) {
       actionReload: "getFootballPitch",
     }
   );
+}
+
+function openDialogImageAlbum(url: string) {
+  dialogStore.showDialog(resolveComponent("user-evaluation-dialog-album"), {
+    url,
+  });
+}
+
+async function deleteEvaluation(id: number) {
+  await evaluationStore.deleteEvaluation(id);
+  await footballPitchStore.getFootballPitch(id);
 }
 
 function navigateToRental(footballPitchLeasingDuration: number) {
@@ -175,7 +193,7 @@ function navigateToRental(footballPitchLeasingDuration: number) {
     </v-row>
     <v-row class="football-evaluation">
       <div class="title">Đánh giá sân bóng</div>
-      <div class="action">
+      <div v-if="user && user?.loggedIn" class="action">
         <v-btn class="button -warning" @click="openDialogCreateEvaluation">
           Thêm đánh giá
           <template #prepend>
@@ -207,8 +225,34 @@ function navigateToRental(footballPitchLeasingDuration: number) {
               {{ format(new Date(evaluation.createdAt), "dd/MM/yyyy HH:mm") }}
             </li>
             <li class="item -content"><span v-html="evaluation.content" /></li>
+            <li class="item -img">
+              <v-row>
+                <v-col
+                  v-for="(img, index) in evaluation.image"
+                  :key="index"
+                  md="2"
+                >
+                  <v-img
+                    class="imgitem"
+                    :src="`${runtimeConfig.public.API_URL}public/${img.url}`"
+                    @click="
+                      openDialogImageAlbum(
+                        `${runtimeConfig.public.API_URL}public/${img.url}`
+                      )
+                    "
+                  />
+                </v-col>
+              </v-row>
+            </li>
           </ul>
-          <div class="action">
+          <div
+            v-if="
+              user &&
+              user?.loggedIn &&
+              user.email === evaluation.customer.account.email
+            "
+            class="action"
+          >
             <v-menu location="start">
               <template v-slot:activator="{ props }">
                 <v-icon v-bind="props">mdi mdi-dots-vertical</v-icon>
@@ -220,7 +264,7 @@ function navigateToRental(footballPitchLeasingDuration: number) {
                   </template>
                   <v-list-item-title>Sửa đánh giá</v-list-item-title>
                 </v-list-item>
-                <v-list-item>
+                <v-list-item @click="deleteEvaluation(evaluation.id)">
                   <template #prepend>
                     <v-icon>mdi mdi-file-document-remove-outline</v-icon>
                   </template>
@@ -324,6 +368,10 @@ function navigateToRental(footballPitchLeasingDuration: number) {
     &.-date {
       margin-top: 0;
     }
+  }
+  :deep(.imgitem) {
+    width: 100%;
+    cursor: pointer;
   }
 }
 

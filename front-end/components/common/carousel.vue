@@ -1,4 +1,6 @@
 <script lang="ts" setup>
+import { useRuntimeConfig } from "nuxt/app";
+
 const runtimeConfig = useRuntimeConfig();
 const props = defineProps({
   images: {

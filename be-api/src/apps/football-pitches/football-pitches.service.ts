@@ -145,6 +145,11 @@ export class FootballPitchesService {
             customer: {
               select: {
                 name: true,
+                account: {
+                  select: {
+                    email: true,
+                  },
+                },
               },
             },
           },
@@ -582,6 +587,7 @@ export class FootballPitchesService {
         startTime,
         endTime,
         images,
+        footballPitchId: footballPitchRentalNow.footballPitch.id,
         footballPitchLeasingDurationId,
         footballPitchTypeId: footballType.id,
         footballPitchTypeName: footballType.name,

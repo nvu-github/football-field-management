@@ -12,7 +12,7 @@ async function confirm() {
   try {
     await store[data.action](payload);
     $toast.success(success);
-    await store[data.callback]();
+    if (data.callback) await store[data.callback]();
   } catch (e) {
     console.log(e);
     $toast.error(error);

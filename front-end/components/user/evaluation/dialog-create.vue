@@ -14,8 +14,8 @@ const runtimeConfig = useRuntimeConfig();
 const route = useRoute();
 const appStore = useAppStore();
 const dialogStore = useDialogStore();
-const footballPitchStore = useFootballPitchStore();
-const evaluationStore = useEvaluationStore();
+const footballPitchStore: any = useFootballPitchStore();
+const evaluationStore: any = useEvaluationStore();
 const { $toast }: any = useNuxtApp();
 const { footballPitch } = storeToRefs(footballPitchStore);
 const { evaluation } = storeToRefs(evaluationStore);
@@ -28,6 +28,7 @@ const payloadEvaluation = ref<Evaluation>({
   image: null,
 });
 const imagePreviews = ref<ImagePreview[]>([]);
+const files = ref();
 
 onBeforeMount(async () => {
   if (id) {
@@ -38,35 +39,42 @@ onBeforeMount(async () => {
 
 async function actionEvaluation() {
   try {
-    const images = await uploadFile();
+    if (!payloadEvaluation.value.content)
+      return $toast.error(`Vui lòng nhập nội dung đánh giá`);
+
+    const images = files.value ? await uploadFile() : null;
 
     let payloadEvaluationFormatted = {
       ...payloadEvaluation.value,
-      image: images.data,
+      image: imagePreviews.value.length > 0 && images ? images.data : null,
       footballPitchId: Number(route.params.id),
     };
+
+    if (!files.value) delete payloadEvaluationFormatted.image;
 
     payloadEvaluationFormatted = id
       ? { ...payloadEvaluationFormatted, id }
       : payloadEvaluationFormatted;
+
     await evaluationStore[action](payloadEvaluationFormatted);
     $toast.success(`${title} đánh giá thành công`);
+
     if (route.params.id) {
       await footballPitchStore[actionReload](route.params.id);
     } else {
       await footballPitchStore[actionReload]();
     }
+    closeDialogCreateEvaluation();
   } catch (error) {
     console.log(error);
     $toast.error(`${title} đánh giá thất bại`);
-  } finally {
     closeDialogCreateEvaluation();
   }
 }
 
 async function getFileInput(e: any) {
-  const files = e.target.files;
-  Array.from(files).forEach((image: any) => {
+  files.value = e.target.files;
+  Array.from(files.value).forEach((image: any) => {
     imagePreviews.value.push({
       id: generateId(),
       file: image,
@@ -93,7 +101,7 @@ async function uploadFile() {
 }
 
 function setEvaluationToForm() {
-  const { score, content, image } = evaluation.value;
+  const { score, content, image }: any = evaluation.value;
   payloadEvaluation.value.score = score;
   payloadEvaluation.value.content = content;
   payloadEvaluation.value.image = image;
@@ -102,8 +110,6 @@ function setEvaluationToForm() {
     url: `${runtimeConfig.public.API_URL}public/${image.url}`,
   }));
 }
-
-// test
 
 function closeDialogCreateEvaluation() {
   dialogStore.closeDialog();
