@@ -65,9 +65,10 @@ formattedCustomerFootballPitchRental.value =
       (invoice: any) =>
         invoice.customerFootballPitchRentalId === customerFootballPitchRental.id
     );
+    const isAccept = status === "ACCEPT";
 
     customerFootballPitchRental.name = `${footballPitchName} - ${name}`;
-    return id ? status === "ACCEPT" : !invoiceFound && status === "ACCEPT";
+    return id ? isAccept : !invoiceFound && isAccept;
   });
 
 watchEffect(() => {

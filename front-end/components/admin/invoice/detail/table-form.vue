@@ -11,7 +11,7 @@ const rules = {
   },
   amount: (value: number) => {
     if (!value) return "Vui lòng nhập số lượng!";
-    if (Number(value) <= 0) "Số lượng phải lớn hơn 0!";
+    if (Number(value) <= 0) "Số lượng không hợp lệ!";
     return true;
   },
 };
@@ -202,7 +202,7 @@ accessoryStore.getAccessories();
             class="button -primary btnadd"
             :disabled="
               !payloadInvoice.invoiceTypeId ||
-              !!payloadInvoice.totalPrice === false
+              payloadInvoice.invoiceTypeId !== 2 && !!payloadInvoice.totalPrice === false
             "
             @click="addInvoiceDetail"
             >Thêm chi tiết

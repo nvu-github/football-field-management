@@ -245,17 +245,18 @@ function navigateToRental(footballPitchLeasingDuration: number) {
               </v-row>
             </li>
           </ul>
-          <div
-            v-if="
-              user &&
-              user?.loggedIn &&
-              user.email === evaluation.customer.account.email
-            "
-            class="action"
-          >
+          <div class="action">
             <v-menu location="start">
               <template v-slot:activator="{ props }">
-                <v-icon v-bind="props">mdi mdi-dots-vertical</v-icon>
+                <v-icon
+                  v-if="
+                    user &&
+                    user?.loggedIn &&
+                    user.email === evaluation.customer.account.email
+                  "
+                  v-bind="props"
+                  >mdi mdi-dots-vertical</v-icon
+                >
               </template>
               <v-list>
                 <v-list-item @click="openDialogUpdateEvaluation(evaluation.id)">
@@ -336,9 +337,12 @@ function navigateToRental(footballPitchLeasingDuration: number) {
     display: flex;
     justify-content: space-between;
     margin-top: 20px;
-    padding: 10px 0;
-    border-top: 1px solid #c5c5c5;
+    padding: 0 0 30px;
     border-bottom: 1px solid #c5c5c5;
+    &:first-child {
+      padding-top: 10px;
+      border-top: 1px solid #c5c5c5;
+    }
   }
   > .evaluationlist > .evaluationitem > .avatar {
     width: 5%;

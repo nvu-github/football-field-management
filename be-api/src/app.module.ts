@@ -20,6 +20,7 @@ import { NotificationsModule } from './apps/notifications/notifications.module';
 import { InvoicesModule } from './apps/invoices/invoices.module';
 import { ChatsModule } from './apps/chats/chats.module';
 import { EvaluationsModule } from './apps/evaluations/evaluations.module';
+import { ReportsModule } from './apps/reports/reports.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { EvaluationsModule } from './apps/evaluations/evaluations.module';
     InvoicesModule,
     ChatsModule,
     EvaluationsModule,
+    ReportsModule,
   ],
   controllers: [AppController],
   providers: [

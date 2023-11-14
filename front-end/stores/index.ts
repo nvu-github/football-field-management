@@ -8,3 +8,4 @@ export * from "./notification";
 export * from "./invoice";
 export * from "./chat";
 export * from "./evaluation";
+export * from "./report";
