@@ -1,5 +1,5 @@
 import { ApiTags } from '@nestjs/swagger';
-import { Controller, UseGuards, Get } from '@nestjs/common';
+import { Controller, UseGuards, Get, Query } from '@nestjs/common';
 
 import { ReportsService } from './reports.service';
 
@@ -9,24 +9,24 @@ import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
-  
+
   @Get('accessories')
-  getReportAccessory() {
-    return this.reportsService.getReportAccessories();
+  getReportAccessory(@Query() query: any) {
+    return this.reportsService.getReportAccessories(query);
   }
 
   @Get('evaluation')
-  getReportEvaluation() {
-    return this.reportsService.getReportEvaluations();
+  getReportEvaluation(@Query() query: any) {
+    return this.reportsService.getReportEvaluations(query);
   }
 
   @Get('rental-field')
-  getReportRentalField() {
-    return this.reportsService.getReportRentalFields();
+  getReportRentalField(@Query() query: any) {
+    return this.reportsService.getReportRentalFields(query);
   }
 
   @Get('revenue')
-  getReportRevenue() {
-    return this.reportsService.getReportRevenues();
+  getReportRevenue(@Query() query: any) {
+    return this.reportsService.getReportRevenues(query);
   }
 }

@@ -2,6 +2,8 @@
 import VueDatePicker from "@vuepic/vue-datepicker";
 import "@vuepic/vue-datepicker/dist/main.css";
 
+import { computed, defineProps, defineEmits, ref, watch } from "vue";
+
 const props = defineProps({
   modelValue: { type: String, required: true, default: "" },
   format: {
@@ -9,6 +11,16 @@ const props = defineProps({
     required: true,
   },
   isTimePicker: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  isMonthPicker: {
+    type: Boolean,
+    required: false,
+    default: false,
+  },
+  isYearPicker: {
     type: Boolean,
     required: false,
     default: false,
@@ -57,6 +69,8 @@ function validDate() {
       :clear="false"
       :placeholder="props.placeholder"
       :disabled="props.disabled"
+      :month-picker="props.isMonthPicker"
+      :year-picker="props.isYearPicker"
       @blur="validDate"
     />
     <span v-if="isValid && messageError" class="message"

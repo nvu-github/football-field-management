@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 
 import { PrismaService } from '@src/prisma.service';
+import { format } from 'date-fns';
 
 @Injectable()
 export class ReportsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
-  async getReportAccessories(query?: object): Promise<any> {
+  async getReportAccessories(query?: any): Promise<any> {
+    const { month, year }: any = query || {};
     const accessories = await this.prisma.accessory.findMany({
       select: {
         id: true,
@@ -20,6 +22,7 @@ export class ReportsService {
           select: {
             amount: true,
             finalCost: true,
+            createdAt: true,
           },
         },
       },
@@ -29,11 +32,24 @@ export class ReportsService {
       const { id, name, accessoryType, invoiceDetail } = accessory;
 
       const total = invoiceDetail.reduce(
-        (total, invoiceDetail) => {
-          return {
-            amount: (total.amount += Number(invoiceDetail.amount)),
-            price: total.price + Number(invoiceDetail.finalCost),
-          };
+        (accumulator, invoiceDetail) => {
+          let condition = true;
+          const monthInvoiceCreated = format(
+            new Date(invoiceDetail.createdAt),
+            'MM',
+          );
+          const yearInvoiceCreated = format(
+            new Date(invoiceDetail.createdAt),
+            'yyyy',
+          );
+
+          if (month) condition = condition && month === monthInvoiceCreated;
+          if (year) condition = condition && year === yearInvoiceCreated;
+
+          accumulator.amount += condition ? Number(invoiceDetail.amount) : 0;
+          accumulator.price += condition ? Number(invoiceDetail.finalCost) : 0;
+
+          return accumulator;
         },
         {
           amount: 0,
@@ -51,7 +67,8 @@ export class ReportsService {
     });
   }
 
-  async getReportEvaluations(): Promise<any> {
+  async getReportEvaluations(query?: any): Promise<any> {
+    const { month, year }: any = query || {};
     const footballPitches = await this.prisma.footballPitch.findMany({
       select: {
         id: true,
@@ -64,6 +81,7 @@ export class ReportsService {
         evaluation: {
           select: {
             score: true,
+            createdAt: true,
           },
         },
       },
@@ -74,17 +92,27 @@ export class ReportsService {
 
       const total = evaluation.reduce(
         (accumulator, evaluation) => {
+          let condition = true;
+          const monthEvaluationCreated = format(
+            new Date(evaluation.createdAt),
+            'MM',
+          );
+          const yearEvaluationCreated = format(
+            new Date(evaluation.createdAt),
+            'yyyy',
+          );
           const isEvaluationGood = Number(evaluation.score) >= 3;
           const isEvaluationBad = Number(evaluation.score) < 3;
 
-          accumulator.countGood += isEvaluationGood ? 1 : 0;
-          accumulator.countBad += isEvaluationBad ? 1 : 0;
-          accumulator.scoreGood += isEvaluationGood
-            ? Number(evaluation.score)
-            : 0;
-          accumulator.scoreBad += isEvaluationBad
-            ? Number(evaluation.score)
-            : 0;
+          if (month) condition = condition && month === monthEvaluationCreated;
+          if (year) condition = condition && year === yearEvaluationCreated;
+
+          accumulator.countGood += condition && isEvaluationGood ? 1 : 0;
+          accumulator.countBad += condition && isEvaluationBad ? 1 : 0;
+          accumulator.scoreGood +=
+            condition && isEvaluationGood ? Number(evaluation.score) : 0;
+          accumulator.scoreBad +=
+            condition && isEvaluationBad ? Number(evaluation.score) : 0;
 
           return accumulator;
         },
@@ -100,20 +128,20 @@ export class ReportsService {
         good:
           total.scoreGood && total.scoreBad
             ? Number(
-              (
-                (total.scoreGood / (total.scoreGood + total.scoreBad)) *
-                100
-              ).toFixed(1),
-            )
+                (
+                  (total.scoreGood / (total.scoreGood + total.scoreBad)) *
+                  100
+                ).toFixed(1),
+              )
             : 0,
         bad:
           total.scoreGood && total.scoreBad
             ? Number(
-              (
-                (total.scoreBad / (total.scoreGood + total.scoreBad)) *
-                100
-              ).toFixed(1),
-            )
+                (
+                  (total.scoreBad / (total.scoreGood + total.scoreBad)) *
+                  100
+                ).toFixed(1),
+              )
             : 0,
       };
 
@@ -134,7 +162,8 @@ export class ReportsService {
     });
   }
 
-  async getReportRentalFields(): Promise<any> {
+  async getReportRentalFields(query?: any): Promise<any> {
+    const { month, year }: any = query || {};
     const footballPitches = await this.prisma.footballPitch.findMany({
       select: {
         id: true,
@@ -148,6 +177,7 @@ export class ReportsService {
           select: {
             id: true,
             status: true,
+            createdAt: true,
             footballPitchLeasingDuration: {
               select: {
                 price: true,
@@ -164,14 +194,22 @@ export class ReportsService {
 
       const total = customerFootballPitchRental.reduce(
         (accumulator, rental) => {
+          let condition = true;
+          const monthRentalCreated = format(new Date(rental.createdAt), 'MM');
+          const yearRentalCreated = format(new Date(rental.createdAt), 'yyyy');
+
+          if (month) condition = condition && month === monthRentalCreated;
+          if (year) condition = condition && year === yearRentalCreated;
+
           const isRented = rental.status === 'ACCEPT';
           const isCanceled = rental.status === 'REJECT';
 
-          accumulator.rented += isRented ? 1 : 0;
-          accumulator.canceled += isCanceled ? 1 : 0;
-          accumulator.revenue += isRented
-            ? Number(rental.footballPitchLeasingDuration.price)
-            : 0;
+          accumulator.rented += condition && isRented ? 1 : 0;
+          accumulator.canceled += condition && isCanceled ? 1 : 0;
+          accumulator.revenue +=
+            condition && isRented
+              ? Number(rental.footballPitchLeasingDuration.price)
+              : 0;
 
           return accumulator;
         },
@@ -193,8 +231,12 @@ export class ReportsService {
     });
   }
 
-  async getReportRevenues(): Promise<any> {
+  async getReportRevenues(query?: any): Promise<any> {
+    const { month, year }: any = query || {};
     const footballPitches = await this.getReportRentalFields();
+    console.log(footballPitches);
     const accessories = await this.getReportAccessories();
+
+    return null;
   }
 }
