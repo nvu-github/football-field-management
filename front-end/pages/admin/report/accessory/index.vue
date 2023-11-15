@@ -1,30 +1,46 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-const month = ref();
-const year = ref();
+import { monthItem } from "~/stores";
+
+const condition = ref({
+  month: null,
+  year: null,
+});
 </script>
 <template>
   <div class="report-accessory">
-    <v-row class="row">
-      <v-col class="col" lg="4" xs="12">
-        <common-date-picker
-          v-model="month"
-          class="datepicker"
-          placeholder="Thời gian thuê"
-          is-month-picker
-        />
-        {{ month }}
+    <v-row class="filter">
+      <v-col class="col" lg="2" xs="12">
+        <v-select
+          v-model="condition.month"
+          placeholder="Tháng"
+          item-title="label"
+          item-value="value"
+          :items="[
+            {
+              label: 'Tất cả',
+              value: null,
+            },
+            ...monthItem,
+          ]"
+          prepend-icon="mdi mdi-calendar-blank-outline"
+          variant="underlined"
+          :menu-icon="false"
+          :hide-details="true"
+          :clear-icon="true"
+          clearable
+        >
+        </v-select>
       </v-col>
       <v-col lg="3" xs="12">
         <common-date-picker
-          v-model="year"
+          v-model="condition.year"
           class="datepicker"
           placeholder="Năm"
           is-year-picker
         />
-        {{ year }}
       </v-col>
-      <v-col class="action" md="lg" xs="12">
+      <v-col class="action" md="7" xs="12">
         <v-btn class="button -success">
           <template #prepend>
             <v-icon>mdi mdi-magnify</v-icon>
@@ -34,8 +50,8 @@ const year = ref();
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12">
-        <table class="table">
+      <v-col md="12">
+        <v-table class="table">
           <thead class="head">
             <tr class="row">
               <th class="column" width="50">STT</th>
@@ -48,9 +64,52 @@ const year = ref();
           <tbody class="body">
             <tr></tr>
           </tbody>
-        </table>
+        </v-table>
       </v-col>
     </v-row>
   </div>
 </template>
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.filter {
+  :deep(.v-field) {
+    height: 36px;
+  }
+  :deep(.v-field__input) {
+    padding-top: 0;
+  }
+
+  :deep(.v-field__input) > input {
+    top: 8px;
+  }
+  :deep(.v-select__selection) {
+    position: absolute;
+    top: 8px;
+  }
+  :deep(.v-input__prepend) {
+    margin: 0;
+    padding-top: 12px;
+    padding-right: 5px;
+    border-bottom: 1px solid #b4b2b2;
+  }
+  :deep(.v-input__prepend) > .v-icon {
+    font-size: 18px;
+    opacity: 0.5;
+  }
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+
+  :deep(.head) > .row > .column,
+  :deep(.body) > .row > .column {
+    border: 1px solid #b4b2b2;
+  }
+
+  :deep(.head) > .row > .column {
+    padding: 0 8px;
+    text-align: center;
+    color: #000;
+  }
+}
+</style>
