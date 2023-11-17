@@ -1,28 +1,56 @@
 <script lang="ts" setup>
-import { ref } from "vue";
-import { monthItem } from "~/stores";
+import { ref, watchEffect } from "vue";
+import { storeToRefs } from "pinia";
+import { monthItem, useReportStore, useAppStore } from "~/stores";
+import { formatPrice } from "~/utils/string";
 
+const appStore = useAppStore();
+const reportStore = useReportStore();
+const { app } = storeToRefs(appStore);
+const { accessoriesReport } = storeToRefs(reportStore);
 const condition = ref({
   month: null,
-  year: null,
+  year: new Date().getFullYear(),
 });
+const totalAccessory = ref({
+  amount: 0,
+  price: 0,
+});
+app.value.title = "Thống kê phụ kiện";
+
+watchEffect(() => {
+  if (accessoriesReport && accessoriesReport.value.length > 0) {
+    totalAccessory.value = accessoriesReport.value.reduce(
+      (total, reportAccessory): any => {
+        return {
+          amount: (total.amount += reportAccessory.totalAmount),
+          price: (total.price += reportAccessory.totalPrice),
+        };
+      },
+      {
+        amount: 0,
+        price: 0,
+      }
+    );
+  }
+});
+
+function filterReport() {
+  reportStore.getAccessoryReport(condition.value);
+}
+
+reportStore.getAccessoryReport(condition.value);
 </script>
 <template>
   <div class="report-accessory">
-    <v-row class="filter">
+    <v-row class="filter mb-5">
       <v-col class="col" lg="2" xs="12">
-        <v-select
+        <v-autocomplete
           v-model="condition.month"
           placeholder="Tháng"
           item-title="label"
           item-value="value"
-          :items="[
-            {
-              label: 'Tất cả',
-              value: null,
-            },
-            ...monthItem,
-          ]"
+          :items="monthItem"
           prepend-icon="mdi mdi-calendar-blank-outline"
           variant="underlined"
           :menu-icon="false"
@@ -30,7 +58,7 @@ const condition = ref({
           :clear-icon="true"
           clearable
         >
-        </v-select>
+        </v-autocomplete>
       </v-col>
       <v-col lg="3" xs="12">
         <common-date-picker
@@ -38,10 +66,11 @@ const condition = ref({
           class="datepicker"
           placeholder="Năm"
           is-year-picker
+          :clear="true"
         />
       </v-col>
       <v-col class="action" md="7" xs="12">
-        <v-btn class="button -success">
+        <v-btn class="button -success" @click="filterReport">
           <template #prepend>
             <v-icon>mdi mdi-magnify</v-icon>
           </template>
@@ -61,8 +90,45 @@ const condition = ref({
               <th class="column" width="150">Tổng tiền thuê/bán</th>
             </tr>
           </thead>
-          <tbody class="body">
-            <tr></tr>
+          <tbody
+            v-if="accessoriesReport && accessoriesReport.length > 0"
+            class="body"
+          >
+            <tr
+              class="row"
+              v-for="(accessoryReport, index) in accessoriesReport"
+              :key="index"
+            >
+              <td class="column text-center">{{ index + 1 }}</td>
+              <td class="column">{{ accessoryReport.name }}</td>
+              <td class="column">{{ accessoryReport.accessoryType.name }}</td>
+              <td class="column text-center">
+                {{ accessoryReport.totalAmount }}
+              </td>
+              <td class="column text-center">
+                {{
+                  accessoryReport.totalPrice > 0
+                    ? `${formatPrice(accessoryReport.totalPrice)} VNĐ`
+                    : 0
+                }}
+              </td>
+            </tr>
+            <tr class="row">
+              <td class="column text-end" colspan="3">Tổng cộng</td>
+              <td class="column text-center">{{ totalAccessory.amount }}</td>
+              <td class="column text-center">
+                {{
+                  totalAccessory.price > 0
+                    ? `${formatPrice(totalAccessory.price)} VNĐ`
+                    : 0
+                }}
+              </td>
+            </tr>
+          </tbody>
+          <tbody v-else class="body">
+            <tr class="row">
+              <td class="column" colspan="5">Không có dữ liệu</td>
+            </tr>
           </tbody>
         </v-table>
       </v-col>
@@ -81,7 +147,7 @@ const condition = ref({
   :deep(.v-field__input) > input {
     top: 8px;
   }
-  :deep(.v-select__selection) {
+  :deep(.v-autocomplete__selection) {
     position: absolute;
     top: 8px;
   }
@@ -110,6 +176,7 @@ const condition = ref({
     padding: 0 8px;
     text-align: center;
     color: #000;
+    font-weight: 600;
   }
 }
 </style>

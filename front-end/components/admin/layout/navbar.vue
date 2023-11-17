@@ -103,14 +103,19 @@ const menus = ref<Menu>([
     url: "/admin/report",
     subMenus: [
       {
+        icon: "mdi mdi-finance",
+        title: "Doanh thu",
+        url: "/admin/report",
+      },
+      {
         icon: "mdi mdi-chart-pie",
         title: "Phụ kiện",
         url: "/admin/report/accessory",
       },
       {
-        icon: "mdi mdi-finance",
-        title: "Doanh thu",
-        url: "/admin/report",
+        icon: "mdi mdi-vote-outline",
+        title: "Đánh giá",
+        url: "/admin/report/evaluation",
       },
     ],
     roleId: 1,

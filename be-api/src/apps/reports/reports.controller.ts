@@ -15,17 +15,17 @@ export class ReportsController {
     return this.reportsService.getReportAccessories(query);
   }
 
-  @Get('evaluation')
+  @Get('evaluations')
   getReportEvaluation(@Query() query: any) {
     return this.reportsService.getReportEvaluations(query);
   }
 
-  @Get('rental-field')
+  @Get('rental-fields')
   getReportRentalField(@Query() query: any) {
     return this.reportsService.getReportRentalFields(query);
   }
 
-  @Get('revenue')
+  @Get('revenues')
   getReportRevenue(@Query() query: any) {
     return this.reportsService.getReportRevenues(query);
   }
