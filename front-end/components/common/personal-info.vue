@@ -1,8 +1,9 @@
 <script lang="ts" setup>
 import userImg from "~/public/user.jpg";
-import { useUserStore, useAuthStore, useAppStore } from "~/stores";
+import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useNuxtApp, useRuntimeConfig } from "nuxt/app";
+import { useUserStore, useAuthStore, useAppStore } from "~/stores";
 
 const rules = {
   name: (value: string) => {
@@ -27,13 +28,15 @@ const runtimeConfig = useRuntimeConfig();
 const userStore = useUserStore();
 const authStore = useAuthStore();
 const appStore = useAppStore();
-const { personalInfo } = storeToRefs(userStore);
-const { user } = storeToRefs(authStore);
+const { personalInfo }: any = storeToRefs(userStore);
+const { user }: any = storeToRefs(authStore);
 const CUSTOMER_ROLE = 4;
 const fileUpload = ref<any>();
 if (user.value?.roleId === CUSTOMER_ROLE) personalInfo.value.gender = "MALE";
 if (user.value) {
-  fileUpload.value = `${runtimeConfig.public.API_URL}public/${user.value.avatar}`;
+  fileUpload.value = user.value.avatar
+    ? `${runtimeConfig.public.API_URL}public/${user.value.avatar}`
+    : userImg;
 }
 
 (await user.value?.roleId) === CUSTOMER_ROLE
@@ -176,7 +179,7 @@ function validForm() {
           <p class="title">Ảnh đại diện</p>
           <v-row>
             <v-avatar color="grey" size="150" rounded="0">
-              <v-img cover :src="fileUpload ? fileUpload : userImg"></v-img>
+              <v-img cover :src="fileUpload"></v-img>
             </v-avatar>
           </v-row>
         </v-col>

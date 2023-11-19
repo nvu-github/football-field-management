@@ -5,7 +5,7 @@
 </template>
 <style lang="scss" scoped>
 .admin-footer {
-  position: absolute;
+  position: relative;
   display: flex;
   justify-content: right;
   bottom: 0;

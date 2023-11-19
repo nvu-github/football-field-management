@@ -175,6 +175,7 @@ reportStore.getAccessoryReport(condition.value);
   :deep(.head) > .row > .column {
     padding: 0 8px;
     text-align: center;
+    background: #f3f3f3;
     color: #000;
     font-weight: 600;
   }

@@ -15,6 +15,7 @@ export class ReportsService {
         name: true,
         accessoryType: {
           select: {
+            id: true,
             name: true,
           },
         },
@@ -43,8 +44,12 @@ export class ReportsService {
             'yyyy',
           );
 
-          if (month) condition = condition && month === monthInvoiceCreated;
-          if (year) condition = condition && year === yearInvoiceCreated;
+          if (month)
+            condition =
+              condition && Number(month) === Number(monthInvoiceCreated);
+          if (year)
+            condition =
+              condition && Number(year) === Number(yearInvoiceCreated);
 
           accumulator.amount += condition ? Number(invoiceDetail.amount) : 0;
           accumulator.price += condition ? Number(invoiceDetail.finalCost) : 0;
@@ -125,24 +130,17 @@ export class ReportsService {
       );
 
       const totalScorePercent = {
-        good:
-          total.scoreGood && total.scoreBad
-            ? Number(
-                (
-                  (total.scoreGood / (total.scoreGood + total.scoreBad)) *
-                  100
-                ).toFixed(1),
-              )
-            : 0,
-        bad:
-          total.scoreGood && total.scoreBad
-            ? Number(
-                (
-                  (total.scoreBad / (total.scoreGood + total.scoreBad)) *
-                  100
-                ).toFixed(1),
-              )
-            : 0,
+        good: Number(
+          (
+            (total.scoreGood / (total.scoreGood + total.scoreBad)) *
+            100
+          ).toFixed(1),
+        ),
+        bad: Number(
+          ((total.scoreBad / (total.scoreGood + total.scoreBad)) * 100).toFixed(
+            1,
+          ),
+        ),
       };
 
       return {
@@ -198,8 +196,11 @@ export class ReportsService {
           const monthRentalCreated = format(new Date(rental.createdAt), 'MM');
           const yearRentalCreated = format(new Date(rental.createdAt), 'yyyy');
 
-          if (month) condition = condition && month === monthRentalCreated;
-          if (year) condition = condition && year === yearRentalCreated;
+          if (month)
+            condition =
+              condition && Number(month) === Number(monthRentalCreated);
+          if (year)
+            condition = condition && Number(year) === Number(yearRentalCreated);
 
           const isRented = rental.status === 'ACCEPT';
           const isCanceled = rental.status === 'REJECT';
@@ -233,10 +234,55 @@ export class ReportsService {
 
   async getReportRevenues(query?: any): Promise<any> {
     const { month, year }: any = query || {};
-    const footballPitches = await this.getReportRentalFields();
-    console.log(footballPitches);
-    const accessories = await this.getReportAccessories();
+    const monthReport = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    const defaultYear = new Date().getFullYear();
 
-    return null;
+    const reports = await Promise.all(
+      monthReport.map(async (month) => {
+        const footballPitches = await this.getReportRentalFields({
+          month,
+          year: year || defaultYear,
+        });
+        const accessories = await this.getReportAccessories({
+          month,
+          year: year || defaultYear,
+        });
+
+        const totalRevenueFootballPitch = footballPitches.reduce(
+          (total, fp) => total + fp.totalRevenue,
+          0,
+        );
+        const totalRevenueAccessory = accessories.reduce(
+          (total, accessory) => {
+            const type = 1;
+            const isAccessoryRental = accessory.accessoryType.id === type;
+            total.rental += isAccessoryRental ? accessory.totalPrice : 0;
+            total.sell += !isAccessoryRental ? accessory.totalPrice : 0;
+
+            return total;
+          },
+          {
+            rental: 0,
+            sell: 0,
+          },
+        );
+
+        const totalRevenue =
+          totalRevenueFootballPitch +
+          totalRevenueAccessory.rental +
+          totalRevenueAccessory.sell;
+
+        return {
+          month,
+          totalRevenueFootballPitch,
+          totalRevenueAccessory,
+          totalRevenue,
+        };
+      }),
+    );
+
+    return reports.filter(
+      (report: any) => !month || Number(month) === Number(report.month),
+    );
   }
 }

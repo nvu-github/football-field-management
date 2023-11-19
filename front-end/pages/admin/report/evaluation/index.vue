@@ -110,51 +110,73 @@ reportStore.getEvaluationReport(condition.value);
               <th class="column" width="50" rowspan="2">STT</th>
               <th class="column" width="300" rowspan="2">Tên sân bóng</th>
               <th class="column" width="150" rowspan="2">Loại sân bóng</th>
-              <th class="column" width="100" colspan="2">Số lượt đánh giá (Lượt)</th>
-              <th class="column" width="100" colspan="2">Điểm đánh giá (Điểm)</th>
+              <th class="column" width="100" colspan="2">
+                Số lượt đánh giá (Lượt)
+              </th>
+              <th class="column" width="100" colspan="2">
+                Điểm đánh giá (Điểm)
+              </th>
               <th class="column" width="100" colspan="2">Tỷ lệ đánh giá (%)</th>
             </tr>
             <tr class="row">
-              <th class="column" width="100">Không tốt</th>
               <th class="column" width="100">Tốt</th>
               <th class="column" width="100">Không tốt</th>
               <th class="column" width="100">Tốt</th>
               <th class="column" width="100">Không tốt</th>
               <th class="column" width="100">Tốt</th>
+              <th class="column" width="100">Không tốt</th>
             </tr>
           </thead>
-          <!-- <tbody
+          <tbody
             v-if="evaluationReport && evaluationReport.length > 0"
             class="body"
           >
             <tr
               class="row"
-              v-for="(accessoryReport, index) in evaluationReport"
+              v-for="(evaluation, index) in evaluationReport"
               :key="index"
             >
               <td class="column text-center">{{ index + 1 }}</td>
-              <td class="column">{{ accessoryReport.name }}</td>
-              <td class="column">{{ accessoryReport.footballType.name }}</td>
+              <td class="column">{{ evaluation.name }}</td>
+              <td class="column">{{ evaluation.footballType.name }}</td>
               <td class="column text-center">
-                {{ accessoryReport.totalAmount }}
+                {{ evaluation.totalCount.good }}
               </td>
               <td class="column text-center">
-                {{
-                  accessoryReport.totalPrice > 0
-                    ? `${formatPrice(accessoryReport.totalPrice)} VNĐ`
-                    : 0
-                }}
+                {{ evaluation.totalCount.bad }}
+              </td>
+              <td class="column text-center">
+                {{ evaluation.totalScore.good }}
+              </td>
+              <td class="column text-center">
+                {{ evaluation.totalScore.bad }}
+              </td>
+              <td class="column text-center">
+                {{ Number(evaluation.totalScorePercent.good) }}
+              </td>
+              <td class="column text-center">
+                {{ Number(evaluation.totalScorePercent.bad) }}
               </td>
             </tr>
             <tr class="row">
               <td class="column text-end" colspan="3">Tổng cộng</td>
-              <td class="column text-center">{{ totalEvaluation.amount }}</td>
               <td class="column text-center">
-                {{
-                  totalEvaluation.price > 0
-                    ? `${formatPrice(totalEvaluation.price)} VNĐ`
-                    : 0
-                }}
+                {{ totalEvaluation.count.good }}
+              </td>
+              <td class="column text-center">
+                {{ totalEvaluation.count.bad }}
+              </td>
+              <td class="column text-center">
+                {{ totalEvaluation.score.good }}
+              </td>
+              <td class="column text-center">
+                {{ totalEvaluation.score.bad }}
+              </td>
+              <td class="column text-center">
+                {{ totalEvaluation.scorePercent.good }}
+              </td>
+              <td class="column text-center">
+                {{ totalEvaluation.scorePercent.bad }}
               </td>
             </tr>
           </tbody>
@@ -162,7 +184,7 @@ reportStore.getEvaluationReport(condition.value);
             <tr class="row">
               <td class="column" colspan="5">Không có dữ liệu</td>
             </tr>
-          </tbody> -->
+          </tbody>
         </v-table>
       </v-col>
     </v-row>
@@ -208,6 +230,7 @@ reportStore.getEvaluationReport(condition.value);
   :deep(.head) > .row > .column {
     padding: 0 8px;
     text-align: center;
+    background: #f3f3f3;
     color: #000;
     font-weight: 600;
   }

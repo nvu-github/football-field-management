@@ -105,7 +105,12 @@ const menus = ref<Menu>([
       {
         icon: "mdi mdi-finance",
         title: "Doanh thu",
-        url: "/admin/report",
+        url: "/admin/report/revenue",
+      },
+      {
+        icon: "mdi mdi-account-cash-outline",
+        title: "Lượt thuê",
+        url: "/admin/report/rental-field",
       },
       {
         icon: "mdi mdi-chart-pie",
