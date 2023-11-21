@@ -225,6 +225,7 @@ reportStore.getEvaluationReport(condition.value);
   :deep(.head) > .row > .column,
   :deep(.body) > .row > .column {
     border: 1px solid #b4b2b2;
+    font-size: 15px;
   }
 
   :deep(.head) > .row > .column {
