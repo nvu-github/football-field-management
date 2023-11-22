@@ -1,4 +1,3 @@
-import { Body } from './../../../front-end/.nuxt/components.d';
 import { HttpException, HttpStatus, Module } from '@nestjs/common';
 import { MulterModule } from '@nestjs/platform-express';
 import * as multer from 'multer';

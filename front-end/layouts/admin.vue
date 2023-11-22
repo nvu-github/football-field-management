@@ -31,7 +31,7 @@ useHead({
 <style lang="scss" scoped>
 .main {
   padding: 40px 35px;
-  min-height: 600px;
+  min-height: calc(100vh - 120px);
 
   :deep(.v-input__details) {
     margin-top: 5px;

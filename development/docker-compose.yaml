@@ -15,31 +15,32 @@ services:
     networks:
       - learn-network
 
-  # api:
-  #   build:
-  #     context: ../api
-  #     dockerfile: ./cicd/development/Dockerfile
-  #   # depends_on:
-  #   #   - express-mysql
-  #   ports:
-  #     - 8080:8080
-  #   volumes:
-  #     - ../api:/api
-  #   container_name: api
-  #   networks:
-  #     - learn-network
+  be-api:
+    build:
+      context: ../be-api
+      dockerfile: ./cicd/development/Dockerfile
+    depends_on:
+      - express-mysql
+    ports:
+      - 8881:8881
+      - 8882:8882
+    volumes:
+      - ../be-api:/be-api
+    container_name: be-api
+    networks:
+      - learn-network
 
-  # front-end:
-  #   build:
-  #     context: ../front-end
-  #     dockerfile: ./cicd/development/Dockerfile
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - ../front-end:/front-end
-  #   container_name: front-end
-  #   networks:
-  #     - learn-network
+  front-end:
+    build:
+      context: ../front-end
+      dockerfile: ./cicd/development/Dockerfile
+    ports:
+      - 3000:3000
+    volumes:
+      - ../front-end:/front-end
+    container_name: front-end
+    networks:
+      - learn-network
 
 networks:
   learn-network:

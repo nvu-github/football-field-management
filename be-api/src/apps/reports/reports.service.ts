@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 
 @Injectable()
 export class ReportsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(private readonly prisma: PrismaService) { }
 
   async getReportAccessories(query?: any): Promise<any> {
     const { month, year }: any = query || {};
@@ -24,6 +24,11 @@ export class ReportsService {
             amount: true,
             finalCost: true,
             createdAt: true,
+            invoice: {
+              select: {
+                status: true,
+              }
+            }
           },
         },
       },
@@ -51,8 +56,8 @@ export class ReportsService {
             condition =
               condition && Number(year) === Number(yearInvoiceCreated);
 
-          accumulator.amount += condition ? Number(invoiceDetail.amount) : 0;
-          accumulator.price += condition ? Number(invoiceDetail.finalCost) : 0;
+          accumulator.amount += condition && invoiceDetail.invoice.status === 'PAID' ? Number(invoiceDetail.amount) : 0;
+          accumulator.price += condition && invoiceDetail.invoice.status === 'PAID' ? Number(invoiceDetail.finalCost) : 0;
 
           return accumulator;
         },
@@ -248,14 +253,18 @@ export class ReportsService {
           year: year || defaultYear,
         });
 
+        if (month == 11) {
+          console.log(accessories)
+        }
+
         const totalRevenueFootballPitch = footballPitches.reduce(
           (total, fp) => total + fp.totalRevenue,
           0,
         );
         const totalRevenueAccessory = accessories.reduce(
           (total, accessory) => {
-            const type = 1;
-            const isAccessoryRental = accessory.accessoryType.id === type;
+            const rentalType = 1;
+            const isAccessoryRental = accessory.accessoryType.id === rentalType;
             total.rental += isAccessoryRental ? accessory.totalPrice : 0;
             total.sell += !isAccessoryRental ? accessory.totalPrice : 0;
 
