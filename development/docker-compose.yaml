@@ -30,17 +30,17 @@ services:
     networks:
       - learn-network
 
-  front-end:
-    build:
-      context: ../front-end
-      dockerfile: ./cicd/development/Dockerfile
-    ports:
-      - 3000:3000
-    volumes:
-      - ../front-end:/front-end
-    container_name: front-end
-    networks:
-      - learn-network
+  # front-end:
+  #   build:
+  #     context: ../front-end
+  #     dockerfile: ./cicd/development/Dockerfile
+  #   ports:
+  #     - 3002:3002
+  #   volumes:
+  #     - ../front-end:/front-end
+  #   container_name: front-end
+  #   networks:
+  #     - learn-network
 
 networks:
   learn-network:
