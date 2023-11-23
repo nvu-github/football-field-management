@@ -66,7 +66,7 @@ const invoiceStore = useInvoiceStore();
 const { accessories } = storeToRefs(accessoryStore);
 const { payloadInvoice }: any = storeToRefs(invoiceStore);
 const priceAccessories = ref<any>({});
-const totalInvoiceDetail = ref<number>(0);
+let totalInvoiceDetail = 0;
 
 watchEffect(() => {
   const invoiceDetails = payloadInvoice.value.invoiceDetails;
@@ -101,22 +101,23 @@ watchEffect(() => {
   });
 
   if (!isNotNullAmount) return;
-  invoiceDetails.forEach((invoiceDetail: any) => {
-    invoiceDetail.price =
-      priceAccessories.value[invoiceDetail.accessoryId].price;
-    invoiceDetail.finalCost =
-      invoiceDetail.price * Number(invoiceDetail.amount);
-  });
+  if (invoiceDetails) {
+    invoiceDetails.forEach((invoiceDetail: any) => {
+      invoiceDetail.price =
+        priceAccessories.value[invoiceDetail.accessoryId].price;
+      invoiceDetail.finalCost =
+        invoiceDetail.price * Number(invoiceDetail.amount);
+    });
+  }
   const { totalPrice } = payloadInvoice.value;
-  payloadInvoice.value.totalPrice =
-    Number(totalPrice) - totalInvoiceDetail.value;
-  totalInvoiceDetail.value = invoiceDetails.reduce(
+  payloadInvoice.value.totalPrice = Number(totalPrice) - totalInvoiceDetail;
+  totalInvoiceDetail = invoiceDetails.reduce(
     (total: number, invoiceDetail: any) => {
       return (total += invoiceDetail.finalCost);
     },
     0
   );
-  payloadInvoice.value.totalPrice += totalInvoiceDetail.value;
+  payloadInvoice.value.totalPrice += totalInvoiceDetail;
 });
 
 function addInvoiceDetail() {
@@ -202,7 +203,8 @@ accessoryStore.getAccessories();
             class="button -primary btnadd"
             :disabled="
               !payloadInvoice.invoiceTypeId ||
-              payloadInvoice.invoiceTypeId !== 2 && !!payloadInvoice.totalPrice === false
+              (payloadInvoice.invoiceTypeId !== 2 &&
+                !!payloadInvoice.totalPrice === false)
             "
             @click="addInvoiceDetail"
             >Thêm chi tiết

@@ -331,10 +331,11 @@ export class InvoicesService {
       customerFootballPitchRental,
     } = invoice;
 
-    const footballPitchLeasingDuration =
-      await this.footballPitchService.getFootballPitchPrice(
-        customerFootballPitchRental.footballPitchLeasingDurationId,
-      );
+    const footballPitchLeasingDuration = customerFootballPitchRental
+      ? await this.footballPitchService.getFootballPitchPrice(
+          customerFootballPitchRental.footballPitchLeasingDurationId,
+        )
+      : { price: null, leasingDurationName: null };
 
     const { price: rentalPrice, leasingDurationName } =
       footballPitchLeasingDuration;

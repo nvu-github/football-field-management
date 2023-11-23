@@ -59,7 +59,7 @@ async function submitRentalInfo() {
   if (!formValidation.status) {
     const errorMessage = formValidation.message
       ? `Vui lòng nhập thông tin ${formValidation.message}`
-      : "Thời gian đặt sân phải lớn hơn hoặc bằng ngày hiện tại";
+      : "Thời gian đặt sân không hợp lệ";
 
     isLoading.value = false;
     return $toast.error(errorMessage);

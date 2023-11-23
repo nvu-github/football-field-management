@@ -50,7 +50,7 @@ const formattedPrice = computed({
     if (value) {
       const numericValue = parseInt(value.replace(/\./g, ""), 10);
       if (!isNaN(numericValue)) {
-        payloadInvoice.value.totalPrice = numericValue;
+        payloadInvoice.value.totalPrice = Number(numericValue);
       }
     }
   },
@@ -72,7 +72,7 @@ formattedCustomerFootballPitchRental.value =
   });
 
 watchEffect(() => {
-  const { customerFootballId, invoiceTypeId, totalPrice } =
+  const { customerFootballId, invoiceTypeId, invoiceDetails } =
     payloadInvoice.value;
 
   if (customerFootballId) {
@@ -143,6 +143,7 @@ function setInvoiceToForm() {
     customerName,
     invoiceDetails,
   }: any = invoice.value;
+
   payloadInvoice.value.invoiceTypeId = invoiceTypeId;
   payloadInvoice.value.customerName =
     invoiceTypeId !== RENTAL_INVOICE ? customerName : "";

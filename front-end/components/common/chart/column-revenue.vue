@@ -1,5 +1,6 @@
 <script lang="ts" setup>
 import VueApexCharts from "vue3-apexcharts";
+import { formatPrice } from "~/utils/string";
 
 const props = defineProps({
   data: {
@@ -82,7 +83,7 @@ const options = {
   legend: {
     position: "bottom",
     offsetX: -10,
-    offsetY: 0,
+    offsetY: 5,
   },
   fill: {
     opacity: 1,
@@ -90,10 +91,5 @@ const options = {
 };
 </script>
 <template>
-  <VueApexCharts
-    type="bar"
-    height="350"
-    :options="options"
-    :series="series"
-  />
+  <VueApexCharts type="bar" height="350" :options="options" :series="series" />
 </template>

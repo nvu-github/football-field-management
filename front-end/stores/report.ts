@@ -57,6 +57,7 @@ export interface AccessoryReport {
   accessoryType: any;
   totalAmount: number;
   totalPrice: number;
+  totalRented: number;
 }
 
 export interface EvaluationReport {

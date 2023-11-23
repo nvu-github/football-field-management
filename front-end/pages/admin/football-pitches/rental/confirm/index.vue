@@ -82,7 +82,9 @@ const formatDatePicker = (date: any): string => {
 };
 
 await footballPitchStore.getCustomerFootballPitchRentals();
-if (customerFootballPitchRentals) filterFootballConfirm();
+watchEffect(() => {
+  if (customerFootballPitchRentals) filterFootballConfirm();
+});
 
 function openDialogConfirm(id: number, status: string) {
   dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
