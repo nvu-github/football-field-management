@@ -7,8 +7,9 @@ RUN apk --no-cache add \
 
 WORKDIR /src
 COPY package.json yarn.lock /
-EXPOSE 8881 8882
 RUN yarn install
+RUN npm install -g @nestjs/cli
 COPY . .
+EXPOSE 8881 8882
 RUN npx prisma generate
 CMD [ "yarn", "start:dev" ]
