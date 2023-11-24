@@ -13,8 +13,12 @@ import {
   Query,
 } from '@nestjs/common';
 import { ApiBearerAuth } from '@nestjs/swagger';
+
 import { FootballPitchesService } from './football-pitches.service';
 import { UploadService } from 'common/upload/upload.service';
+import { AccessoriesService } from '@app/accessories/accessories.service';
+import { InvoicesService } from '@app/invoices/invoices.service';
+
 import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
 
 import {
@@ -32,6 +36,8 @@ export class FootballPitchesController {
   constructor(
     private readonly footballPitchService: FootballPitchesService,
     private readonly uploadService: UploadService,
+    private readonly accessoryService: AccessoriesService,
+    private readonly invoiceService: InvoicesService,
   ) {}
 
   @Get('leasing-durations/public')
@@ -97,11 +103,46 @@ export class FootballPitchesController {
     const footballPitchRentalFound =
       await this.footballPitchService.getCustomerFootballPitchRental(+id);
 
-    if (footballPitchRentalFound.length === 0)
+    if (footballPitchRentalFound.length === 0) {
       throw new HttpException(
         'Không tìm thấy thông tin đặt sân',
         HttpStatus.BAD_REQUEST,
       );
+    }
+
+    if (body.status === 'ACCEPT') {
+      const dataAmountAccessories = await Promise.all(
+        footballPitchRentalFound.invoice.invoiceDetail.map(
+          async (accessory: any) => {
+            const amountAccessory = await this.accessoryService.getAccessory(
+              accessory.accessoryId,
+            );
+            return {
+              id: accessory.accessoryId,
+              amount: amountAccessory.amount - accessory.amount,
+            };
+          },
+        ),
+      );
+
+      await Promise.all(
+        dataAmountAccessories.map(
+          async (accessory) =>
+            await this.accessoryService.updateAnyAccessory(accessory.id, {
+              amount: accessory.amount,
+            }),
+        ),
+      );
+    }
+
+    if (body.status === 'REJECT') {
+      await this.invoiceService.deleteInvoiceDetails(
+        footballPitchRentalFound.invoice.id,
+      );
+      await this.invoiceService.deleteInvoice(
+        footballPitchRentalFound.invoice.id,
+      );
+    }
 
     return this.footballPitchService.updateStatusFootballPitchRental(
       +id,

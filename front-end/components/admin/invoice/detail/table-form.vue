@@ -26,7 +26,7 @@ const headers = [
   },
   {
     title: "Phụ kiện",
-    width: "23%",
+    width: "30%",
     align: "start",
     sortable: false,
     key: "accessory",
@@ -47,7 +47,7 @@ const headers = [
   },
   {
     title: "Thành tiền",
-    width: "20%",
+    width: "16%",
     align: "start",
     sortable: false,
     key: "finalCost",
@@ -66,10 +66,19 @@ const invoiceStore = useInvoiceStore();
 const { accessories } = storeToRefs(accessoryStore);
 const { payloadInvoice }: any = storeToRefs(invoiceStore);
 const priceAccessories = ref<any>({});
+const formattedAccessories = ref<any>([]);
 let totalInvoiceDetail = 0;
 
 watchEffect(() => {
   const invoiceDetails = payloadInvoice.value.invoiceDetails;
+
+  if (payloadInvoice.value.invoiceTypeId && accessories.value) {
+    formattedAccessories.value = accessories.value.filter(
+      (accessory: any) =>
+        accessory.accessoryTypeId === payloadInvoice.value.invoiceTypeId
+    );
+  }
+
   if (!invoiceDetails) return;
 
   const accessoryIds = invoiceDetails.map(
@@ -160,7 +169,7 @@ accessoryStore.getAccessories();
           variant="outlined"
           menu-icon="false"
           class="pt-3"
-          :items="accessories"
+          :items="formattedAccessories"
           :rules="[rules.accessoryId]"
         ></v-autocomplete>
       </template>

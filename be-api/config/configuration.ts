@@ -15,14 +15,15 @@ export default () => ({
   },
   payment: {
     vnpayUrl: process.env.VNPAY_URL,
+    vnpayApi: process.env.VNPAY_API,
     tmnCodeVnPay: process.env.VNPAY_TMN_CODE,
     secretKeyVnPay: process.env.VNPAY_SECRET_KEY,
-    returnUrlVnPay: process.env.VNPAY_RETURN_URL
+    returnUrlVnPay: process.env.VNPAY_RETURN_URL,
   },
   mail: {
     clientId: process.env.EMAIL_CLIENT_ID,
     clientSecret: process.env.EMAIL_CLIENT_SECRET,
     refreshToken: process.env.EMAIL_REFRESH_TOKEN,
-    address: process.env.EMAIL_ADDRESS
-  }
+    address: process.env.EMAIL_ADDRESS,
+  },
 });

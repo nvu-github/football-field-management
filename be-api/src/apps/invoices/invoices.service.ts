@@ -71,6 +71,7 @@ export class InvoicesService {
       select: {
         id: true,
         customerName: true,
+        customerPhone: true,
         totalPrice: true,
         moneyPaid: true,
         status: true,
@@ -115,6 +116,7 @@ export class InvoicesService {
     const {
       id,
       customerName,
+      customerPhone,
       totalPrice,
       moneyPaid,
       status,
@@ -134,6 +136,7 @@ export class InvoicesService {
         invoiceType.id === RENTAL_INVOICE
           ? customerFootballPitchRental.customer.name
           : customerName,
+      customerPhone: invoiceType.id !== RENTAL_INVOICE ? customerPhone : null,
       footballPitchName:
         invoiceType.id === RENTAL_INVOICE
           ? customerFootballPitchRental.footballPitch.name
@@ -280,6 +283,7 @@ export class InvoicesService {
       select: {
         id: true,
         customerName: true,
+        customerPhone: true,
         totalPrice: true,
         status: true,
         invoiceType: {
@@ -324,6 +328,7 @@ export class InvoicesService {
     const {
       id,
       customerName,
+      customerPhone,
       totalPrice,
       status,
       invoiceType,
@@ -351,7 +356,7 @@ export class InvoicesService {
           : customerName,
       customerPhoneNumber: customerFootballPitchRental
         ? customerFootballPitchRental.customer.phoneNumber
-        : null,
+        : customerPhone,
       rentalDate: customerFootballPitchRental
         ? customerFootballPitchRental.rentalDate
         : null,

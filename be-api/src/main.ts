@@ -48,11 +48,11 @@ async function bootstrap() {
 
   app.use('/public', expressStatic(join(__dirname, '../..', 'public')));
   await app.listen(configuration().port);
-  console.log('App is running on port: ', configuration().port);
+  // console.log('App is running on port: ', configuration().port);
 
-  if (module.hot) {
-    module.hot.accept();
-    module.hot.dispose(() => app.close());
-  }
+  // if (module.hot) {
+  //   module.hot.accept();
+  //   module.hot.dispose(() => app.close());
+  // }
 }
 bootstrap();

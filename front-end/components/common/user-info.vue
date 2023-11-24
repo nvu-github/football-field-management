@@ -1,8 +1,10 @@
 <script lang="ts" setup>
-import userImg from "~/public/user.jpg";
+import { ref } from "vue";
 import { storeToRefs } from "pinia";
-import { useAuthStore } from "~/stores";
 import { useRouter, useNuxtApp, useRuntimeConfig } from "nuxt/app";
+import { useAuthStore } from "~/stores";
+import userImg from "~/public/user.jpg";
+
 const router = useRouter();
 const { $toast }: any = useNuxtApp();
 const authStore = useAuthStore();
@@ -13,6 +15,8 @@ const CUSTOMER_ROLE = 4;
 
 async function logout() {
   try {
+    $toast.success("Đăng xuất tài khoản thành công");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     user.value = {
       name: "",
       email: "",
@@ -21,8 +25,6 @@ async function logout() {
       loggedIn: false,
     };
     authStore.signOut();
-    $toast.success("Đăng xuất tài khoản thành công");
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     return router.push("/auth/login");
   } catch (error) {
     console.log(error);

@@ -6,7 +6,7 @@ import { IAccessoryType, IAccessory } from './interfaces';
 
 @Injectable()
 export class AccessoriesService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   createAccessory(payloads: PayloadAccessoryDto): Promise<IAccessory | any> {
     return this.prisma.accessory.create({
@@ -34,6 +34,15 @@ export class AccessoriesService {
         name: true,
         description: true,
       },
+    });
+  }
+
+  updateAnyAccessory(id: number, data: any): Promise<any> {
+    return this.prisma.accessory.update({
+      where: {
+        id,
+      },
+      data,
     });
   }
 
@@ -154,7 +163,15 @@ export class AccessoriesService {
     });
 
     return accessories.map((accessory) => {
-      const { id, name, description, amount, price, accessoryType, accessoryImage } = accessory
+      const {
+        id,
+        name,
+        description,
+        amount,
+        price,
+        accessoryType,
+        accessoryImage,
+      } = accessory;
       return {
         id,
         name,
@@ -163,7 +180,7 @@ export class AccessoriesService {
         price: Number(price),
         accessoryTypeId: accessoryType.id,
         accessoryTypeName: accessoryType.name,
-        images: accessoryImage.map((image: any) => ({ ...image }))
+        images: accessoryImage.map((image: any) => ({ ...image })),
       };
     });
   }

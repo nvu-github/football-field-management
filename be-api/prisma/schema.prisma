@@ -288,6 +288,7 @@ model InvoiceType {
 model Invoice {
   id                 Int           @id @default(autoincrement())
   customerName       String?       @map("customer_name")
+  customerPhone      String?       @map("customer_phone")
   totalPrice         Decimal       @map("total_price") @db.Decimal(12, 0)
   moneyPaid          Decimal?      @map("money_paid") @db.Decimal(12, 0)
   status             InvoiceStatus @default(UNPAID)

@@ -105,7 +105,7 @@ function cancelPayment() {
             <v-col cols="12">
               <div class="title mb-4">
                 Để đặt sân quý khách vui lòng thanh toán trước tiền thuê <br />
-                hoặc thanh toán đặt cọc 30% tiền thuê
+                hoặc thanh toán đặt cọc 30% tổng tiền thuê
               </div>
               <div class="subtitle">
                 <p class="price mb-2">
@@ -114,7 +114,7 @@ function cancelPayment() {
                   <span class="unit">VNĐ</span>
                 </p>
                 <p class="price mb-2">
-                  <b class="label">Tổng tiền sân: </b>
+                  <b class="label">Tổng tiền thuê: </b>
                   {{ formatPrice(rentalPrice) }} <span class="unit">VNĐ</span>
                 </p>
               </div>

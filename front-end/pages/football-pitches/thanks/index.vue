@@ -71,7 +71,7 @@ async function createInvoice(customerFootballPitchRentalId: number) {
   payloadInvoice.value = {
     totalPrice: rentalPrice,
     moneyPaid,
-    status: amountPayment === rentalPrice ? "PAID" : "DEPOSIT",
+    status: "DEPOSIT",
     staffId: 1,
     invoiceTypeId: 1,
     customerFootballId: customerFootballPitchRentalId,
@@ -125,6 +125,7 @@ async function createNotification() {
 </template>
 <style lang="scss" scoped>
 .football-pitches-thank-page {
+  margin-top: 30px;
   :deep(.v-col) {
     display: flex;
     justify-content: center;

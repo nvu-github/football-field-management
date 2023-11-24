@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watchEffect, resolveComponent } from "vue";
 import { storeToRefs } from "pinia";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { useAppStore, useFootballPitchStore, useDialogStore } from "~/stores";
 import { formatPrice } from "~/utils/string";
 
@@ -68,7 +68,7 @@ const { app, isLoading } = storeToRefs(appStore);
 const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
 app.value.title = "Quản lý đặt sân";
 const conditionFilterFootballPitch = ref<any>({
-  rentalDate: new Date(),
+  rentalDate: null,
   status: null,
 });
 const footballPitchConfirmFound = ref<any>();
@@ -139,40 +139,31 @@ function openDialogDetail(id: number) {
 }
 
 function filterFootballConfirm() {
-  isLoading.value = true;
   const { rentalDate, leasingDuration, status } =
     conditionFilterFootballPitch.value;
-  if (rentalDate || leasingDuration || status) {
-    footballPitchConfirmFound.value = customerFootballPitchRentals.value.filter(
-      (footballPitch) => {
-        let condition = true;
+  footballPitchConfirmFound.value = customerFootballPitchRentals.value.filter(
+    (footballPitch) => {
+      let condition = true;
 
-        if (rentalDate) {
-          console.log(
-            new Date(footballPitch.rentalDate).toLocaleString("en-US", {
-              timeZone: "Asia/Bangkok",
-            })
-          );
-          condition =
-            condition &&
-            format(new Date(rentalDate), "dd/MM/yyyy") ===
-              format(new Date(footballPitch.rentalDate), "dd/MM/yyyy");
-        }
-
-        if (leasingDuration) {
-          const footballLeasingDuration = `${footballPitch.startTime} - ${footballPitch.endTime}`;
-          condition = condition && footballLeasingDuration === leasingDuration;
-        }
-
-        if (status) {
-          condition = condition && footballPitch.status === status;
-        }
-
-        return condition;
+      if (rentalDate) {
+        condition =
+          condition &&
+          format(new Date(rentalDate), "dd/MM/yyyy") ===
+            format(new Date(footballPitch.rentalDate), "dd/MM/yyyy");
       }
-    );
-  }
-  isLoading.value = false;
+
+      if (leasingDuration) {
+        const footballLeasingDuration = `${footballPitch.startTime} - ${footballPitch.endTime}`;
+        condition = condition && footballLeasingDuration === leasingDuration;
+      }
+
+      if (status) {
+        condition = condition && footballPitch.status === status;
+      }
+
+      return condition;
+    }
+  );
 }
 </script>
 <template>
@@ -196,7 +187,7 @@ function filterFootballConfirm() {
           variant="underlined"
         ></v-autocomplete>
       </v-col>
-      <v-col class="action" md="lg" xs="12">
+      <!-- <v-col class="action" md="lg" xs="12">
         <v-btn
           class="button -success"
           :loading="isLoading"
@@ -207,7 +198,7 @@ function filterFootballConfirm() {
           </template>
           Tìm kiếm
         </v-btn>
-      </v-col>
+      </v-col> -->
     </v-row>
     <v-row>
       <v-col md="12">
@@ -283,6 +274,9 @@ function filterFootballConfirm() {
   > .row > .action {
     display: flex;
     align-items: center;
+  }
+  :deep(.dp__clear_icon) {
+    display: block;
   }
 }
 </style>

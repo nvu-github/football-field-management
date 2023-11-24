@@ -15,6 +15,7 @@ import { formatPrice } from "~/utils/string";
 const rules = {
   invoiceTypeId: (value: number) => !!value || "Vui lòng chọn loại hóa đơn",
   customerName: (value: string) => !!value || "Vui lòng nhập tên khách hàng",
+  customerPhone: (value: string) => !!value || "Vui lòng nhập số điện thoại",
   customerFootballId: (value: number) => !!value || "Vui lòng chọn khách hàng",
   totalPrice: (value: number) => {
     if (!value) return "Vui lòng nhập tổng tiền hóa đơn!";
@@ -141,12 +142,15 @@ function setInvoiceToForm() {
     status,
     footballPitchName,
     customerName,
+    customerPhone,
     invoiceDetails,
   }: any = invoice.value;
 
   payloadInvoice.value.invoiceTypeId = invoiceTypeId;
   payloadInvoice.value.customerName =
     invoiceTypeId !== RENTAL_INVOICE ? customerName : "";
+  payloadInvoice.value.customerPhone =
+    invoiceTypeId !== RENTAL_INVOICE ? customerPhone : "";
   payloadInvoice.value.customerFootballId =
     invoiceTypeId === RENTAL_INVOICE
       ? `${footballPitchName} - ${customerName}`
@@ -179,15 +183,24 @@ invoiceTypeStore.getInvoiceTypes();
                 :rules="[rules.invoiceTypeId]"
                 @update:modelValue="handleInvoiceType"
               ></v-select>
-              <v-text-field
-                v-if="payloadInvoice.invoiceTypeId !== RENTAL_INVOICE"
-                v-model="payloadInvoice.customerName"
-                label="Tên khách hàng*"
-                type="text"
-                variant="underlined"
-                required
-                :rules="[rules.customerName]"
-              />
+              <template v-if="payloadInvoice.invoiceTypeId !== RENTAL_INVOICE">
+                <v-text-field
+                  v-model="payloadInvoice.customerName"
+                  label="Tên khách hàng*"
+                  type="text"
+                  variant="underlined"
+                  required
+                  :rules="[rules.customerName]"
+                />
+                <v-text-field
+                  v-model="payloadInvoice.customerPhone"
+                  label="Số điện thoại*"
+                  type="text"
+                  variant="underlined"
+                  required
+                  :rules="[rules.customerPhone]"
+                />
+              </template>
               <v-autocomplete
                 v-else
                 v-model="payloadInvoice.customerFootballId"

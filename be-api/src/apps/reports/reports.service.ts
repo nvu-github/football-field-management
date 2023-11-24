@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 
 @Injectable()
 export class ReportsService {
-  constructor(private readonly prisma: PrismaService) { }
+  constructor(private readonly prisma: PrismaService) {}
 
   async getReportAccessories(query?: any): Promise<any> {
     const { month, year }: any = query || {};
@@ -27,8 +27,8 @@ export class ReportsService {
             invoice: {
               select: {
                 status: true,
-              }
-            }
+              },
+            },
           },
         },
       },
@@ -56,14 +56,26 @@ export class ReportsService {
             condition =
               condition && Number(year) === Number(yearInvoiceCreated);
 
-          accumulator.amount += condition && invoiceDetail.invoice.status === 'PAID' ? Number(invoiceDetail.amount) : 0;
-          accumulator.price += condition && invoiceDetail.invoice.status === 'PAID' ? Number(invoiceDetail.finalCost) : 0;
-
+          accumulator.amount +=
+            condition && invoiceDetail.invoice.status === 'PAID'
+              ? Number(invoiceDetail.amount)
+              : 0;
+          accumulator.price +=
+            condition && invoiceDetail.invoice.status === 'PAID'
+              ? Number(invoiceDetail.finalCost)
+              : 0;
+          accumulator.rented +=
+            condition &&
+            invoiceDetail.invoice.status === 'PAID' &&
+            accessoryType.id === 1
+              ? 1
+              : 0;
           return accumulator;
         },
         {
           amount: 0,
           price: 0,
+          rented: 0,
         },
       );
 
@@ -73,6 +85,7 @@ export class ReportsService {
         accessoryType,
         totalAmount: total.amount,
         totalPrice: total.price,
+        totalRented: total.rented,
       };
     });
   }
@@ -252,10 +265,6 @@ export class ReportsService {
           month,
           year: year || defaultYear,
         });
-
-        if (month == 11) {
-          console.log(accessories)
-        }
 
         const totalRevenueFootballPitch = footballPitches.reduce(
           (total, fp) => total + fp.totalRevenue,

@@ -1,6 +1,7 @@
 export interface Invoice {
   id?: number | null;
   customerName?: string;
+  customerPhone?: string;
   totalPrice: number | null;
   moneyPaid?: number | null;
   status: string;
@@ -45,6 +46,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   const payloadInvoice = ref<Invoice>({
     id: null,
     customerName: "",
+    customerPhone: "",
     totalPrice: null,
     moneyPaid: null,
     status: "",
@@ -115,6 +117,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     payloadInvoice.value = {
       id: null,
       customerName: "",
+      customerPhone: "",
       totalPrice: null,
       moneyPaid: null,
       status: "",

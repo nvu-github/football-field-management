@@ -49,6 +49,11 @@ const options = {
       enabled: true,
     },
   },
+  dataLabels: {
+    formatter: (val) => {
+      return val ? formatPrice(val) : val;
+    },
+  },
   responsive: [
     {
       breakpoint: 480,
@@ -87,6 +92,13 @@ const options = {
   },
   fill: {
     opacity: 1,
+  },
+  yaxis: {
+    labels: {
+      formatter: (val) => {
+        return val ? `${formatPrice(val)} VNĐ` : val;
+      },
+    },
   },
 };
 </script>

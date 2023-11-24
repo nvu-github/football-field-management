@@ -3,6 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 import * as moment from 'moment';
 import * as queryString from 'qs';
 import * as crypto from 'crypto';
+import * as request from 'request';
 import { sortObject } from 'utils/app';
 
 import configuration from 'config/configuration';
@@ -13,6 +14,7 @@ import { PayloadCreatePaymentDto } from './dtos';
 @Controller('payment')
 export class PaymentController {
   private readonly vnpayUrl: string;
+  private readonly vnpayApi: string;
   private readonly tmnCodeVnPay: string;
   private readonly secretKeyVnPay: string;
   private readonly returnUrlVnPay: string;
@@ -20,6 +22,7 @@ export class PaymentController {
   constructor() {
     const { payment } = configuration();
     this.vnpayUrl = payment.vnpayUrl;
+    this.vnpayApi = payment.vnpayApi;
     this.tmnCodeVnPay = payment.tmnCodeVnPay;
     this.secretKeyVnPay = payment.secretKeyVnPay;
     this.returnUrlVnPay = payment.returnUrlVnPay;
@@ -89,8 +92,6 @@ export class PaymentController {
     let signed = hmac.update(Buffer.from(signData, 'utf-8')).digest('hex');
 
     if (secureHash === signed) {
-      //Kiem tra xem du lieu trong db co hop le hay khong va thong bao ket qua
-
       return { code: vnp_Params['vnp_ResponseCode'] };
     } else {
       return { code: '97' };
@@ -99,7 +100,6 @@ export class PaymentController {
 
   @Get('vnpay-ipn')
   getVNPayIpn(@Request() req: any, @Response() res: any) {
-    console.log('co chay vao day');
     let vnp_Params = req.query;
     let secureHash = vnp_Params['vnp_SecureHash'];
 
@@ -120,5 +120,92 @@ export class PaymentController {
     } else {
       return 'fail';
     }
+  }
+
+  @Get('vnpay-refund')
+  vnPayRefund(@Request() req: any, @Response() res: any) {
+    process.env.TZ = 'Asia/Ho_Chi_Minh';
+    let date = new Date();
+
+    let secretKey = this.secretKeyVnPay;
+    let vnp_TmnCode = this.tmnCodeVnPay;
+    let vnp_TxnRef = req.body.orderId;
+    let vnp_TransactionDate = req.body.transDate;
+    let vnp_Amount = req.body.amount * 100;
+    let vnp_TransactionType = req.body.transType;
+    let vnp_CreateBy = req.body.user;
+
+    let vnp_RequestId = moment(date).format('HHmmss');
+    let vnp_Version = '2.1.0';
+    let vnp_Command = 'refund';
+    let vnp_OrderInfo = 'Hoan tien GD ma:' + vnp_TxnRef;
+
+    let vnp_IpAddr =
+      req.headers['x-forwarded-for'] ||
+      req.connection.remoteAddress ||
+      req.socket.remoteAddress ||
+      req.connection.socket.remoteAddress;
+
+    let vnp_CreateDate = moment(date).format('YYYYMMDDHHmmss');
+
+    let vnp_TransactionNo = '0';
+
+    let data =
+      vnp_RequestId +
+      '|' +
+      vnp_Version +
+      '|' +
+      vnp_Command +
+      '|' +
+      vnp_TmnCode +
+      '|' +
+      vnp_TransactionType +
+      '|' +
+      vnp_TxnRef +
+      '|' +
+      vnp_Amount +
+      '|' +
+      vnp_TransactionNo +
+      '|' +
+      vnp_TransactionDate +
+      '|' +
+      vnp_CreateBy +
+      '|' +
+      vnp_CreateDate +
+      '|' +
+      vnp_IpAddr +
+      '|' +
+      vnp_OrderInfo;
+    let hmac = crypto.createHmac('sha512', secretKey);
+    let vnp_SecureHash = hmac.update(new Buffer(data, 'utf-8')).digest('hex');
+
+    let dataObj = {
+      vnp_RequestId: vnp_RequestId,
+      vnp_Version: vnp_Version,
+      vnp_Command: vnp_Command,
+      vnp_TmnCode: vnp_TmnCode,
+      vnp_TransactionType: vnp_TransactionType,
+      vnp_TxnRef: vnp_TxnRef,
+      vnp_Amount: vnp_Amount,
+      vnp_TransactionNo: vnp_TransactionNo,
+      vnp_CreateBy: vnp_CreateBy,
+      vnp_OrderInfo: vnp_OrderInfo,
+      vnp_TransactionDate: vnp_TransactionDate,
+      vnp_CreateDate: vnp_CreateDate,
+      vnp_IpAddr: vnp_IpAddr,
+      vnp_SecureHash: vnp_SecureHash,
+    };
+
+    request(
+      {
+        url: this.vnpayApi,
+        method: 'POST',
+        json: true,
+        body: dataObj,
+      },
+      function (error, response, body) {
+        console.log(response);
+      },
+    );
   }
 }

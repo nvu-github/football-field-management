@@ -78,6 +78,15 @@ function openDialogDetail(id: number) {
     }
   );
 }
+
+function openDialogRentalDetail(id: number) {
+  dialogStore.showDialog(
+    resolveComponent("common-football-pitch-dialog-rental-detail"),
+    {
+      id,
+    }
+  );
+}
 </script>
 <template>
   <div class="football-pitches-history-page">
@@ -141,7 +150,7 @@ function openDialogDetail(id: number) {
             <div class="price">
               <v-icon>mdi mdi-cash</v-icon>
               <span class="value">
-                {{ formatPrice(customerFootballPitchRental.price) }}
+                {{ formatPrice(customerFootballPitchRental.totalPrice) }}
                 <span class="unit">VNĐ</span>
               </span>
             </div>
@@ -168,16 +177,24 @@ function openDialogDetail(id: number) {
                   <v-btn
                     v-bind="props"
                     class="button -primary -rental"
-                    @click="openDialogDetail(customerFootballPitchRental.customerFootballPitchRentalId)"
+                    @click="
+                      openDialogDetail(
+                        customerFootballPitchRental.customerFootballPitchRentalId
+                      )
+                    "
                   >
                     <v-icon>mdi mdi-alpha-d-circle-outline</v-icon>
                   </v-btn>
                 </template>
               </v-tooltip>
-              <v-tooltip location="bottom" text="Hóa đơn">
+              <v-tooltip location="bottom" text="Thanh toán">
                 <template #activator="{ props }">
-                  <v-btn v-bind="props" class="button -warning -rental">
-                    <v-icon>mdi mdi-receipt-text</v-icon>
+                  <v-btn
+                    v-bind="props"
+                    class="button -warning -rental"
+                    :disabled="customerFootballPitchRental.status !== 'ACCEPT'"
+                  >
+                    <v-icon>mdi mdi-cash-multiple</v-icon>
                   </v-btn>
                 </template>
               </v-tooltip>

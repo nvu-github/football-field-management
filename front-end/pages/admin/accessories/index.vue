@@ -7,15 +7,20 @@ import { formatPrice } from "~/utils/string";
 const headers = [
   {
     title: "STT",
+    width: "5%",
     align: "center",
     sortable: false,
     key: "sno",
   },
-  { title: "Tên phụ kiện", width: "30%", align: "start", key: "name" },
-  { title: "Mô tả", width: "25%", align: "start", key: "description" },
-  { title: "Số lượng", width: "10%", align: "center", key: "amount" },
+  { title: "Tên phụ kiện", width: "25%", align: "start", key: "name" },
+  { title: "Số lượng", width: "15%", align: "center", key: "amount" },
   { title: "Giá thuê", width: "18%", align: "center", key: "price" },
-  { title: "Loại phụ kiện", width: "15%", align: "center", key: "type" },
+  {
+    title: "Loại phụ kiện",
+    width: "15%",
+    align: "start",
+    key: "accessoryTypeName",
+  },
   {
     title: "Tác vụ",
     width: "15%",
@@ -91,9 +96,6 @@ accessoryStore.getAccessories();
         <v-data-table :headers="headers" :items="accessories">
           <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
-          </template>
-          <template #[`item.description`]="{ item }">
-            <span v-html="item.raw.description"></span>
           </template>
           <template #[`item.price`]="{ item }">
             {{ formatPrice(item.raw.price) }} VNĐ

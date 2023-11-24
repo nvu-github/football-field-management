@@ -14,13 +14,18 @@ import {
 } from '@nestjs/common';
 
 import { InvoicesService } from './invoices.service';
+import { AccessoriesService } from '@app/accessories/accessories.service';
+
 import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
 import { PayloadInvoiceDto, PayloadInvoiceTypeDto } from './dtos';
 
 @ApiTags('Invoice')
 @Controller('invoices')
 export class InvoicesController {
-  constructor(private readonly invoicesService: InvoicesService) {}
+  constructor(
+    private readonly invoicesService: InvoicesService,
+    private readonly accessoryService: AccessoriesService,
+  ) {}
 
   @Post('types')
   @ApiBearerAuth()
@@ -134,6 +139,29 @@ export class InvoicesController {
       throw new HttpException('Không tìm thấy hóa đơn', HttpStatus.BAD_REQUEST);
 
     if (!staffBody) body.staffId = staffId;
+
+    if (body.status === 'PAID') {
+      const dataAmountAccessories = await Promise.all(
+        body.invoiceDetails.map(async (accessory: any) => {
+          const amountAccessory = await this.accessoryService.getAccessory(
+            accessory.accessoryId,
+          );
+          return {
+            id: accessory.accessoryId,
+            amount: amountAccessory.amount + accessory.amount,
+          };
+        }),
+      );
+
+      await Promise.all(
+        dataAmountAccessories.map(
+          async (accessory) =>
+            await this.accessoryService.updateAnyAccessory(accessory.id, {
+              amount: accessory.amount,
+            }),
+        ),
+      );
+    }
 
     delete body.invoiceDetails;
     const invoiceCreated = await this.invoicesService.updateInvoice(+id, body);

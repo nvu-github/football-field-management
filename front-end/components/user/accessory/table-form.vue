@@ -5,13 +5,24 @@ import { storeToRefs } from "pinia";
 import { useCustomerStore, useAccessoryStore, useDialogStore } from "~/stores";
 import { generateId, formatPrice } from "~/utils/string";
 
+const { $toast }: any = useNuxtApp();
 const rules = {
   accessoryId: (value: number) => {
-    if (!value) return "Vui lòng chọn phụ kiện!";
+    if (!value) {
+      $toast.error("Vui lòng chọn phụ kiện!");
+      return false;
+    }
     return true;
   },
   amount: (value: number) => {
-    if (!value) return "Vui lòng nhập số lượng!";
+    if (!value) {
+      $toast.error("Vui lòng nhập số lượng!");
+      return false;
+    }
+    if (Number(value) < 0) {
+      $toast.error("Số lượng không được nhỏ hơn 0!");
+      return false;
+    }
     return true;
   },
 };
@@ -54,13 +65,13 @@ const headers = [
   },
 ];
 
-const { $toast }: any = useNuxtApp();
 const customerStore = useCustomerStore();
 const accessoryStore = useAccessoryStore();
 const { accessories } = storeToRefs(accessoryStore);
 const dialogStore = useDialogStore();
 const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 const priceAccessories = ref<any>({});
+const formattedAccessories = ref<any>([]);
 
 watchEffect(() => {
   const accessoryIds =
@@ -80,6 +91,11 @@ watchEffect(() => {
       };
     }
   });
+
+  if (accessories.value)
+    formattedAccessories.value = accessories.value.filter(
+      (accessory: any) => accessory.accessoryTypeId === 1
+    );
 });
 
 function addAccessoryRental() {
@@ -141,7 +157,7 @@ accessoryStore.getAccessories();
           variant="outlined"
           menu-icon="false"
           class="pt-3"
-          :items="accessories"
+          :items="formattedAccessories"
           :rules="[rules.accessoryId]"
         ></v-autocomplete>
       </template>

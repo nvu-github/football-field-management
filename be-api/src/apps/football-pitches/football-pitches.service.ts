@@ -608,12 +608,15 @@ export class FootballPitchesService {
                 cfpr.rental_date as rentalDate, 
                 fpl.price, 
                 ld.start_time as startTime, 
-                ld.end_time as endTime 
+                ld.end_time as endTime,
+                i.total_price as totalPrice,
+                i.money_paid as moneyPaid
         FROM customers c 
         INNER JOIN customer_football_pitch_rental cfpr on c.id = cfpr.customer_id
         INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
         INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
         INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
+        INNER JOIN invoices i on i.customer_football_id = cfpr.id
         WHERE c.id = ${customerId}
       `;
     return footballPitchRentalCustomerHistories || [];
@@ -657,6 +660,7 @@ export class FootballPitchesService {
       INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
       INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
       INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
+      ORDER BY cfpr.created_at DESC
     `;
 
     return (
@@ -713,17 +717,24 @@ export class FootballPitchesService {
           },
           invoice: {
             select: {
+              id: true,
               totalPrice: true,
               moneyPaid: true,
               status: true,
+              invoiceDetail: {
+                select: {
+                  accessoryId: true,
+                  amount: true,
+                },
+              },
             },
           },
           accessoryRentalCustomer: {
             select: {
+              amount: true,
               accessory: {
                 select: {
                   name: true,
-                  amount: true,
                   price: true,
                 },
               },
@@ -766,9 +777,10 @@ export class FootballPitchesService {
       price,
       leasingDurationName,
       footballPitchImages,
-      accessoryRentals: accessoryRentalCustomer.map(
-        (accessoryRental) => accessoryRental.accessory,
-      ),
+      accessoryRentals: accessoryRentalCustomer.map((accessoryRental) => ({
+        ...accessoryRental.accessory,
+        amount: accessoryRental.amount,
+      })),
     };
   }
 

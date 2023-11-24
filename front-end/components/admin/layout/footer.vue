@@ -1,6 +1,6 @@
 <template>
   <div class="admin-footer">
-    <h3>Sân Bóng Hoàng Quân - Hoang Quan Football Field</h3>
+    <h3>Sân Bóng Hoàng Quân</h3>
   </div>
 </template>
 <style lang="scss" scoped>
