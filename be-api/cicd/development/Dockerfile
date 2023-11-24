@@ -12,4 +12,4 @@ RUN npm install -g @nestjs/cli
 COPY . .
 EXPOSE 8881 8882
 RUN npx prisma generate
-CMD [ "yarn", "start:dev" ]
+CMD [ "yarn", "dev" ]
