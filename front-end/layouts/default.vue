@@ -71,6 +71,7 @@ useHead({
 
 .main {
   padding: 10px 20px;
+  margin-bottom: 20px;
   min-height: 600px;
   :deep(.v-breadcrumbs) {
     padding-bottom: 0;

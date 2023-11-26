@@ -1,11 +1,13 @@
 <script lang="ts" setup>
 import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { useAppStore } from "~/stores";
+import { useAppStore, useAuthStore } from "~/stores";
 import { useHead } from "nuxt/app";
 
 const appStore = useAppStore();
+const authStore = useAuthStore();
 const { app, isShowSidebar } = storeToRefs(appStore);
+const { user } = storeToRefs(authStore);
 const { title } = app.value;
 onMounted(() => appStore.setLoading());
 useHead({
@@ -22,7 +24,7 @@ useHead({
       </div>
       <admin-layout-footer :class="['footer', { '-full': !isShowSidebar }]" />
     </v-main>
-    <common-chat />
+    <common-chat v-if="user && user.roleId === 1" />
     <common-dialog />
     <common-loading />
   </v-app>

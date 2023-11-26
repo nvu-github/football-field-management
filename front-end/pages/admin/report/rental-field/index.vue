@@ -120,7 +120,7 @@ reportStore.getRentalFieldReport(condition.value);
                 }}
               </td>
             </tr>
-            <tr class="row">
+            <!-- <tr class="row">
               <td class="column text-end" colspan="3">Tổng cộng</td>
               <td class="column text-center">{{ totalRentalField.rented }}</td>
               <td class="column text-center">
@@ -133,7 +133,7 @@ reportStore.getRentalFieldReport(condition.value);
                     : 0
                 }}
               </td>
-            </tr>
+            </tr> -->
           </tbody>
           <tbody v-else class="body">
             <tr class="row">

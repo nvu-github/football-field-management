@@ -9,19 +9,16 @@ const { $toast }: any = useNuxtApp();
 const rules = {
   accessoryId: (value: number) => {
     if (!value) {
-      $toast.error("Vui lòng chọn phụ kiện!");
-      return false;
+      return "Vui lòng chọn phụ kiện!";
     }
     return true;
   },
   amount: (value: number) => {
     if (!value) {
-      $toast.error("Vui lòng nhập số lượng!");
-      return false;
+      return "Vui lòng nhập số lượng!";
     }
     if (Number(value) < 0) {
-      $toast.error("Số lượng không được nhỏ hơn 0!");
-      return false;
+      return "Số lượng không được nhỏ hơn 0!";
     }
     return true;
   },
