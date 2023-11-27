@@ -151,7 +151,7 @@ function openDialogRentalDetail(id: number) {
               <v-icon>mdi mdi-cash</v-icon>
               <span class="value">
                 {{ formatPrice(customerFootballPitchRental.totalPrice) }}
-                <span class="unit">VNĐ</span>
+                <span class="unit">₫</span>
               </span>
             </div>
           </v-card-subtitle>

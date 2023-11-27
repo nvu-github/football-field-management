@@ -203,13 +203,13 @@ accessoryTypeStore.getAccessoryTypes();
                 <v-col md="6">
                   <v-text-field
                     v-model.trim="formattedPrice"
-                    label="Giá phụ kiện (VNĐ)*"
+                    label="Giá phụ kiện (₫)*"
                     type="text"
                     variant="underlined"
                     :rules="[rules.price]"
                     required
                   >
-                    <template #append> VNĐ </template>
+                    <template #append> ₫ </template>
                   </v-text-field>
                 </v-col>
               </v-row>

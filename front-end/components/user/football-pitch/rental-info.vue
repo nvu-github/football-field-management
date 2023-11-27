@@ -139,7 +139,7 @@ function getStatusCustomerFootballPitchRental(status: string | null) {
               {{
                 footballPitchPriceFound &&
                 footballPitchPriceFound.price !== undefined
-                  ? `${formatPrice(footballPitchPriceFound.price)} VNĐ`
+                  ? `${formatPrice(footballPitchPriceFound.price)} ₫`
                   : ""
               }}
             </p>

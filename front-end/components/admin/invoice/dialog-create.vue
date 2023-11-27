@@ -5,7 +5,6 @@ import { storeToRefs } from "pinia";
 import {
   useInvoiceStore,
   useAppStore,
-  useInvoiceTypeStore,
   useDialogStore,
   useFootballPitchStore,
   invoiceStatuses,
@@ -13,9 +12,6 @@ import {
 import { formatPrice } from "~/utils/string";
 
 const rules = {
-  invoiceTypeId: (value: number) => !!value || "Vui lòng chọn loại hóa đơn",
-  customerName: (value: string) => !!value || "Vui lòng nhập tên khách hàng",
-  customerPhone: (value: string) => !!value || "Vui lòng nhập số điện thoại",
   customerFootballId: (value: number) => !!value || "Vui lòng chọn khách hàng",
   totalPrice: (value: number) => {
     if (!value) return "Vui lòng nhập tổng tiền hóa đơn!";
@@ -27,16 +23,13 @@ const rules = {
 const appStore = useAppStore();
 const invoiceStore: any = useInvoiceStore();
 const footballPitchStore = useFootballPitchStore();
-const invoiceTypeStore = useInvoiceTypeStore();
 const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
-const { invoiceTypes } = storeToRefs(invoiceTypeStore);
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
 const { invoices, invoice, payloadInvoice } = storeToRefs(invoiceStore);
 const { dialog, closeDialog } = useDialogStore();
 const { id, title, action }: any = dialog.data;
 const formattedCustomerFootballPitchRental = ref<any>([]);
-const RENTAL_INVOICE = 1;
 const customInvoiceStatuses = ref<any>();
 
 const formattedPrice = computed({
@@ -73,8 +66,7 @@ formattedCustomerFootballPitchRental.value =
   });
 
 watchEffect(() => {
-  const { customerFootballId, invoiceTypeId, invoiceDetails } =
-    payloadInvoice.value;
+  const { customerFootballId, invoiceDetails } = payloadInvoice.value;
 
   if (customerFootballId) {
     const customerFootballPitchRentalFound =
@@ -87,9 +79,6 @@ watchEffect(() => {
       ? customerFootballPitchRentalFound.price
       : null;
   }
-
-  if (invoiceTypeId && invoiceTypeId !== RENTAL_INVOICE)
-    customInvoiceStatuses.value = [invoiceStatuses[0], invoiceStatuses[2]];
 });
 
 onBeforeMount(async () => {
@@ -125,42 +114,20 @@ async function actionInvoice() {
   }
 }
 
-function handleInvoiceType() {
-  const { invoiceTypeId } = payloadInvoice.value;
-
-  if (invoiceTypeId && invoiceTypeId !== RENTAL_INVOICE) {
-    customInvoiceStatuses.value = [invoiceStatuses[0], invoiceStatuses[2]];
-    payloadInvoice.value.customerFootballId = null;
-    payloadInvoice.value.totalPrice = 0;
-  }
-}
-
 function setInvoiceToForm() {
   const {
-    invoiceTypeId,
     totalPrice,
     status,
     footballPitchName,
     customerName,
-    customerPhone,
     invoiceDetails,
   }: any = invoice.value;
 
-  payloadInvoice.value.invoiceTypeId = invoiceTypeId;
-  payloadInvoice.value.customerName =
-    invoiceTypeId !== RENTAL_INVOICE ? customerName : "";
-  payloadInvoice.value.customerPhone =
-    invoiceTypeId !== RENTAL_INVOICE ? customerPhone : "";
-  payloadInvoice.value.customerFootballId =
-    invoiceTypeId === RENTAL_INVOICE
-      ? `${footballPitchName} - ${customerName}`
-      : null;
+  payloadInvoice.value.customerFootballId = `${footballPitchName} - ${customerName}`;
   payloadInvoice.value.totalPrice = totalPrice;
   payloadInvoice.value.status = status;
   payloadInvoice.value.invoiceDetails = invoiceDetails;
 }
-
-invoiceTypeStore.getInvoiceTypes();
 </script>
 <template>
   <div class="dialog-invoice-create">
@@ -172,37 +139,7 @@ invoiceTypeStore.getInvoiceTypes();
         <v-card-text>
           <v-row>
             <v-col cols="12">
-              <v-select
-                v-model="payloadInvoice.invoiceTypeId"
-                label="Chọn loại hóa đơn*"
-                item-value="id"
-                item-title="name"
-                variant="underlined"
-                required
-                :items="invoiceTypes"
-                :rules="[rules.invoiceTypeId]"
-                @update:modelValue="handleInvoiceType"
-              ></v-select>
-              <template v-if="payloadInvoice.invoiceTypeId !== RENTAL_INVOICE">
-                <v-text-field
-                  v-model="payloadInvoice.customerName"
-                  label="Tên khách hàng*"
-                  type="text"
-                  variant="underlined"
-                  required
-                  :rules="[rules.customerName]"
-                />
-                <v-text-field
-                  v-model="payloadInvoice.customerPhone"
-                  label="Số điện thoại*"
-                  type="text"
-                  variant="underlined"
-                  required
-                  :rules="[rules.customerPhone]"
-                />
-              </template>
               <v-autocomplete
-                v-else
                 v-model="payloadInvoice.customerFootballId"
                 label="Chọn khách hàng thuê sân*"
                 item-value="id"
@@ -216,14 +153,14 @@ invoiceTypeStore.getInvoiceTypes();
                 <v-col md="6">
                   <v-text-field
                     v-model="formattedPrice"
-                    label="Tổng tiền hóa đơn (VNĐ)*"
+                    label="Tổng tiền hóa đơn (₫)*"
                     type="text"
                     variant="underlined"
                     required
                     class="mr-2"
                     :rules="[rules.totalPrice]"
                   >
-                    <template #append> VNĐ </template>
+                    <template #append> ₫ </template>
                   </v-text-field>
                 </v-col>
                 <v-col md="6">

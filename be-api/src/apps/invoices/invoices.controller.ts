@@ -27,69 +27,6 @@ export class InvoicesController {
     private readonly accessoryService: AccessoriesService,
   ) {}
 
-  @Post('types')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  createInvoiceType(@Body() payloads: PayloadInvoiceTypeDto) {
-    return this.invoicesService.createInvoiceType(payloads);
-  }
-
-  @Patch('types/:id')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  async updateInvoiceType(
-    @Param('id') id: string,
-    @Body() payloads: PayloadInvoiceTypeDto,
-  ) {
-    const InvoiceType = await this.invoicesService.getInvoiceType(+id);
-
-    if (!InvoiceType) {
-      throw new HttpException(
-        'Loại sân bóng này không tồn tại',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return this.invoicesService.updateInvoiceType(+id, payloads);
-  }
-
-  @Delete('types/:id')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  async deleteInvoiceType(@Param('id') id: string) {
-    const InvoiceType = await this.invoicesService.getInvoiceType(+id);
-
-    if (!InvoiceType) {
-      throw new HttpException(
-        'Loại sân bóng này không tồn tại',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-
-    return this.invoicesService.deleteInvoiceType(+id);
-  }
-
-  @Get('types')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  getInvoiceTypes() {
-    return this.invoicesService.getInvoiceTypes();
-  }
-
-  @Get('types/:id')
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  async getInvoiceType(@Param('id') id: string) {
-    const InvoiceType = await this.invoicesService.getInvoiceType(+id);
-
-    if (!InvoiceType) {
-      throw new HttpException(
-        'Loại sân bóng này không tồn tại',
-        HttpStatus.NOT_FOUND,
-      );
-    }
-    return InvoiceType;
-  }
-
   @Post()
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

@@ -22,7 +22,6 @@ const { leasingDurations } = storeToRefs(leasingDurationStore);
 const conditionFilterFootballPitch = ref<any>({
   rentalDate: new Date(),
   leasingDuration: null,
-  status: null,
   footballPitchId: null,
 });
 const footballPitchInfoFound = ref<any>();
@@ -93,11 +92,7 @@ async function filterFootballInfo() {
           condition = condition && footballLeasingDuration === leasingDuration;
         }
 
-        if (status) {
-          condition = condition && footballPitch.status === status;
-        }
-
-        return condition;
+        return condition && footballPitch.status === "EMPTY";
       }
     );
   }
@@ -137,16 +132,6 @@ leasingDurationStore.getLeasingDurationPublics();
           variant="underlined"
         ></v-autocomplete>
       </v-col>
-      <v-col lg="2" xs="12">
-        <v-autocomplete
-          v-model="conditionFilterFootballPitch.status"
-          label="Trạng thái"
-          item-value="key"
-          item-title="title"
-          :items="statusFootballPitch"
-          variant="underlined"
-        ></v-autocomplete>
-      </v-col>
       <v-col class="action" md="2" xs="12">
         <v-btn class="button -success" @click="filterFootballInfo">
           <template #prepend>
@@ -158,7 +143,7 @@ leasingDurationStore.getLeasingDurationPublics();
     </v-row>
     <v-row v-if="footballPitchInfoFound && footballPitchInfoFound.length > 0">
       <v-col
-        md="6"
+        md="4"
         v-for="rentalInfo in footballPitchInfoFound"
         :key="rentalInfo.id"
       >

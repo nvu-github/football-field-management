@@ -177,13 +177,13 @@ footballPitchStore.getFootballPitches();
               ></v-autocomplete>
               <v-text-field
                 v-model.trim="formattedPrice"
-                label="Giá thuê (VNĐ)*"
+                label="Giá thuê (₫)*"
                 type="text"
                 variant="underlined"
                 :rules="[rules.price]"
                 required
               >
-                <template #append> VNĐ </template>
+                <template #append> ₫ </template>
               </v-text-field>
             </v-col>
           </v-row>

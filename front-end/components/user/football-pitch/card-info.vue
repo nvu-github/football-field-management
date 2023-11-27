@@ -122,7 +122,7 @@ function navigateToRental(id: number) {
           >
         </div>
         <div class="price mt-2">
-          <b class="title">Giá thuê:</b> {{ formatPrice(props.price) }} VNĐ
+          <b class="title">Giá thuê:</b> {{ formatPrice(props.price) }}₫
         </div>
       </v-card-text>
       <v-card-action class="action">
@@ -154,24 +154,24 @@ function navigateToRental(id: number) {
 </template>
 <style lang="scss" scoped>
 .card-info {
-  display: flex;
-  width: 100%;
+  width: 90%;
+  margin-bottom: 20px;
+  border: 1px solid;
+  border-color: #a9ca31;
+
   &:hover {
     transform: translateY(-1px) scale(1.005) translateZ(0);
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    cursor: pointer;
   }
   > :deep(.v-img) {
-    width: 54%;
     height: 200px;
     flex: none;
-  }
-  > :deep(.v-img) > .v-img__img {
-    width: 300px;
   }
 }
 
 .card-content {
-  padding-left: 10px;
-  width: 45%;
+  padding: 10px;
   > .title {
     padding: 0;
   }

@@ -134,7 +134,7 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
                   customerFootballPitchRentalDetail
                     ? `${formatPrice(
                         customerFootballPitchRentalDetail.price
-                      )} VNĐ`
+                      )} ₫`
                     : ""
                 }}
               </li>
@@ -163,7 +163,7 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
                   customerFootballPitchRentalDetail.invoice
                     ? `${formatPrice(
                         customerFootballPitchRentalDetail.invoice.totalPrice
-                      )} VNĐ`
+                      )} ₫`
                     : ""
                 }}
               </li>
@@ -174,7 +174,7 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
                   customerFootballPitchRentalDetail.invoice
                     ? `${formatPrice(
                         customerFootballPitchRentalDetail.invoice.moneyPaid
-                      )} VNĐ`
+                      )} ₫`
                     : ""
                 }}
               </li>
@@ -230,7 +230,7 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
                   <td>{{ accessory.name }}</td>
                   <td class="text-center">{{ accessory.amount }}</td>
                   <td class="text-center">
-                    {{ formatPrice(accessory.price) }} VNĐ
+                    {{ formatPrice(accessory.price) }} ₫
                   </td>
                 </tr>
               </tbody>

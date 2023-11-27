@@ -1,12 +1,11 @@
 export interface Invoice {
   id?: number | null;
-  customerName?: string;
-  customerPhone?: string;
+  rentalDate?: string;
+  leasingDurationTime?: string;
   totalPrice: number | null;
   moneyPaid?: number | null;
   status: string;
   staffId: number | null;
-  invoiceTypeId: number | null;
   customerFootballId?: number | null;
   invoiceDetails?: Array<InvoiceDetail>;
 }
@@ -17,11 +16,6 @@ export interface InvoiceDetail {
   amount: number;
   finalCost: number;
   accessoryId: number;
-}
-
-export interface InvoiceType {
-  id?: number;
-  name: string;
 }
 
 export const invoiceStatuses: any = [
@@ -45,13 +39,10 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   const invoice = ref<Invoice>();
   const payloadInvoice = ref<Invoice>({
     id: null,
-    customerName: "",
-    customerPhone: "",
     totalPrice: null,
     moneyPaid: null,
     status: "",
     staffId: null,
-    invoiceTypeId: null,
     customerFootballId: null,
     invoiceDetails: [],
   });
@@ -116,13 +107,10 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   function resetFormInvoice() {
     payloadInvoice.value = {
       id: null,
-      customerName: "",
-      customerPhone: "",
       totalPrice: null,
       moneyPaid: null,
       status: "",
       staffId: null,
-      invoiceTypeId: null,
       customerFootballId: null,
       invoiceDetails: [],
     };
@@ -142,49 +130,5 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     getInvoice,
     getInvoiceDetail,
     resetFormInvoice,
-  };
-});
-
-export const useInvoiceTypeStore = defineStore("invoiceTypeStore", () => {
-  const { $apis }: any = useNuxtApp();
-  const invoiceTypes = ref<Invoice[]>([]);
-  const invoiceType = ref<Invoice>();
-
-  function createInvoiceType(params: InvoiceType) {
-    delete params.id;
-    return $apis.post("invoices/types", {
-      ...convertProjectObjToObj(params),
-    });
-  }
-
-  function updateInvoiceType(params: InvoiceType) {
-    const { id }: any = params;
-    delete params.id;
-    return $apis.patch(`invoices/types/${id}`, {
-      ...convertProjectObjToObj(params),
-    });
-  }
-
-  function deleteInvoiceType({ id }: { id: string }) {
-    return $apis.delete(`invoices/types/${id}`);
-  }
-
-  async function getInvoiceTypes() {
-    const InvoiceTypeList = await $apis.get("invoices/types");
-    invoiceTypes.value = InvoiceTypeList.data;
-  }
-
-  async function getInvoiceType(id: number) {
-    const InvoiceTypeSingle = await $apis.get(`invoices/types/${id}`);
-    invoiceType.value = InvoiceTypeSingle.data;
-  }
-  return {
-    invoiceTypes,
-    invoiceType,
-    createInvoiceType,
-    updateInvoiceType,
-    deleteInvoiceType,
-    getInvoiceTypes,
-    getInvoiceType,
   };
 });

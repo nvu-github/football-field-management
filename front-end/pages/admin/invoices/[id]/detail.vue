@@ -34,14 +34,7 @@ const total = invoiceDetail.value.invoiceDetails.reduce(
     <p class="footballname">SÂN BÓNG HOÀNG QUÂN</p>
     <p class="address">ĐC: Thị Trấn Sông Thao, Cẩm Khê, Phú Thọ</p>
     <p class="phone">ĐT: 0964 573 999</p>
-    <p class="title">
-      HÓA ĐƠN
-      {{
-        invoiceDetail && invoiceDetail.invoiceTypeId === 1
-          ? "THUÊ SÂN"
-          : "BÁN HÀNG"
-      }}
-    </p>
+    <p class="title">HÓA ĐƠN THUÊ SÂN</p>
     <ul class="info -customer">
       <li class="item -name">
         <span class="label"> Tên khách hàng: </span>
@@ -53,28 +46,30 @@ const total = invoiceDetail.value.invoiceDetails.reduce(
         {{ invoiceDetail ? invoiceDetail.customerPhoneNumber : "" }}
       </li>
     </ul>
-    <template v-if="invoiceDetail && invoiceDetail.invoiceTypeId === 1">
-      <ul class="info -football">
-        <li class="item -name">
-          <span class="label"> Sân thuê: </span>
-          {{ invoiceDetail.footballPitchName }}
-        </li>
-        <li class="item -price">
-          <span class="label"> Giá thuê: </span>
-          {{ `${formatPrice(invoiceDetail.rentalPrice)} VNĐ` }}
-        </li>
-      </ul>
-      <ul class="info -rental">
-        <li class="item -day">
-          <span class="label"> Ngày thuê: </span>
-          {{ format(new Date(invoiceDetail.rentalDate), "dd/MM/yyyy") }}
-        </li>
-        <li class="item -time">
-          <span class="label"> Thời gian thuê: </span>
-          {{ invoiceDetail.leasingDurationName }}
-        </li>
-      </ul>
-    </template>
+    <ul class="info -football">
+      <li class="item -name">
+        <span class="label"> Sân thuê: </span>
+        {{ invoiceDetail ? invoiceDetail.footballPitchName : "" }}
+      </li>
+      <li class="item -price">
+        <span class="label"> Giá thuê: </span>
+        {{ invoiceDetail ? `${formatPrice(invoiceDetail.rentalPrice)} ₫` : "" }}
+      </li>
+    </ul>
+    <ul class="info -rental">
+      <li class="item -day">
+        <span class="label"> Ngày thuê: </span>
+        {{
+          invoiceDetail
+            ? format(new Date(invoiceDetail.rentalDate), "dd/MM/yyyy")
+            : ""
+        }}
+      </li>
+      <li class="item -time">
+        <span class="label"> Thời gian thuê: </span>
+        {{ invoiceDetail ? invoiceDetail.leasingDurationName : "" }}
+      </li>
+    </ul>
     <div class="invoice-detail mt-2 mb-8">
       <table class="table">
         <thead class="head">
@@ -112,7 +107,7 @@ const total = invoiceDetail.value.invoiceDetails.reduce(
     </div>
     <p class="total">
       <span class="label">Tổng tiền thanh toán:</span>
-      {{ invoiceDetail ? `${formatPrice(invoiceDetail.totalPrice)} VNĐ` : "" }}
+      {{ invoiceDetail ? `${formatPrice(invoiceDetail.totalPrice)} ₫` : "" }}
     </p>
     <p class="total -text">
       <span class="label">Số tiền bằng chữ:</span>

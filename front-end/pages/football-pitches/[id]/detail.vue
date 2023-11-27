@@ -164,7 +164,7 @@ function navigateToRental(footballPitchLeasingDuration: number) {
                 {{ leasingDuration.leasingDuration.endTime }}
               </td>
               <td class="text-center">
-                {{ formatPrice(leasingDuration.price) }} VNĐ
+                {{ formatPrice(leasingDuration.price) }} ₫
               </td>
               <td class="text-center action">
                 <v-tooltip location="right" text="Đặt ngay">

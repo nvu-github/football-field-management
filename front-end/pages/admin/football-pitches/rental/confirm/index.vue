@@ -217,7 +217,7 @@ function filterFootballConfirm() {
             {{ item.raw.startTime }} - {{ item.raw.endTime }}
           </template>
           <template #[`item.price`]="{ item }">
-            {{ formatPrice(item.raw.price) }} VNĐ
+            {{ formatPrice(item.raw.price) }} ₫
           </template>
           <template #[`item.status`]="{ item }">
             <v-chip

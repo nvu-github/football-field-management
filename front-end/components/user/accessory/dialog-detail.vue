@@ -66,7 +66,7 @@ accessoryStore.getAccessory(id);
             </p>
             <p class="price row">
               <b class="label">Giá thuê: </b
-              >{{ accessory ? `${formatPrice(accessory?.price)} VNĐ` : "" }}
+              >{{ accessory ? `${formatPrice(accessory?.price)} ₫` : "" }}
             </p>
           </v-col>
         </v-row>

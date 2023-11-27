@@ -165,7 +165,7 @@ accessoryStore.getAccessories();
               priceAccessories[item.raw.accessoryId]
                 ? `${formatPrice(
                     priceAccessories[item.raw.accessoryId].price
-                  )} VNĐ`
+                  )} ₫`
                 : ""
             }`
           }}

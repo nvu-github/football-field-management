@@ -96,7 +96,7 @@ const options = {
   yaxis: {
     labels: {
       formatter: (val) => {
-        return val ? `${formatPrice(val)} VNĐ` : val;
+        return val ? `${formatPrice(val)} ₫` : val;
       },
     },
   },

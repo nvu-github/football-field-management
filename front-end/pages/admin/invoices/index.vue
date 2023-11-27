@@ -1,31 +1,45 @@
 <script lang="ts" setup>
 import { resolveComponent } from "vue";
 import { storeToRefs } from "pinia";
+import format from "date-fns/format";
 import { useAppStore, useInvoiceStore, useDialogStore } from "~/stores";
 import { formatPrice } from "~/utils/string";
 
 const headers = [
   {
     title: "STT",
+    width: "5%",
     align: "center",
     sortable: false,
     key: "sno",
   },
   {
     title: "Tên khách hàng",
-    width: "25%",
+    width: "20%",
     align: "start",
     key: "customerName",
   },
   {
-    title: "Loại hóa đơn",
+    title: "Tên sân bóng",
+    width: "15%",
+    align: "start",
+    key: "footballPitchName",
+  },
+  {
+    title: "Thời gian thuê",
     width: "20%",
     align: "start",
-    key: "invoiceTypeName",
+    key: "rentalDate",
   },
   { title: "Trạng thái", width: "15%", align: "start", key: "status" },
-  { title: "Tổng tiền", width: "15%", align: "start", key: "totalPrice" },
-  { title: "Tác vụ", align: "center", key: "actions", sortable: false },
+  { title: "Tổng tiền", width: "10%", align: "start", key: "totalPrice" },
+  {
+    title: "Tác vụ",
+    width: "20%",
+    align: "center",
+    key: "actions",
+    sortable: false,
+  },
 ];
 const appStore = useAppStore();
 const invoiceStore = useInvoiceStore();
@@ -96,6 +110,10 @@ invoiceStore.getInvoices();
           <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
+          <template #[`item.rentalDate`]="{ item }">
+            {{ format(new Date(item.raw.rentalDate), "dd/MM/yyyy") }}
+            {{ item.raw.leasingDurationTime }}
+          </template>
           <template #[`item.status`]="{ item }">
             <v-chip
               :color="invoiceStore.getStatusInvoice(item.raw.status).color"
@@ -104,7 +122,7 @@ invoiceStore.getInvoices();
             </v-chip>
           </template>
           <template #[`item.totalPrice`]="{ item }">
-            {{ formatPrice(item.raw.totalPrice) }} VNĐ
+            {{ formatPrice(item.raw.totalPrice) }} ₫
           </template>
           <template #[`item.actions`]="{ item }">
             <v-btn

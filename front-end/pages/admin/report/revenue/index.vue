@@ -101,13 +101,13 @@ reportStore.getRevenueReport(condition.value);
             <tr class="row">
               <th class="column" width="50" rowspan="2">STT</th>
               <th class="column" width="200" rowspan="2">Tháng</th>
-              <th class="column" width="120" rowspan="2">Sân bóng (VNĐ)</th>
+              <th class="column" width="120" rowspan="2">Sân bóng (₫)</th>
               <th class="column" width="100" colspan="2">Phụ kiện</th>
-              <th class="column" width="100" rowspan="2">Tổng tiền (VNĐ)</th>
+              <th class="column" width="100" rowspan="2">Tổng tiền (₫)</th>
             </tr>
             <tr class="row">
-              <td class="column" width="150">Thuê (VNĐ)</td>
-              <td class="column" width="150">Bán (VNĐ)</td>
+              <td class="column" width="150">Thuê (₫)</td>
+              <td class="column" width="150">Bán (₫)</td>
             </tr>
           </thead>
           <tbody v-if="revenueReport && revenueReport.length > 0" class="body">
@@ -121,28 +121,28 @@ reportStore.getRevenueReport(condition.value);
               <td class="column text-center">
                 {{
                   revenue.totalRevenueFootballPitch > 0
-                    ? `${formatPrice(revenue.totalRevenueFootballPitch)} VNĐ`
+                    ? `${formatPrice(revenue.totalRevenueFootballPitch)} ₫`
                     : 0
                 }}
               </td>
               <td class="column text-center">
                 {{
                   revenue.totalRevenueAccessory.rental > 0
-                    ? `${formatPrice(revenue.totalRevenueAccessory.rental)} VNĐ`
+                    ? `${formatPrice(revenue.totalRevenueAccessory.rental)} ₫`
                     : 0
                 }}
               </td>
               <td class="column text-center">
                 {{
                   revenue.totalRevenueAccessory.sell > 0
-                    ? `${formatPrice(revenue.totalRevenueAccessory.sell)} VNĐ`
+                    ? `${formatPrice(revenue.totalRevenueAccessory.sell)} ₫`
                     : 0
                 }}
               </td>
               <td class="column text-center">
                 {{
                   revenue.totalRevenue > 0
-                    ? `${formatPrice(revenue.totalRevenue)} VNĐ`
+                    ? `${formatPrice(revenue.totalRevenue)} ₫`
                     : 0
                 }}
               </td>
@@ -152,28 +152,28 @@ reportStore.getRevenueReport(condition.value);
               <td class="column text-center">
                 {{
                   totalRevenue.revenueFootballPitch > 0
-                    ? `${formatPrice(totalRevenue.revenueFootballPitch)} VNĐ`
+                    ? `${formatPrice(totalRevenue.revenueFootballPitch)} ₫`
                     : 0
                 }}
               </td>
               <td class="column text-center">
                 {{
                   totalRevenue.revenueAccessory.rental > 0
-                    ? `${formatPrice(totalRevenue.revenueAccessory.rental)} VNĐ`
+                    ? `${formatPrice(totalRevenue.revenueAccessory.rental)} ₫`
                     : 0
                 }}
               </td>
               <td class="column text-center">
                 {{
                   totalRevenue.revenueAccessory.sell > 0
-                    ? `${formatPrice(totalRevenue.revenueAccessory.sell)} VNĐ`
+                    ? `${formatPrice(totalRevenue.revenueAccessory.sell)} ₫`
                     : 0
                 }}
               </td>
               <td class="column text-center">
                 {{
                   totalRevenue.revenue > 0
-                    ? `${formatPrice(totalRevenue.revenue)} VNĐ`
+                    ? `${formatPrice(totalRevenue.revenue)} ₫`
                     : 0
                 }}
               </td>

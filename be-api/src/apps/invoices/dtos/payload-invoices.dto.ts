@@ -43,13 +43,6 @@ export class PayloadInvoiceDto {
     example: 1,
   })
   @IsNumber()
-  @IsNotEmpty()
-  readonly invoiceTypeId: number;
-
-  @ApiProperty({
-    example: 1,
-  })
-  @IsNumber()
   @IsOptional()
   readonly customerFootballId: number;
 

@@ -73,7 +73,6 @@ async function createInvoice(customerFootballPitchRentalId: number) {
     moneyPaid,
     status: "DEPOSIT",
     staffId: 1,
-    invoiceTypeId: 1,
     customerFootballId: customerFootballPitchRentalId,
   };
   if (customerAccessoryRentals) {

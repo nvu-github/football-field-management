@@ -111,22 +111,22 @@ function cancelPayment() {
                 <p class="price mb-2">
                   <b class="label">Tiền cọc: </b>
                   {{ formatPrice(subRentalPrice) }}
-                  <span class="unit">VNĐ</span>
+                  <span class="unit">₫</span>
                 </p>
                 <p class="price mb-2">
                   <b class="label">Tổng tiền thuê: </b>
-                  {{ formatPrice(rentalPrice) }} <span class="unit">VNĐ</span>
+                  {{ formatPrice(rentalPrice) }} <span class="unit">₫</span>
                 </p>
               </div>
               <v-text-field
                 v-model.trim="formattedPrice"
-                label="Qúy khác vui lòng nhập số tiền thanh toán (VNĐ)*"
+                label="Qúy khác vui lòng nhập số tiền thanh toán (₫)*"
                 type="text"
                 variant="underlined"
                 :rules="[rules.price]"
                 required
               >
-                <template #append> VNĐ </template>
+                <template #append> ₫ </template>
               </v-text-field>
             </v-col>
           </v-row>

@@ -72,13 +72,6 @@ let totalInvoiceDetail = 0;
 watchEffect(() => {
   const invoiceDetails = payloadInvoice.value.invoiceDetails;
 
-  if (payloadInvoice.value.invoiceTypeId && accessories.value) {
-    formattedAccessories.value = accessories.value.filter(
-      (accessory: any) =>
-        accessory.accessoryTypeId === payloadInvoice.value.invoiceTypeId
-    );
-  }
-
   if (!invoiceDetails) return;
 
   const accessoryIds = invoiceDetails.map(
@@ -169,7 +162,7 @@ accessoryStore.getAccessories();
           variant="outlined"
           menu-icon="false"
           class="pt-3"
-          :items="formattedAccessories"
+          :items="accessories"
           :rules="[rules.accessoryId]"
         ></v-autocomplete>
       </template>
@@ -180,7 +173,7 @@ accessoryStore.getAccessories();
               priceAccessories[item.raw.accessoryId]
                 ? `${formatPrice(
                     priceAccessories[item.raw.accessoryId].price
-                  )} VNĐ`
+                  )} ₫`
                 : ""
             }`
           }}
@@ -198,7 +191,7 @@ accessoryStore.getAccessories();
       </template>
       <template #[`item.finalCost`]="{ item }">
         <span v-if="item.raw.finalCost" class="finalcost">
-          {{ formatPrice(item.raw.finalCost) }} VNĐ
+          {{ formatPrice(item.raw.finalCost) }} ₫
         </span>
       </template>
       <template #[`item.actions`]="{ item }">
@@ -210,11 +203,7 @@ accessoryStore.getAccessories();
         <div class="action">
           <v-btn
             class="button -primary btnadd"
-            :disabled="
-              !payloadInvoice.invoiceTypeId ||
-              (payloadInvoice.invoiceTypeId !== 2 &&
-                !!payloadInvoice.totalPrice === false)
-            "
+            :disabled="!!!payloadInvoice.totalPrice"
             @click="addInvoiceDetail"
             >Thêm chi tiết
             <template #prepend>

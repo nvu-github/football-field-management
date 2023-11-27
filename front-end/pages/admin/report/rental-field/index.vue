@@ -115,7 +115,7 @@ reportStore.getRentalFieldReport(condition.value);
               <td class="column text-center">
                 {{
                   rentalField.totalRevenue > 0
-                    ? `${formatPrice(rentalField.totalRevenue)} VNĐ`
+                    ? `${formatPrice(rentalField.totalRevenue)} ₫`
                     : 0
                 }}
               </td>
@@ -129,7 +129,7 @@ reportStore.getRentalFieldReport(condition.value);
               <td class="column text-center">
                 {{
                   totalRentalField.revenue > 0
-                    ? `${formatPrice(totalRentalField.revenue)} VNĐ`
+                    ? `${formatPrice(totalRentalField.revenue)} ₫`
                     : 0
                 }}
               </td>

@@ -98,7 +98,7 @@ accessoryStore.getAccessories();
             {{ item.index + 1 }}
           </template>
           <template #[`item.price`]="{ item }">
-            {{ formatPrice(item.raw.price) }} VNĐ
+            {{ formatPrice(item.raw.price) }} ₫
           </template>
           <template #[`item.actions`]="{ item }">
             <v-btn

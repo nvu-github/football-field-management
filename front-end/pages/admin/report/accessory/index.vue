@@ -108,7 +108,7 @@ reportStore.getAccessoryReport(condition.value);
               <td class="column text-center">
                 {{
                   accessoryReport.totalPrice > 0
-                    ? `${formatPrice(accessoryReport.totalPrice)} VNĐ`
+                    ? `${formatPrice(accessoryReport.totalPrice)} ₫`
                     : 0
                 }}
               </td>
@@ -119,7 +119,7 @@ reportStore.getAccessoryReport(condition.value);
               <td class="column text-center">
                 {{
                   totalAccessory.price > 0
-                    ? `${formatPrice(totalAccessory.price)} VNĐ`
+                    ? `${formatPrice(totalAccessory.price)} ₫`
                     : 0
                 }}
               </td>

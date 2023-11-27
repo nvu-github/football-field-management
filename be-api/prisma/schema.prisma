@@ -276,32 +276,19 @@ model AccessoryRentalCustomer {
   @@map("accessory_rental_customer")
 }
 
-model InvoiceType {
-  id   Int    @id @default(autoincrement())
-  name String
-
-  invoice Invoice[]
-
-  @@map("invoice_types")
-}
-
 model Invoice {
   id                 Int           @id @default(autoincrement())
-  customerName       String?       @map("customer_name")
-  customerPhone      String?       @map("customer_phone")
   totalPrice         Decimal       @map("total_price") @db.Decimal(12, 0)
   moneyPaid          Decimal?      @map("money_paid") @db.Decimal(12, 0)
   status             InvoiceStatus @default(UNPAID)
   staffId            Int           @map("staff_id")
-  invoiceTypeId      Int           @map("invoice_type_id")
-  customerFootballId Int?          @unique @map("customer_football_id")
+  customerFootballId Int           @unique @map("customer_football_id")
   createdAt          DateTime      @default(now()) @map("created_at")
   updatedAt          DateTime      @updatedAt @map("updated_at")
 
   invoiceDetail               InvoiceDetail[]
-  staff                       Staff                        @relation(fields: [staffId], references: [id])
-  invoiceType                 InvoiceType                  @relation(fields: [invoiceTypeId], references: [id])
-  customerFootballPitchRental CustomerFootballPitchRental? @relation(fields: [customerFootballId], references: [id])
+  staff                       Staff                       @relation(fields: [staffId], references: [id])
+  customerFootballPitchRental CustomerFootballPitchRental @relation(fields: [customerFootballId], references: [id])
 
   @@map("invoices")
 }
