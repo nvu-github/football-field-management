@@ -2,10 +2,10 @@ export interface Invoice {
   id?: number | null;
   rentalDate?: string;
   leasingDurationTime?: string;
-  totalPrice: number | null;
+  totalPrice?: number | null;
   moneyPaid?: number | null;
   status: string;
-  staffId: number | null;
+  staffId?: number | null;
   customerFootballId?: number | null;
   invoiceDetails?: Array<InvoiceDetail>;
 }
@@ -93,12 +93,12 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     switch (status) {
       case "DEPOSIT":
         text = "Đã cọc";
-        color = "primary";
+        color = "orange";
         break;
 
       case "UNPAID":
         text = "Chưa thanh toán";
-        color = "orange";
+        color = "danger";
         break;
     }
     return { text, color };

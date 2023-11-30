@@ -84,6 +84,9 @@ async function confirmPayment() {
       "customerFootballPitchRental",
       JSON.stringify(payloadCustomerFootballPitchRental.value)
     );
+    localStorage.setItem("paymentMethod", JSON.stringify({
+      status: 'rental',
+    }));
     window.location.href = paymentRedirect;
   } catch (err) {
     console.log(err);
