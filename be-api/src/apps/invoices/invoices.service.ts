@@ -21,6 +21,12 @@ export class InvoicesService {
     });
   }
 
+  creatInvoiceFootballPitchRental(payload: any): Promise<any> {
+    return this.prisma.invoiceFootballPitchRental.create({
+      data: payload,
+    });
+  }
+
   createInvoiceDetails(payload: any): Promise<any> {
     return this.prisma.invoiceDetail.createMany({
       data: payload,
@@ -87,28 +93,32 @@ export class InvoicesService {
             },
           },
         },
-        customerFootballPitchRental: {
+        invoiceFootballPitchRental: {
           select: {
-            id: true,
-            rentalDate: true,
-            customer: {
+            customerFootballPitchRental: {
               select: {
-                name: true,
-              },
-            },
-            footballPitchLeasingDuration: {
-              select: {
-                leasingDuration: {
+                id: true,
+                rentalDate: true,
+                customer: {
                   select: {
-                    startTime: true,
-                    endTime: true,
+                    name: true,
                   },
                 },
-              },
-            },
-            footballPitch: {
-              select: {
-                name: true,
+                footballPitchLeasingDuration: {
+                  select: {
+                    leasingDuration: {
+                      select: {
+                        startTime: true,
+                        endTime: true,
+                      },
+                    },
+                  },
+                },
+                footballPitch: {
+                  select: {
+                    name: true,
+                  },
+                },
               },
             },
           },
@@ -121,7 +131,7 @@ export class InvoicesService {
       moneyPaid,
       status,
       invoiceDetail,
-      customerFootballPitchRental,
+      invoiceFootballPitchRental,
     } = invoice;
 
     return {
@@ -129,12 +139,7 @@ export class InvoicesService {
       totalPrice,
       moneyPaid,
       status,
-      rentalDate: customerFootballPitchRental.rentalDate,
-      customerName: customerFootballPitchRental.customer.name,
-      footballPitchName: customerFootballPitchRental.footballPitch.name,
-      customerFootballPitchRentalId: customerFootballPitchRental
-        ? customerFootballPitchRental.id
-        : null,
+      invoiceFootballPitchRental,
       invoiceDetails: invoiceDetail,
     };
   }
@@ -146,29 +151,33 @@ export class InvoicesService {
         totalPrice: true,
         moneyPaid: true,
         status: true,
-        customerFootballPitchRental: {
+        invoiceFootballPitchRental: {
           select: {
-            id: true,
-            status: true,
-            rentalDate: true,
-            customer: {
+            customerFootballPitchRental: {
               select: {
-                name: true,
-              },
-            },
-            footballPitchLeasingDuration: {
-              select: {
-                leasingDuration: {
+                id: true,
+                status: true,
+                rentalDate: true,
+                customer: {
                   select: {
-                    startTime: true,
-                    endTime: true,
+                    name: true,
                   },
                 },
-              },
-            },
-            footballPitch: {
-              select: {
-                name: true,
+                footballPitchLeasingDuration: {
+                  select: {
+                    leasingDuration: {
+                      select: {
+                        startTime: true,
+                        endTime: true,
+                      },
+                    },
+                  },
+                },
+                footballPitch: {
+                  select: {
+                    name: true,
+                  },
+                },
               },
             },
           },
@@ -188,20 +197,14 @@ export class InvoicesService {
           totalPrice,
           moneyPaid,
           status,
-          customerFootballPitchRental,
+          invoiceFootballPitchRental,
         } = invoice;
         return {
           id,
           totalPrice,
           moneyPaid,
           status,
-          customerName: customerFootballPitchRental.customer.name,
-          footballPitchName: customerFootballPitchRental.footballPitch.name,
-          customerFootballPitchRentalId: customerFootballPitchRental
-            ? customerFootballPitchRental.id
-            : null,
-          rentalDate: customerFootballPitchRental.rentalDate,
-          leasingDurationTime: `${customerFootballPitchRental.footballPitchLeasingDuration.leasingDuration.startTime} - ${customerFootballPitchRental.footballPitchLeasingDuration.leasingDuration.endTime}`,
+          invoiceFootballPitchRental,
         };
       });
   }
@@ -229,20 +232,24 @@ export class InvoicesService {
             },
           },
         },
-        customerFootballPitchRental: {
+        invoiceFootballPitchRental: {
           select: {
-            id: true,
-            footballPitchLeasingDurationId: true,
-            rentalDate: true,
-            customer: {
+            customerFootballPitchRental: {
               select: {
-                name: true,
-                phoneNumber: true,
-              },
-            },
-            footballPitch: {
-              select: {
-                name: true,
+                id: true,
+                footballPitchLeasingDurationId: true,
+                rentalDate: true,
+                customer: {
+                  select: {
+                    name: true,
+                    phoneNumber: true,
+                  },
+                },
+                footballPitch: {
+                  select: {
+                    name: true,
+                  },
+                },
               },
             },
           },
@@ -254,34 +261,15 @@ export class InvoicesService {
       totalPrice,
       status,
       invoiceDetail,
-      customerFootballPitchRental,
+      invoiceFootballPitchRental,
     } = invoice;
-
-    const footballPitchLeasingDuration = customerFootballPitchRental
-      ? await this.footballPitchService.getFootballPitchPrice(
-          customerFootballPitchRental.footballPitchLeasingDurationId,
-        )
-      : { price: null, leasingDurationName: null };
-
-    const { price: rentalPrice, leasingDurationName } =
-      footballPitchLeasingDuration;
 
     return {
       id,
       totalPrice,
       status,
-      customerName: customerFootballPitchRental.customer.name,
-      customerPhoneNumber: customerFootballPitchRental.customer.phoneNumber,
-      rentalDate: customerFootballPitchRental
-        ? customerFootballPitchRental.rentalDate
-        : null,
-      footballPitchName: customerFootballPitchRental.footballPitch.name,
-      customerFootballPitchRentalId: customerFootballPitchRental
-        ? customerFootballPitchRental.id
-        : null,
+      invoiceFootballPitchRental,
       invoiceDetails: invoiceDetail,
-      rentalPrice,
-      leasingDurationName,
     };
   }
 }

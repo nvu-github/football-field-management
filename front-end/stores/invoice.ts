@@ -6,7 +6,7 @@ export interface Invoice {
   moneyPaid?: number | null;
   status: string;
   staffId?: number | null;
-  customerFootballId?: number | null;
+  customerFootballIds?: Array<number> | null;
   invoiceDetails?: Array<InvoiceDetail>;
 }
 
@@ -43,7 +43,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     moneyPaid: null,
     status: "",
     staffId: null,
-    customerFootballId: null,
+    customerFootballIds: [],
     invoiceDetails: [],
   });
   const invoiceDetail = ref<any>();
@@ -111,7 +111,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
       moneyPaid: null,
       status: "",
       staffId: null,
-      customerFootballId: null,
+      customerFootballIds: [],
       invoiceDetails: [],
     };
   }

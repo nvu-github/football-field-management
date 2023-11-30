@@ -253,8 +253,8 @@ model CustomerFootballPitchRental {
   createdAt                      DateTime                          @default(now()) @map("created_at")
   updatedAt                      DateTime                          @updatedAt @map("updated_at")
 
-  invoice                      Invoice?
   accessoryRentalCustomer      AccessoryRentalCustomer[]
+  invoiceFootballPitchRental   InvoiceFootballPitchRental?
   customer                     Customer                     @relation(fields: [customerId], references: [id])
   footballPitch                FootballPitch                @relation(fields: [footballPitchId], references: [id])
   footballPitchLeasingDuration FootballPitchLeasingDuration @relation(fields: [footballPitchLeasingDurationId], references: [id])
@@ -277,18 +277,17 @@ model AccessoryRentalCustomer {
 }
 
 model Invoice {
-  id                 Int           @id @default(autoincrement())
-  totalPrice         Decimal       @map("total_price") @db.Decimal(12, 0)
-  moneyPaid          Decimal?      @map("money_paid") @db.Decimal(12, 0)
-  status             InvoiceStatus @default(UNPAID)
-  staffId            Int           @map("staff_id")
-  customerFootballId Int           @unique @map("customer_football_id")
-  createdAt          DateTime      @default(now()) @map("created_at")
-  updatedAt          DateTime      @updatedAt @map("updated_at")
+  id         Int           @id @default(autoincrement())
+  totalPrice Decimal       @map("total_price") @db.Decimal(12, 0)
+  moneyPaid  Decimal?      @map("money_paid") @db.Decimal(12, 0)
+  status     InvoiceStatus @default(UNPAID)
+  staffId    Int           @map("staff_id")
+  createdAt  DateTime      @default(now()) @map("created_at")
+  updatedAt  DateTime      @updatedAt @map("updated_at")
 
-  invoiceDetail               InvoiceDetail[]
-  staff                       Staff                       @relation(fields: [staffId], references: [id])
-  customerFootballPitchRental CustomerFootballPitchRental @relation(fields: [customerFootballId], references: [id])
+  invoiceDetail              InvoiceDetail[]
+  invoiceFootballPitchRental InvoiceFootballPitchRental[]
+  staff                      Staff                        @relation(fields: [staffId], references: [id])
 
   @@map("invoices")
 }
@@ -307,6 +306,17 @@ model InvoiceDetail {
   accessory Accessory @relation(fields: [accessoryId], references: [id])
 
   @@map("invoice_details")
+}
+
+model InvoiceFootballPitchRental {
+  id                      Int @id @default(autoincrement())
+  invoiceId               Int @map("invoice_id")
+  customerFootballPitchId Int @unique @map("customer_football_pitch_id")
+
+  invoice                     Invoice                     @relation(fields: [invoiceId], references: [id])
+  customerFootballPitchRental CustomerFootballPitchRental @relation(fields: [customerFootballPitchId], references: [id])
+
+  @@map("invoice_football_pitch_rental")
 }
 
 enum Gender {

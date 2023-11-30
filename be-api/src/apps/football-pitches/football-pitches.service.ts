@@ -665,35 +665,63 @@ export class FootballPitchesService {
       ORDER BY cfpr.created_at DESC
     `;
 
+    const accessoryRentalCustomers =
+      await this.prisma.accessoryRentalCustomer.findMany({
+        select: {
+          id: true,
+          customerFootballPitchRentalId: true,
+          accessory: {
+            select: {
+              id: true,
+              price: true,
+            },
+          },
+          amount: true,
+        },
+      });
+
     return (
-      footballPitchRentalCustomers.filter((footballPitchRentalCustomer) => {
-        let condition = true;
-        if (footballPitchId) {
-          condition =
-            condition &&
-            footballPitchRentalCustomer.footballPitchId ===
-              Number(footballPitchId);
-        }
+      footballPitchRentalCustomers
+        .filter((footballPitchRentalCustomer) => {
+          let condition = true;
+          if (footballPitchId) {
+            condition =
+              condition &&
+              footballPitchRentalCustomer.footballPitchId ===
+                Number(footballPitchId);
+          }
 
-        if (footballPitchLeasingDurationId) {
-          condition =
-            condition &&
-            footballPitchRentalCustomer.footballPitchLeasingDurationId ===
-              Number(footballPitchLeasingDurationId);
-        }
+          if (footballPitchLeasingDurationId) {
+            condition =
+              condition &&
+              footballPitchRentalCustomer.footballPitchLeasingDurationId ===
+                Number(footballPitchLeasingDurationId);
+          }
 
-        if (rentalDate) {
-          condition =
-            condition &&
-            format(new Date(rentalDate), 'dd/MM/yyyy') ===
-              format(
-                new Date(footballPitchRentalCustomer.rentalDate),
-                'dd/MM/yyyy',
-              );
-        }
+          if (rentalDate) {
+            condition =
+              condition &&
+              format(new Date(rentalDate), 'dd/MM/yyyy') ===
+                format(
+                  new Date(footballPitchRentalCustomer.rentalDate),
+                  'dd/MM/yyyy',
+                );
+          }
 
-        return condition;
-      }) || []
+          return condition;
+        })
+        .map((footballPitchRentalCustomer: any) => {
+          const accessoryRentalCustomerFound = accessoryRentalCustomers.filter(
+            (accessoryRentalCustomer) =>
+              accessoryRentalCustomer.customerFootballPitchRentalId ===
+              footballPitchRentalCustomer.id,
+          );
+
+          return {
+            ...footballPitchRentalCustomer,
+            accessoryRentalCustomers: accessoryRentalCustomerFound,
+          };
+        }) || []
     );
   }
 
@@ -717,16 +745,20 @@ export class FootballPitchesService {
               phoneNumber: true,
             },
           },
-          invoice: {
+          invoiceFootballPitchRental: {
             select: {
-              id: true,
-              totalPrice: true,
-              moneyPaid: true,
-              status: true,
-              invoiceDetail: {
+              invoice: {
                 select: {
-                  accessoryId: true,
-                  amount: true,
+                  id: true,
+                  totalPrice: true,
+                  moneyPaid: true,
+                  status: true,
+                  invoiceDetail: {
+                    select: {
+                      accessoryId: true,
+                      amount: true,
+                    },
+                  },
                 },
               },
             },
@@ -756,7 +788,7 @@ export class FootballPitchesService {
       status,
       rentalDate,
       customer,
-      invoice,
+      invoiceFootballPitchRental,
       accessoryRentalCustomer,
     } = customerFootballPitchRental;
     const {
@@ -772,7 +804,7 @@ export class FootballPitchesService {
       status,
       rentalDate,
       customer,
-      invoice,
+      invoice: invoiceFootballPitchRental.invoice,
       footballPitchName,
       footballPitchTypeId,
       footballPitchTypeName,

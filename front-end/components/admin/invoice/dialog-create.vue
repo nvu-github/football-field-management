@@ -66,18 +66,43 @@ formattedCustomerFootballPitchRental.value =
   });
 
 watchEffect(() => {
-  const { customerFootballId, invoiceDetails } = payloadInvoice.value;
+  const { customerFootballIds, invoiceDetails } = payloadInvoice.value;
 
-  if (customerFootballId) {
-    const customerFootballPitchRentalFound =
-      formattedCustomerFootballPitchRental.value.find(({ id }: any) => {
-        return typeof customerFootballId === "string"
-          ? id === invoice.value.customerFootballPitchRentalId
-          : id === customerFootballId;
-      });
-    payloadInvoice.value.totalPrice = customerFootballPitchRentalFound
-      ? customerFootballPitchRentalFound.price
-      : null;
+  if (customerFootballIds) {
+    const total = customerFootballIds.reduce(
+      (total: number, customerFootballId: any) => {
+        const customerFootballPitchRentalFound =
+          formattedCustomerFootballPitchRental.value.find(
+            ({ id }: any) => id === customerFootballId
+          );
+        if (customerFootballPitchRentalFound) {
+          const totalAccessoryRentalCustomer =
+            customerFootballPitchRentalFound.accessoryRentalCustomers.reduce(
+              (total: number, accessoryRentalCustomer: any) => {
+                return (total +=
+                  Number(accessoryRentalCustomer.accessory.price) *
+                  accessoryRentalCustomer.amount);
+              },
+              0
+            );
+          total +=
+            Number(customerFootballPitchRentalFound.price) +
+            totalAccessoryRentalCustomer;
+        }
+        return total;
+      },
+      0
+    );
+    console.log(total);
+    //   const customerFootballPitchRentalFound =
+    //     formattedCustomerFootballPitchRental.value.find(({ id }: any) => {
+    //       return typeof customerFootballId === "string"
+    //         ? id === invoice.value.customerFootballPitchRentalId
+    //         : id === customerFootballId;
+    //     });
+    //   payloadInvoice.value.totalPrice = customerFootballPitchRentalFound
+    //     ? customerFootballPitchRentalFound.price
+    //     : null;
   }
 });
 
@@ -115,18 +140,17 @@ async function actionInvoice() {
 }
 
 function setInvoiceToForm() {
-  const {
-    totalPrice,
-    status,
-    footballPitchName,
-    customerName,
-    invoiceDetails,
-  }: any = invoice.value;
-
-  payloadInvoice.value.customerFootballId = `${footballPitchName} - ${customerName}`;
-  payloadInvoice.value.totalPrice = totalPrice;
-  payloadInvoice.value.status = status;
-  payloadInvoice.value.invoiceDetails = invoiceDetails;
+  // const {
+  //   totalPrice,
+  //   status,
+  //   footballPitchName,
+  //   customerName,
+  //   invoiceDetails,
+  // }: any = invoice.value;
+  // payloadInvoice.value.customerFootballId = `${footballPitchName} - ${customerName}`;
+  // payloadInvoice.value.totalPrice = totalPrice;
+  // payloadInvoice.value.status = status;
+  // payloadInvoice.value.invoiceDetails = invoiceDetails;
 }
 </script>
 <template>
@@ -139,16 +163,17 @@ function setInvoiceToForm() {
         <v-card-text>
           <v-row>
             <v-col cols="12">
-              <v-autocomplete
-                v-model="payloadInvoice.customerFootballId"
+              <v-select
+                v-model="payloadInvoice.customerFootballIds"
                 label="Chọn khách hàng thuê sân*"
                 item-value="id"
                 item-title="name"
                 variant="underlined"
-                required
                 :items="formattedCustomerFootballPitchRental"
                 :rules="[rules.customerFootballId]"
-              ></v-autocomplete>
+                required
+                multiple
+              ></v-select>
               <v-row>
                 <v-col md="6">
                   <v-text-field

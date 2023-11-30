@@ -154,7 +154,7 @@ accessoryStore.getAccessories();
         <span class="sno">{{ item.index + 1 }}</span>
       </template>
       <template #[`item.accessory`]="{ item }">
-        <v-autocomplete
+        <v-select
           v-model="item.raw.accessoryId"
           label="Chọn phụ kiện*"
           item-value="id"
@@ -164,7 +164,7 @@ accessoryStore.getAccessories();
           class="pt-3"
           :items="accessories"
           :rules="[rules.accessoryId]"
-        ></v-autocomplete>
+        ></v-select>
       </template>
       <template #[`item.price`]="{ item }">
         <span class="price">

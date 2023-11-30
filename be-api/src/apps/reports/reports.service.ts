@@ -194,6 +194,15 @@ export class ReportsService {
             id: true,
             status: true,
             createdAt: true,
+            invoiceFootballPitchRental: {
+              select: {
+                invoice: {
+                  select: {
+                    status: true,
+                  },
+                },
+              },
+            },
             footballPitchLeasingDuration: {
               select: {
                 price: true,
@@ -220,7 +229,10 @@ export class ReportsService {
           if (year)
             condition = condition && Number(year) === Number(yearRentalCreated);
 
-          const isRented = rental.status === 'ACCEPT';
+          const statusInvoice =
+            rental?.invoiceFootballPitchRental?.invoice.status;
+          const isRented =
+            rental.status === 'ACCEPT' && statusInvoice === 'PAID';
           const isCanceled = rental.status === 'REJECT';
 
           accumulator.rented += condition && isRented ? 1 : 0;
