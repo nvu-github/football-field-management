@@ -7,11 +7,13 @@ import {
   useAppStore,
   useDialogStore,
   useFootballPitchStore,
+  usePaymentStore,
 } from "~/stores";
 import { formatPrice } from "~/utils/string";
 
 const appStore = useAppStore();
 const dialogStore = useDialogStore();
+const paymentStore = usePaymentStore();
 const customerStore = useCustomerStore();
 const footballPitchStore = useFootballPitchStore();
 const { breadCrumbs } = storeToRefs(appStore);
@@ -21,9 +23,8 @@ const conditionFilterHistory = ref<any>({
   rentalDate: null,
   status: null,
 });
-
 const formattedHistories = ref<CustomerAccessoryRentalHistory>();
-await customerStore.getCustomerFootballPitchRentalHisTories();
+
 breadCrumbs.value = [
   {
     title: "Trang chủ",
@@ -45,6 +46,8 @@ const formatDatePicker = (date: any): string => {
   return `${day}/${month}/${year}`;
 };
 
+localStorage.removeItem("paymentMethod");
+await customerStore.getCustomerFootballPitchRentalHisTories();
 formattedHistories.value = customerFootballPitchRentalHistories.value;
 function filterHistories() {
   const { rentalDate: rentalDateCondition, status: statusCondition } =
@@ -79,13 +82,19 @@ function openDialogDetail(id: number) {
   );
 }
 
-function openDialogRentalDetail(id: number) {
-  dialogStore.showDialog(
-    resolveComponent("common-football-pitch-dialog-rental-detail"),
-    {
-      id,
-    }
+async function paymentInvoice(invoiceId: number, price: number) {
+  const paymentUrl = await paymentStore.createPaymentUrl({
+    amount: Number(price),
+  });
+  const { paymentRedirect } = paymentUrl.data;
+  localStorage.setItem(
+    "paymentMethod",
+    JSON.stringify({
+      invoiceId,
+      status: "paid",
+    })
   );
+  window.location.href = paymentRedirect;
 }
 </script>
 <template>
@@ -192,7 +201,16 @@ function openDialogRentalDetail(id: number) {
                   <v-btn
                     v-bind="props"
                     class="button -warning -rental"
-                    :disabled="customerFootballPitchRental.status !== 'ACCEPT'"
+                    :disabled="
+                      customerFootballPitchRental.invoiceStatus === 'PAID'
+                    "
+                    @click="
+                      paymentInvoice(
+                        customerFootballPitchRental.invoiceId,
+                        Number(customerFootballPitchRental.totalPrice) -
+                          Number(customerFootballPitchRental.moneyPaid)
+                      )
+                    "
                   >
                     <v-icon>mdi mdi-cash-multiple</v-icon>
                   </v-btn>

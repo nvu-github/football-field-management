@@ -42,7 +42,7 @@ footballPitchStore.getFootballPitchRentalInfo(formatISO9075(new Date()));
         </nuxt-link>
       </v-col>
       <v-col
-        md="6"
+        md="4"
         v-for="rentalInfo in formattedFootballPitchRental(
           footballPitchRentalInfo
         )"
@@ -57,6 +57,9 @@ footballPitchStore.getFootballPitchRentalInfo(formatISO9075(new Date()));
           :price="rentalInfo.price"
           :status="rentalInfo.status"
           :football-pitch-type="rentalInfo.footballPitchTypeName"
+          :football-pitch-leasing-duration-id="
+            rentalInfo.footballPitchLeasingDurationId
+          "
           :avatar="
             rentalInfo.images.length > 0
               ? `${runtimeConfig.public.API_URL}public/${rentalInfo.images[0].url}`

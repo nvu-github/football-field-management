@@ -54,6 +54,7 @@ customerStore
     await accessoryStore.getAccessories();
     await createInvoice(id);
     await createNotification();
+    localStorage.removeItem("paymentMethod");
     customerStore.resetForm();
   })
   .catch((error) => {
@@ -71,7 +72,7 @@ async function createInvoice(customerFootballPitchRentalId: number) {
   payloadInvoice.value = {
     totalPrice: rentalPrice,
     moneyPaid,
-    status: "DEPOSIT",
+    status: Number(rentalPrice) === Number(moneyPaid) ? "PAID" : "DEPOSIT",
     staffId: 1,
     customerFootballId: customerFootballPitchRentalId,
   };

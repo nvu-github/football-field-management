@@ -154,7 +154,7 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
                 >
               </li>
             </ul>
-            <ul v-if="user?.roleId !== CUSTOMER_ROLE" class="list -invoice">
+            <ul class="list -invoice">
               <li class="item -title">Hóa đơn</li>
               <li class="item -price">
                 <span class="label">Tổng tiền thuê: </span>
