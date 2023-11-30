@@ -14,6 +14,7 @@ export class PayloadInvoiceDto {
   })
   @IsNumber()
   @IsNotEmpty()
+  @IsOptional()
   readonly totalPrice: number;
 
   @ApiProperty({

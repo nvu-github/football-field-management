@@ -609,8 +609,10 @@ export class FootballPitchesService {
                 fpl.price, 
                 ld.start_time as startTime, 
                 ld.end_time as endTime,
+                i.id as invoiceId,
                 i.total_price as totalPrice,
-                i.money_paid as moneyPaid
+                i.money_paid as moneyPaid,
+                i.status as invoiceStatus
         FROM customers c 
         INNER JOIN customer_football_pitch_rental cfpr on c.id = cfpr.customer_id
         INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id

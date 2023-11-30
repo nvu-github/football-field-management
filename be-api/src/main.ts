@@ -5,13 +5,14 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import * as cookieParser from 'cookie-parser';
 import { static as expressStatic } from 'express';
 import { join } from 'path';
-
+import { config } from 'dotenv';
 import 'module-alias/register';
 
 import { AppModule } from 'src/app.module';
 import configuration from 'config/configuration';
 
 declare const module: any;
+config();
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);

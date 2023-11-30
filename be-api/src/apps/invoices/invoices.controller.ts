@@ -77,7 +77,7 @@ export class InvoicesController {
 
     if (!staffBody) body.staffId = staffId;
 
-    if (body.status === 'PAID') {
+    if (body.status === 'PAID' && body.invoiceDetails) {
       const dataAmountAccessories = await Promise.all(
         body.invoiceDetails.map(async (accessory: any) => {
           const amountAccessory = await this.accessoryService.getAccessory(
@@ -101,6 +101,7 @@ export class InvoicesController {
     }
 
     delete body.invoiceDetails;
+    if (!body.staffId) delete body.staffId;
     const invoiceCreated = await this.invoicesService.updateInvoice(+id, body);
 
     if (!invoiceCreated)
