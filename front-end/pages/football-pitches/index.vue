@@ -29,21 +29,6 @@ await footballPitchStore.getFootballPitchRentalInfo(
   formatISO9075(conditionFilterFootballPitch.value.rentalDate)
 );
 
-const statusFootballPitch = [
-  {
-    key: "EMPTY",
-    title: "Trống",
-  },
-  {
-    key: "ACCEPT",
-    title: "Đã đặt",
-  },
-  {
-    key: "PENDING",
-    title: "Đang đặt",
-  },
-];
-
 breadCrumbs.value = [
   {
     title: "Trang chủ",
