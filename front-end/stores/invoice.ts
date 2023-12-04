@@ -4,9 +4,9 @@ export interface Invoice {
   leasingDurationTime?: string;
   totalPrice?: number | null;
   moneyPaid?: number | null;
-  status: string;
+  status?: string;
   staffId?: number | null;
-  customerFootballIds?: Array<number> | null;
+  customerFootballIds?: Array<number>;
   invoiceDetails?: Array<InvoiceDetail>;
 }
 
@@ -16,6 +16,23 @@ export interface InvoiceDetail {
   amount: number;
   finalCost: number;
   accessoryId: number;
+}
+
+export interface InvoiceCustomer {
+  id: number;
+  invoiceFootballPitchRental: {
+    invoiceId: number;
+    invoice: {
+      totalPrice: number;
+      moneyPaid: number | null;
+      invoiceDetail: {
+        accessoryId: number;
+        amount: number;
+        price: number;
+        finalCost: number;
+      };
+    };
+  };
 }
 
 export const invoiceStatuses: any = [
@@ -37,6 +54,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
   const { $apis }: any = useNuxtApp();
   const invoices = ref<Invoice[]>([]);
   const invoice = ref<Invoice>();
+  const invoiceCustomer = ref<InvoiceCustomer[]>([]);
   const payloadInvoice = ref<Invoice>({
     id: null,
     totalPrice: null,
@@ -86,6 +104,13 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     invoiceDetail.value = invoiceDetailSingle.data;
   }
 
+  async function getInvoiceCustomerRental(customerRentalId: number) {
+    const invoiceCustomerRentals = await $apis.get(
+      `invoices/${customerRentalId}/customer`
+    );
+    invoiceCustomer.value = invoiceCustomerRentals.data;
+  }
+
   function getStatusInvoice(status: string | any) {
     let text = "Đã thanh toán";
     let color = "success";
@@ -121,6 +146,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     invoices,
     invoice,
     invoiceDetail,
+    invoiceCustomer,
     createInvoice,
     updateInvoice,
     deleteInvoice,
@@ -129,6 +155,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     getInvoices,
     getInvoice,
     getInvoiceDetail,
+    getInvoiceCustomerRental,
     resetFormInvoice,
   };
 });

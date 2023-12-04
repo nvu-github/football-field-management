@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, computed } from "vue";
 import { storeToRefs } from "pinia";
-import { useNuxtApp } from "nuxt/app";
+import { navigateTo, useNuxtApp } from "nuxt/app";
 import {
   useDialogStore,
   usePaymentStore,
@@ -84,14 +84,20 @@ async function confirmPayment() {
       "customerFootballPitchRental",
       JSON.stringify(payloadCustomerFootballPitchRental.value)
     );
-    localStorage.setItem("paymentMethod", JSON.stringify({
-      status: 'rental',
-    }));
+    localStorage.setItem(
+      "paymentMethod",
+      JSON.stringify({
+        status: "rental",
+      })
+    );
+    console.log(paymentRedirect);
+    // navigateTo(`/football-pitches/rental?vnp_Amount=${amount}`);
     window.location.href = paymentRedirect;
   } catch (err) {
     console.log(err);
     $toast.error("Có lỗi xảy ra trong quá trình đặt sân");
   }
+  cancelPayment();
 }
 
 function cancelPayment() {

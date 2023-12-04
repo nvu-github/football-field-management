@@ -618,7 +618,8 @@ export class FootballPitchesService {
         INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
         INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
         INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
-        INNER JOIN invoices i on i.customer_football_id = cfpr.id
+        INNER JOIN invoice_football_pitch_rental ifrt on ifrt.customer_football_pitch_id = cfpr.id
+        INNER JOIN invoices i on i.id = ifrt.invoice_id
         WHERE c.id = ${customerId}
       `;
     return footballPitchRentalCustomerHistories || [];
@@ -632,6 +633,7 @@ export class FootballPitchesService {
       },
       select: {
         id: true,
+        customerId: true,
       },
     });
   }
@@ -656,12 +658,16 @@ export class FootballPitchesService {
               fpl.id as footballPitchLeasingDurationId, 
               fpl.price, 
               ld.start_time as startTime, 
-              ld.end_time as endTime 
+              ld.end_time as endTime,
+              i.id as invoiceId,
+              i.status as invoiceStatus
       FROM customers c 
       INNER JOIN customer_football_pitch_rental cfpr on c.id = cfpr.customer_id
       INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
       INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
       INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
+      LEFT JOIN invoice_football_pitch_rental ifpr on ifpr.customer_football_pitch_id = cfpr.id
+      LEFT JOIN invoices i on i.id = ifpr.invoice_id
       ORDER BY cfpr.created_at DESC
     `;
 

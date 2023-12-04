@@ -53,23 +53,35 @@ const formattedPrice = computed({
 await footballPitchStore.getCustomerFootballPitchRentals();
 customInvoiceStatuses.value = invoiceStatuses;
 formattedCustomerFootballPitchRental.value =
-  customerFootballPitchRentals.value.filter((customerFootballPitchRental) => {
-    const { footballPitchName, name, status } = customerFootballPitchRental;
-    const invoiceFound = invoices.value.find(
-      (invoice: any) =>
-        invoice.customerFootballPitchRentalId === customerFootballPitchRental.id
-    );
-    const isAccept = status === "ACCEPT";
+  customerFootballPitchRentals.value.filter(
+    (customerFootballPitchRental: any) => {
+      const { footballPitchName, name, status } = customerFootballPitchRental;
+      const invoiceFound = invoices.value.filter((invoice: any) => {
+        const invoiceFootballPitchRentalFound =
+          invoice.invoiceFootballPitchRental.find(
+            (invoiceFootballPitchRental: any) =>
+              invoiceFootballPitchRental.customerFootballPitchRental.id ===
+              customerFootballPitchRental.id
+          );
 
-    customerFootballPitchRental.name = `${footballPitchName} - ${name}`;
-    return id ? isAccept : !invoiceFound && isAccept;
-  });
+        return !!invoiceFootballPitchRentalFound;
+      });
+      const isAccept = status === "ACCEPT";
+
+      customerFootballPitchRental.name = `${footballPitchName} - ${name}`;
+      return id
+        ? isAccept &&
+            (customerFootballPitchRental.invoiceId === id ||
+              !customerFootballPitchRental.invoiceStatus)
+        : invoiceFound.length === 0 && isAccept;
+    }
+  );
 
 watchEffect(() => {
-  const { customerFootballIds, invoiceDetails } = payloadInvoice.value;
+  const { customerFootballIds } = payloadInvoice.value;
 
   if (customerFootballIds) {
-    const total = customerFootballIds.reduce(
+    payloadInvoice.value.totalPrice = customerFootballIds.reduce(
       (total: number, customerFootballId: any) => {
         const customerFootballPitchRentalFound =
           formattedCustomerFootballPitchRental.value.find(
@@ -93,16 +105,14 @@ watchEffect(() => {
       },
       0
     );
-    console.log(total);
-    //   const customerFootballPitchRentalFound =
-    //     formattedCustomerFootballPitchRental.value.find(({ id }: any) => {
-    //       return typeof customerFootballId === "string"
-    //         ? id === invoice.value.customerFootballPitchRentalId
-    //         : id === customerFootballId;
-    //     });
-    //   payloadInvoice.value.totalPrice = customerFootballPitchRentalFound
-    //     ? customerFootballPitchRentalFound.price
-    //     : null;
+
+    const totalInvoiceDetail = payloadInvoice.value.invoiceDetails.reduce(
+      (total: number, invoiceDetail: any) => {
+        return (total += invoiceDetail.finalCost);
+      },
+      0
+    );
+    payloadInvoice.value.totalPrice += totalInvoiceDetail;
   }
 });
 
@@ -140,17 +150,19 @@ async function actionInvoice() {
 }
 
 function setInvoiceToForm() {
-  // const {
-  //   totalPrice,
-  //   status,
-  //   footballPitchName,
-  //   customerName,
-  //   invoiceDetails,
-  // }: any = invoice.value;
-  // payloadInvoice.value.customerFootballId = `${footballPitchName} - ${customerName}`;
-  // payloadInvoice.value.totalPrice = totalPrice;
-  // payloadInvoice.value.status = status;
-  // payloadInvoice.value.invoiceDetails = invoiceDetails;
+  const {
+    totalPrice,
+    status,
+    invoiceDetails,
+    invoiceFootballPitchRental,
+  }: any = invoice.value;
+  payloadInvoice.value.customerFootballIds = invoiceFootballPitchRental.map(
+    (invoiceFootballPitchRental: any) =>
+      invoiceFootballPitchRental.customerFootballPitchRental.id
+  );
+  payloadInvoice.value.totalPrice = totalPrice;
+  payloadInvoice.value.status = status;
+  payloadInvoice.value.invoiceDetails = invoiceDetails;
 }
 </script>
 <template>

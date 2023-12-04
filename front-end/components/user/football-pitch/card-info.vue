@@ -56,11 +56,6 @@ function getStatusFootball(status: string) {
   let message = "Đã đặt";
   let color = "error";
 
-  if (status === "PENDING") {
-    message = "Đang đặt";
-    color = "deep-purple";
-  }
-
   if (status === "EMPTY") {
     message = "Trống";
     color = "primary";

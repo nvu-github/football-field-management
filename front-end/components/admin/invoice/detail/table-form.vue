@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, watchEffect } from "vue";
+import { ref, watchEffect, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useAccessoryStore, useInvoiceStore } from "~/stores";
 import { generateId, formatPrice } from "~/utils/string";
@@ -11,7 +11,7 @@ const rules = {
   },
   amount: (value: number) => {
     if (!value) return "Vui lòng nhập số lượng!";
-    if (Number(value) <= 0) "Số lượng không hợp lệ!";
+    if (Number(value) <= 0) return "Số lượng không hợp lệ!";
     return true;
   },
 };
@@ -66,7 +66,6 @@ const invoiceStore = useInvoiceStore();
 const { accessories } = storeToRefs(accessoryStore);
 const { payloadInvoice }: any = storeToRefs(invoiceStore);
 const priceAccessories = ref<any>({});
-const formattedAccessories = ref<any>([]);
 let totalInvoiceDetail = 0;
 
 watchEffect(() => {
@@ -106,21 +105,31 @@ watchEffect(() => {
   if (invoiceDetails) {
     invoiceDetails.forEach((invoiceDetail: any) => {
       invoiceDetail.price =
-        priceAccessories.value[invoiceDetail.accessoryId].price;
+        priceAccessories.value[invoiceDetail.accessoryId]?.price || 0;
       invoiceDetail.finalCost =
         invoiceDetail.price * Number(invoiceDetail.amount);
     });
   }
-  const { totalPrice } = payloadInvoice.value;
-  payloadInvoice.value.totalPrice = Number(totalPrice) - totalInvoiceDetail;
-  totalInvoiceDetail = invoiceDetails.reduce(
-    (total: number, invoiceDetail: any) => {
-      return (total += invoiceDetail.finalCost);
-    },
-    0
-  );
-  payloadInvoice.value.totalPrice += totalInvoiceDetail;
 });
+
+watch(
+  () => payloadInvoice.value.invoiceDetails.map((item: any) => item.finalCost),
+  function () {
+    const { totalPrice } = payloadInvoice.value;
+    payloadInvoice.value.totalPrice =
+      Number(totalPrice) - Number(totalInvoiceDetail);
+    totalInvoiceDetail = payloadInvoice.value.invoiceDetails.reduce(
+      (total: number, invoiceDetail: any) => {
+        return (total += invoiceDetail.finalCost);
+      },
+      0
+    );
+    payloadInvoice.value.totalPrice += Number(totalInvoiceDetail);
+  },
+  {
+    deep: true,
+  }
+);
 
 function addInvoiceDetail() {
   const invoiceDetail = {

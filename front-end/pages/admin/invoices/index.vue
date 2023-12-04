@@ -19,19 +19,9 @@ const headers = [
     align: "start",
     key: "customerName",
   },
-  {
-    title: "Tên sân bóng",
-    width: "15%",
-    align: "start",
-    key: "footballPitchName",
-  },
-  {
-    title: "Thời gian thuê",
-    width: "20%",
-    align: "start",
-    key: "rentalDate",
-  },
+  { title: "Sân thuê", width: "20%", align: "start", key: "footballRental" },
   { title: "Trạng thái", width: "15%", align: "start", key: "status" },
+  { title: "Thời gian tạo", width: "15%", align: "start", key: "createdAt" },
   { title: "Tổng tiền", width: "10%", align: "start", key: "totalPrice" },
   {
     title: "Tác vụ",
@@ -110,9 +100,29 @@ invoiceStore.getInvoices();
           <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
-          <template #[`item.rentalDate`]="{ item }">
-            {{ format(new Date(item.raw.rentalDate), "dd/MM/yyyy") }}
-            {{ item.raw.leasingDurationTime }}
+          <template #[`item.customerName`]="{ item }">
+            {{
+              item.raw.invoiceFootballPitchRental &&
+              item.raw.invoiceFootballPitchRental.length > 0
+                ? item.raw.invoiceFootballPitchRental[0]
+                    .customerFootballPitchRental.customer.name
+                : ""
+            }}
+          </template>
+          <template #[`item.footballRental`]="{ item }">
+            <ol>
+              <li
+                v-for="(value, index) in item.raw.invoiceFootballPitchRental"
+                :key="index"
+              >
+                {{
+                  `${value.customerFootballPitchRental.footballPitch.name} (${value.customerFootballPitchRental.footballPitchLeasingDuration.leasingDuration.startTime} - ${value.customerFootballPitchRental.footballPitchLeasingDuration.leasingDuration.endTime})`
+                }}
+              </li>
+            </ol>
+          </template>
+          <template #[`item.createdAt`]="{ item }">
+            {{ format(new Date(item.raw.createdAt), "HH:ss dd/MM/yyyy") }}
           </template>
           <template #[`item.status`]="{ item }">
             <v-chip

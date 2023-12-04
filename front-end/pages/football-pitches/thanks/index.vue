@@ -27,14 +27,14 @@ const footballPitchStore = useFootballPitchStore();
 const invoiceStore = useInvoiceStore();
 const accessoryStore = useAccessoryStore();
 const { accessories } = storeToRefs(accessoryStore);
-const { payloadInvoice } = storeToRefs(invoiceStore);
+const { payloadInvoice, invoiceCustomer } = storeToRefs(invoiceStore);
 const { footballPitch } = storeToRefs(footballPitchStore);
 const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 const timer = ref(10);
 
 const intervalId = setInterval(() => {
   if (timer.value === 0) {
-    navigateTo("/football-pitches/histories");
+    // navigateTo("/football-pitches/histories");
     clearInterval(intervalId);
   } else {
     timer.value -= 1;
@@ -50,9 +50,16 @@ customerStore
     ),
   })
   .then(async (rentalData) => {
-    const { id } = rentalData.data;
+    const { id, customerId } = rentalData.data;
     await accessoryStore.getAccessories();
-    await createInvoice(id);
+    await invoiceStore.getInvoiceCustomerRental(+customerId);
+
+    if (invoiceCustomer.value && invoiceCustomer.value.length > 0) {
+      await updateInvoice(id);
+    } else {
+      await createInvoice(id);
+    }
+
     await createNotification();
     localStorage.removeItem("paymentMethod");
     customerStore.resetForm();
@@ -69,13 +76,15 @@ async function createInvoice(customerFootballPitchRentalId: number) {
   const { vnp_Amount } = route.query;
   const amountPayment = Number(vnp_Amount) / 100;
   const moneyPaid = amountPayment;
+
   payloadInvoice.value = {
     totalPrice: rentalPrice,
     moneyPaid,
     status: Number(rentalPrice) === Number(moneyPaid) ? "PAID" : "DEPOSIT",
     staffId: 1,
-    customerFootballId: customerFootballPitchRentalId,
+    customerFootballIds: [customerFootballPitchRentalId],
   };
+
   if (customerAccessoryRentals) {
     payloadInvoice.value.invoiceDetails = customerAccessoryRentals.map(
       (customerAccessoryRental: any) => {
@@ -95,6 +104,58 @@ async function createInvoice(customerFootballPitchRentalId: number) {
   await invoiceStore.createInvoice(payloadInvoice.value);
 }
 
+async function updateInvoice(customerFootballPitchRentalId: number) {
+  const { rentalPrice, customerAccessoryRentals } =
+    payloadCustomerFootballPitchRental.value;
+  const { vnp_Amount } = route.query;
+  const amountPayment = Number(vnp_Amount) / 100;
+  const moneyPaid = amountPayment;
+
+  const customerFootballIds = invoiceCustomer.value.map(({ id }) => id);
+
+  payloadInvoice.value = {
+    id: invoiceCustomer.value[0].invoiceFootballPitchRental.invoiceId,
+    totalPrice:
+      Number(rentalPrice) +
+      Number(
+        invoiceCustomer.value[0].invoiceFootballPitchRental.invoice.totalPrice
+      ),
+    moneyPaid:
+      Number(moneyPaid) +
+      Number(
+        invoiceCustomer.value[0].invoiceFootballPitchRental.invoice.moneyPaid
+      ),
+    customerFootballIds: [
+      ...customerFootballIds,
+      customerFootballPitchRentalId,
+    ],
+  };
+
+  if (customerAccessoryRentals) {
+    const accessoryRentals = customerAccessoryRentals.map(
+      (customerAccessoryRental: any) => {
+        const { accessoryId, amount } = customerAccessoryRental;
+        const accessoryFound: any = accessories.value.find(
+          ({ id }) => id === accessoryId
+        );
+        return {
+          price: accessoryFound.price,
+          amount: Number(amount),
+          finalCost: accessoryFound.price * Number(amount),
+          accessoryId,
+        };
+      }
+    );
+
+    payloadInvoice.value.invoiceDetails = mergeInvoiceDetails(
+      invoiceCustomer.value[0].invoiceFootballPitchRental.invoice.invoiceDetail,
+      accessoryRentals
+    );
+  }
+
+  await invoiceStore.updateInvoice(payloadInvoice.value);
+}
+
 async function createNotification() {
   const { footballPitchId } = payloadCustomerFootballPitchRental.value;
   await footballPitchStore.getFootballPitch(Number(footballPitchId));
@@ -103,6 +164,36 @@ async function createNotification() {
     content: footballPitch.value?.name,
     status: "UNREAD",
   });
+}
+
+function mergeInvoiceDetails(invoiceDetail1: any, invoiceDetail2: any) {
+  const mergedArray: any[] = [];
+  const mapData: any = {};
+
+  function addToPriceMap(obj: any) {
+    const { accessoryId, price, amount, finalCost, ...rest } = obj;
+    if (!mapData[accessoryId]) {
+      mapData[accessoryId] = { price: 0, amount: 0, finalCost: 0, ...rest };
+    }
+
+    mapData[accessoryId].price += Number(price);
+    mapData[accessoryId].amount += Number(amount);
+    mapData[accessoryId].finalCost += Number(finalCost);
+  }
+
+  invoiceDetail1.forEach((obj: any) => {
+    addToPriceMap(obj);
+  });
+
+  invoiceDetail2.forEach((obj: any) => {
+    addToPriceMap(obj);
+  });
+
+  Object.keys(mapData).forEach((id) => {
+    mergedArray.push({ accessoryId: parseInt(id), ...mapData[id] });
+  });
+
+  return mergedArray;
 }
 </script>
 <template>

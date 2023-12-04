@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useAppStore } from "~/stores";
+import { useAppStore, useAuthStore } from "~/stores";
 const appStore = useAppStore();
+const authStore = useAuthStore();
+const { user } = storeToRefs(authStore);
 const { app, isShowSidebar } = storeToRefs(appStore);
 
 function handleShowMenu() {
@@ -17,7 +19,10 @@ function handleShowMenu() {
       </div>
     </div>
     <div class="action">
-      <common-notification class="notification" />
+      <common-notification
+        v-if="user && user.roleId === 1"
+        class="notification"
+      />
       <common-user-info class="user" />
     </div>
   </v-app-bar>

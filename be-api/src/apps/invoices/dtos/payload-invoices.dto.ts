@@ -31,6 +31,7 @@ export class PayloadInvoiceDto {
   @IsString()
   @IsNotEmpty()
   @NotContains(' ')
+  @IsOptional()
   readonly status: string;
 
   @ApiProperty({
@@ -41,11 +42,11 @@ export class PayloadInvoiceDto {
   staffId: number;
 
   @ApiProperty({
-    example: 1,
+    example: [1, 2],
   })
-  @IsNumber()
+  @IsArray()
   @IsOptional()
-  readonly customerFootballId: number;
+  customerFootballIds: Array<number>;
 
   @ApiProperty({
     example: [

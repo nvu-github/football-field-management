@@ -28,6 +28,32 @@ const total = invoiceDetail.value.invoiceDetails.reduce(
     finalCost: 0,
   }
 );
+const footballPitchName = invoiceDetail.value.invoiceFootballPitchRental
+  .map(
+    (invoiceFootballPitch: any) =>
+      invoiceFootballPitch.customerFootballPitchRental.footballPitch.name
+  )
+  .join(", ");
+
+const leasingDurationTime = invoiceDetail.value.invoiceFootballPitchRental
+  .map(
+    (invoiceFootballPitch: any) =>
+      invoiceFootballPitch.customerFootballPitchRental
+        .footballPitchLeasingDuration.leasingDuration.startTime +
+      " - " +
+      invoiceFootballPitch.customerFootballPitchRental
+        .footballPitchLeasingDuration.leasingDuration.endTime
+  )
+  .join(", ");
+
+const priceRental = invoiceDetail.value.invoiceFootballPitchRental
+  .map((invoiceFootballPitch: any) =>
+    formatPrice(
+      invoiceFootballPitch.customerFootballPitchRental
+        .footballPitchLeasingDuration.price
+    )
+  )
+  .join("₫, ");
 </script>
 <template>
   <div class="invoice-detail-pages">
@@ -38,22 +64,32 @@ const total = invoiceDetail.value.invoiceDetails.reduce(
     <ul class="info -customer">
       <li class="item -name">
         <span class="label"> Tên khách hàng: </span>
-        {{ invoiceDetail ? invoiceDetail.customerName : "" }}
+        {{
+          invoiceDetail
+            ? invoiceDetail.invoiceFootballPitchRental[0]
+                .customerFootballPitchRental.customer.name
+            : ""
+        }}
         <span class="dot"></span>
       </li>
       <li class="item -phone">
         <span class="label"> ĐT: </span>
-        {{ invoiceDetail ? invoiceDetail.customerPhoneNumber : "" }}
+        {{
+          invoiceDetail
+            ? invoiceDetail.invoiceFootballPitchRental[0]
+                .customerFootballPitchRental.customer.phoneNumber
+            : ""
+        }}
       </li>
     </ul>
     <ul class="info -football">
       <li class="item -name">
         <span class="label"> Sân thuê: </span>
-        {{ invoiceDetail ? invoiceDetail.footballPitchName : "" }}
+        {{ invoiceDetail ? footballPitchName : "" }}
       </li>
       <li class="item -price">
         <span class="label"> Giá thuê: </span>
-        {{ invoiceDetail ? `${formatPrice(invoiceDetail.rentalPrice)} ₫` : "" }}
+        {{ invoiceDetail ? `${priceRental}₫` : "" }}
       </li>
     </ul>
     <ul class="info -rental">
@@ -61,13 +97,18 @@ const total = invoiceDetail.value.invoiceDetails.reduce(
         <span class="label"> Ngày thuê: </span>
         {{
           invoiceDetail
-            ? format(new Date(invoiceDetail.rentalDate), "dd/MM/yyyy")
+            ? format(
+                new Date(
+                  invoiceDetail.invoiceFootballPitchRental[0].customerFootballPitchRental.rentalDate
+                ),
+                "dd/MM/yyyy"
+              )
             : ""
         }}
       </li>
       <li class="item -time">
         <span class="label"> Thời gian thuê: </span>
-        {{ invoiceDetail ? invoiceDetail.leasingDurationName : "" }}
+        {{ invoiceDetail ? leasingDurationTime : "" }}
       </li>
     </ul>
     <div class="invoice-detail mt-2 mb-8">

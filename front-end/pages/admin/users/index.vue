@@ -13,7 +13,7 @@ const headers = [
   { title: "Tên người dùng", align: "start", key: "name" },
   { title: "Email", align: "start", key: "email" },
   { title: "Quyền", align: "start", key: "role" },
-  { title: "Trạng thái", align: "start", key: "status" },
+  // { title: "Trạng thái", align: "start", key: "status" },
   { title: "Tác vụ", align: "center", key: "actions", sortable: false },
 ];
 const appStore = useAppStore();
@@ -129,13 +129,13 @@ userStore.getAccounts();
             >
               <v-icon> mdi-pencil </v-icon>
             </v-btn>
-            <v-btn
+            <!-- <v-btn
               class="button -success"
               :disabled="item.raw.status !== 'PENDING'"
               @click="openDialogConfirm(item.raw.id)"
             >
               <v-icon> mdi mdi-check-bold </v-icon>
-            </v-btn>
+            </v-btn> -->
             <v-btn
               class="button -danger"
               @click="openDialogDelete(item.raw.id)"

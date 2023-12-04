@@ -22,7 +22,7 @@ export class InvoicesService {
   }
 
   creatInvoiceFootballPitchRental(payload: any): Promise<any> {
-    return this.prisma.invoiceFootballPitchRental.create({
+    return this.prisma.invoiceFootballPitchRental.createMany({
       data: payload,
     });
   }
@@ -54,6 +54,14 @@ export class InvoicesService {
 
   deleteInvoiceDetails(invoiceId: number): Promise<any> {
     return this.prisma.invoiceDetail.deleteMany({
+      where: {
+        invoiceId,
+      },
+    });
+  }
+
+  deleteInvoiceFootballPitchRental(invoiceId: number): Promise<any> {
+    return this.prisma.invoiceFootballPitchRental.deleteMany({
       where: {
         invoiceId,
       },
@@ -106,6 +114,7 @@ export class InvoicesService {
                 },
                 footballPitchLeasingDuration: {
                   select: {
+                    price: true,
                     leasingDuration: {
                       select: {
                         startTime: true,
@@ -151,6 +160,7 @@ export class InvoicesService {
         totalPrice: true,
         moneyPaid: true,
         status: true,
+        createdAt: true,
         invoiceFootballPitchRental: {
           select: {
             customerFootballPitchRental: {
@@ -197,6 +207,7 @@ export class InvoicesService {
           totalPrice,
           moneyPaid,
           status,
+          createdAt,
           invoiceFootballPitchRental,
         } = invoice;
         return {
@@ -204,6 +215,7 @@ export class InvoicesService {
           totalPrice,
           moneyPaid,
           status,
+          createdAt,
           invoiceFootballPitchRental,
         };
       });
@@ -239,6 +251,17 @@ export class InvoicesService {
                 id: true,
                 footballPitchLeasingDurationId: true,
                 rentalDate: true,
+                footballPitchLeasingDuration: {
+                  select: {
+                    price: true,
+                    leasingDuration: {
+                      select: {
+                        startTime: true,
+                        endTime: true,
+                      },
+                    },
+                  },
+                },
                 customer: {
                   select: {
                     name: true,
@@ -271,5 +294,38 @@ export class InvoicesService {
       invoiceFootballPitchRental,
       invoiceDetails: invoiceDetail,
     };
+  }
+
+  getInvoiceByCustomer(customerId: number): Promise<any> {
+    return this.prisma.customerFootballPitchRental.findMany({
+      where: {
+        customerId,
+        rentalDate: {
+          gte: new Date().toISOString(),
+        },
+      },
+      select: {
+        id: true,
+        invoiceFootballPitchRental: {
+          select: {
+            invoiceId: true,
+            invoice: {
+              select: {
+                totalPrice: true,
+                moneyPaid: true,
+                invoiceDetail: {
+                  select: {
+                    accessoryId: true,
+                    amount: true,
+                    price: true,
+                    finalCost: true,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
   }
 }
