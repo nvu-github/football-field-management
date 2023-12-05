@@ -15,13 +15,9 @@ export interface CustomerAccessoryRental {
 
 export interface CustomerAccessoryRentalHistory {
   id: number;
-  name: string;
-  footballPitchName: string;
+  totalPrice: number;
   status: string;
-  rentalDate: string;
-  price: string;
-  startTime: string;
-  endTime: string;
+  invoiceFootballPitchRental: any;
 }
 
 export const useCustomerStore = defineStore("customerStore", () => {

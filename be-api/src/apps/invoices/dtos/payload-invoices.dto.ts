@@ -23,7 +23,7 @@ export class PayloadInvoiceDto {
   @IsNumber()
   @IsNotEmpty()
   @IsOptional()
-  readonly moneyPaid: number;
+  moneyPaid: number;
 
   @ApiProperty({
     example: 'UNPAID',

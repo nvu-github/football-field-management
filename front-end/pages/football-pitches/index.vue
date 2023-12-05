@@ -50,7 +50,9 @@ const formatDatePicker = (date: any): string => {
   return `${day}/${month}/${year}`;
 };
 
-footballPitchInfoFound.value = footballPitchRentalInfo.value;
+footballPitchInfoFound.value = footballPitchRentalInfo.value.filter(
+  (footballPitch) => footballPitch.status === "EMPTY"
+);
 async function filterFootballInfo() {
   const { rentalDate, leasingDuration, status, footballPitchId } =
     conditionFilterFootballPitch.value;
@@ -77,7 +79,7 @@ async function filterFootballInfo() {
           condition = condition && footballLeasingDuration === leasingDuration;
         }
 
-        return condition && footballPitch.status === "EMPTY";
+        return condition;
       }
     );
   }

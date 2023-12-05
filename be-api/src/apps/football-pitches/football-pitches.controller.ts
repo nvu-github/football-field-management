@@ -18,8 +18,11 @@ import { FootballPitchesService } from './football-pitches.service';
 import { UploadService } from 'common/upload/upload.service';
 import { AccessoriesService } from '@app/accessories/accessories.service';
 import { InvoicesService } from '@app/invoices/invoices.service';
+import { MailService } from 'common/mail/mail.service';
 
 import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
+
+import { format } from 'date-fns';
 
 import {
   PayloadFootballPitchTypeDto,
@@ -38,6 +41,7 @@ export class FootballPitchesController {
     private readonly uploadService: UploadService,
     private readonly accessoryService: AccessoriesService,
     private readonly invoiceService: InvoicesService,
+    private readonly mailService: MailService,
   ) {}
 
   @Get('leasing-durations/public')
@@ -133,15 +137,66 @@ export class FootballPitchesController {
             }),
         ),
       );
+
+      await this.mailService.sendMail({
+        to: footballPitchRentalFound.customer.account.email,
+        from: 'nguyenuc0911@gmail.com',
+        subject: 'Thông báo đặt lịch sân bóng Hoàng Quân',
+        template: 'customerFootballPitchRental',
+        data: {
+          ...footballPitchRentalFound,
+          status: body.status,
+          message: 'Quý khách đã đặt sân thành công!',
+          rentalDate: format(
+            new Date(footballPitchRentalFound.rentalDate),
+            'dd/MM/yyyy',
+          ),
+        },
+      });
     }
 
     if (body.status === 'REJECT') {
-      await this.invoiceService.deleteInvoiceDetails(
+      let payloadInvoice = null;
+      const accessoryPriceTotal =
+        footballPitchRentalFound.accessoryRentals &&
+        footballPitchRentalFound.accessoryRentals.length > 0
+          ? footballPitchRentalFound.accessoryRentals.reduce((total, item) => {
+              return total + Number(item.price) * Number(item.amount);
+            }, 0)
+          : 0;
+      const totalPrice =
+        Number(footballPitchRentalFound.invoice.totalPrice) -
+        Number(footballPitchRentalFound.price) -
+        Number(accessoryPriceTotal);
+      const moneyPaid =
+        footballPitchRentalFound.invoice.totalPrice ==
+        footballPitchRentalFound.invoice.moneyPaid
+          ? footballPitchRentalFound.invoice.moneyPaid - totalPrice
+          : footballPitchRentalFound.invoice.moneyPaid;
+
+      if (totalPrice > 0) payloadInvoice = { totalPrice, moneyPaid };
+      else payloadInvoice = { status: 'UNPAID' };
+
+      await this.invoiceService.updateInvoice(
         footballPitchRentalFound.invoice.id,
+        payloadInvoice,
       );
-      await this.invoiceService.deleteInvoice(
-        footballPitchRentalFound.invoice.id,
-      );
+
+      await this.mailService.sendMail({
+        to: footballPitchRentalFound.customer.account.email,
+        from: 'nguyenuc0911@gmail.com',
+        subject: 'Thông báo đặt lịch sân bóng Hoàng Quân',
+        template: 'customerFootballPitchRental',
+        data: {
+          ...footballPitchRentalFound,
+          status: body.status,
+          message: 'Quý khách đã hủy đặt sân thành công!',
+          rentalDate: format(
+            new Date(footballPitchRentalFound.rentalDate),
+            'dd/MM/yyyy',
+          ),
+        },
+      });
     }
 
     return this.footballPitchService.updateStatusFootballPitchRental(

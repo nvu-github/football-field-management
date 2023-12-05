@@ -600,20 +600,20 @@ export class FootballPitchesService {
   ): Promise<any> {
     const footballPitchRentalCustomerHistories: any[] = await this.prisma
       .$queryRaw`
-        SELECT  c.id, 
-                c.name, 
+        SELECT  c.id,
+                c.name,
                 f.name as footballPitchName,
                 cfpr.id as customerFootballPitchRentalId,
-                cfpr.status, 
-                cfpr.rental_date as rentalDate, 
-                fpl.price, 
-                ld.start_time as startTime, 
+                cfpr.status,
+                cfpr.rental_date as rentalDate,
+                fpl.price,
+                ld.start_time as startTime,
                 ld.end_time as endTime,
                 i.id as invoiceId,
                 i.total_price as totalPrice,
                 i.money_paid as moneyPaid,
                 i.status as invoiceStatus
-        FROM customers c 
+        FROM customers c
         INNER JOIN customer_football_pitch_rental cfpr on c.id = cfpr.customer_id
         INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
         INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
@@ -621,8 +621,85 @@ export class FootballPitchesService {
         INNER JOIN invoice_football_pitch_rental ifrt on ifrt.customer_football_pitch_id = cfpr.id
         INNER JOIN invoices i on i.id = ifrt.invoice_id
         WHERE c.id = ${customerId}
+        ORDER BY i.id DESC
       `;
-    return footballPitchRentalCustomerHistories || [];
+
+    const groupedHistories = footballPitchRentalCustomerHistories.reduce(
+      (result, history) => {
+        const existingItem = result.find(
+          (item) => item.invoiceId === history.invoiceId,
+        );
+
+        if (existingItem) {
+          existingItem.footballPitch.push({
+            name: history.footballPitchName,
+            customerFootballPitchRentalId:
+              history.customerFootballPitchRentalId,
+            leasingDuration: `${history.startTime} - ${history.endTime}`,
+            price: history.price,
+            status: history.status,
+          });
+        } else {
+          result.push({
+            ...history,
+            footballPitch: [
+              {
+                name: history.footballPitchName,
+                customerFootballPitchRentalId:
+                  history.customerFootballPitchRentalId,
+                leasingDuration: `${history.startTime} - ${history.endTime}`,
+                price: history.price,
+                status: history.status,
+              },
+            ],
+          });
+        }
+
+        return result;
+      },
+      [],
+    );
+    return (
+      (await Promise.all(
+        groupedHistories.map(async (item) => {
+          const accessoryRentalCustomer =
+            await this.prisma.accessoryRentalCustomer.findMany({
+              where: {
+                customerFootballPitchRentalId:
+                  item.customerFootballPitchRentalId,
+              },
+              select: {
+                amount: true,
+                accessory: {
+                  select: {
+                    price: true,
+                  },
+                },
+              },
+            });
+          const totalPriceAccessory = accessoryRentalCustomer.reduce(
+            (total, accessory: any) => {
+              return (
+                total +
+                Number(accessory.amount) * Number(accessory.accessory.price)
+              );
+            },
+            0,
+          );
+
+          return {
+            ...item,
+            footballPitch: item.footballPitch.map((footballPitch) => {
+              return {
+                ...footballPitch,
+                price:
+                  Number(footballPitch.price) + Number(totalPriceAccessory),
+              };
+            }),
+          };
+        }),
+      )) || []
+    );
   }
 
   async createCustomerFootballPitchRental(payload: any): Promise<any> {
@@ -668,7 +745,12 @@ export class FootballPitchesService {
       INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
       LEFT JOIN invoice_football_pitch_rental ifpr on ifpr.customer_football_pitch_id = cfpr.id
       LEFT JOIN invoices i on i.id = ifpr.invoice_id
-      ORDER BY cfpr.created_at DESC
+      ORDER BY 
+        CASE cfpr.status
+          WHEN 'PENDING' THEN 1
+          WHEN 'ACCEPT' THEN 2
+          WHEN 'REJECT' THEN 3
+        END;
     `;
 
     const accessoryRentalCustomers =
@@ -723,8 +805,18 @@ export class FootballPitchesService {
               footballPitchRentalCustomer.id,
           );
 
+          const totalPriceAccessory = accessoryRentalCustomerFound.reduce(
+            (total, item) => {
+              return total + Number(item.amount) * Number(item.accessory.price);
+            },
+            0,
+          );
+
           return {
             ...footballPitchRentalCustomer,
+            price:
+              Number(footballPitchRentalCustomer.price) +
+              Number(totalPriceAccessory),
             accessoryRentalCustomers: accessoryRentalCustomerFound,
           };
         }) || []
@@ -749,6 +841,11 @@ export class FootballPitchesService {
             select: {
               name: true,
               phoneNumber: true,
+              account: {
+                select: {
+                  email: true,
+                },
+              },
             },
           },
           invoiceFootballPitchRental: {

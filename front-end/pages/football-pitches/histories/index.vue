@@ -133,52 +133,63 @@ async function paymentInvoice(invoiceId: number, price: number) {
         v-for="customerFootballPitchRental in formattedHistories"
         :key="customerFootballPitchRental.id"
       >
-        <v-card
-          class="mx-auto mt-3"
-          prepend-icon="mdi mdi-soccer-field"
-          variant="outlined"
-        >
-          <template v-slot:title>
-            {{ customerFootballPitchRental.footballPitchName }}
-          </template>
-          <v-card-subtitle class="subtitle">
-            <div class="hour">
-              <v-icon>mdi mdi-clock-time-nine-outline</v-icon>
-              {{ customerFootballPitchRental.startTime }} -
-              {{ customerFootballPitchRental.endTime }}
-            </div>
-            <div class="day">
-              <v-icon>mdi mdi-calendar-range</v-icon>
-              {{
-                format(
-                  new Date(customerFootballPitchRental.rentalDate),
-                  "dd/MM/yyyy"
-                )
-              }}
-            </div>
-            <div class="price">
-              <v-icon>mdi mdi-cash</v-icon>
-              <span class="value">
-                {{ formatPrice(customerFootballPitchRental.totalPrice) }}
-                <span class="unit">₫</span>
-              </span>
-            </div>
-          </v-card-subtitle>
+        <v-card class="mx-auto mt-3" variant="outlined">
+          <div
+            v-for="item in customerFootballPitchRental.footballPitch"
+            :key="item.customerFootballPitchRentalId"
+            class="football-info"
+          >
+            <v-card-title>
+              <v-icon>mdi mdi-soccer-field</v-icon> {{ item.name }}
+            </v-card-title>
+            <v-card-subtitle class="subtitle">
+              <div class="hour">
+                <v-icon>mdi mdi-clock-time-nine-outline</v-icon>
+                {{ item.leasingDuration }}
+              </div>
+              <div class="day">
+                <v-icon class="mr-1">mdi mdi-folder-swap-outline</v-icon>
+                <v-chip
+                  :color="
+                    footballPitchStore.getStatusCustomerFootballPitchRental(
+                      item.status
+                    ).color
+                  "
+                  >{{
+                    footballPitchStore.getStatusCustomerFootballPitchRental(
+                      item.status
+                    ).text
+                  }}</v-chip
+                >
+              </div>
+              <div class="price">
+                <v-icon>mdi mdi-cash</v-icon>
+                <span class="value">
+                  {{ formatPrice(item.price) }}
+                  <span class="unit">₫</span>
+                </span>
+              </div>
+            </v-card-subtitle>
+          </div>
           <v-card-action class="actionbtn">
-            <div class="status">
-              <label for="">Trạng thái: </label>
-              <v-chip
-                :color="
-                  footballPitchStore.getStatusCustomerFootballPitchRental(
-                    customerFootballPitchRental.status
-                  ).color
-                "
-                >{{
-                  footballPitchStore.getStatusCustomerFootballPitchRental(
-                    customerFootballPitchRental.status
-                  ).text
-                }}</v-chip
-              >
+            <div class="content">
+              <div class="status">
+                <label class="label">Ngày thuê: </label>
+                {{
+                  format(
+                    new Date(customerFootballPitchRental.rentalDate),
+                    "dd/MM/yyyy"
+                  )
+                }}
+              </div>
+              <div class="price">
+                <label class="label">Đã thanh toán: </label>
+                {{ formatPrice(customerFootballPitchRental.moneyPaid) }} ₫
+              </div>
+              <div class="price">
+                <label class="label">Tổng tiền: </label>
+                {{ formatPrice(customerFootballPitchRental.totalPrice) }} ₫
+              </div>
             </div>
             <div class="action">
               <v-tooltip location="bottom" text="Chi tiết">
@@ -202,7 +213,10 @@ async function paymentInvoice(invoiceId: number, price: number) {
                     v-bind="props"
                     class="button -warning -rental"
                     :disabled="
-                      customerFootballPitchRental.invoiceStatus === 'PAID'
+                      customerFootballPitchRental.invoiceStatus === 'PAID' ||
+                      customerFootballPitchRental.footballPitch.some(
+                        (item) => item.status === 'PENDING'
+                      )
                     "
                     @click="
                       paymentInvoice(
@@ -216,13 +230,6 @@ async function paymentInvoice(invoiceId: number, price: number) {
                   </v-btn>
                 </template>
               </v-tooltip>
-              <!-- <v-tooltip location="bottom" text="Hủy đặt sân">
-                <template #activator="{ props }">
-                  <v-btn v-bind="props" class="button -danger">
-                    <v-icon> mdi mdi-close-circle-outline </v-icon>
-                  </v-btn>
-                </template>
-              </v-tooltip> -->
             </div>
           </v-card-action>
         </v-card>
@@ -275,13 +282,23 @@ async function paymentInvoice(invoiceId: number, price: number) {
   :deep(.actionbtn) {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-end;
     margin-top: 10px;
     margin-right: 10px;
   }
 
-  :deep(.actionbtn) > .status {
-    margin-left: 10px;
+  :deep(.actionbtn) > .content > .status {
+    margin-left: 15px;
+  }
+
+  :deep(.actionbtn) > .content > .price {
+    margin-top: 10px;
+    margin-left: 15px;
+    color: #e60000;
+
+    > .label {
+      color: #000;
+    }
   }
 
   :deep(.actionbtn) > .action > .button {

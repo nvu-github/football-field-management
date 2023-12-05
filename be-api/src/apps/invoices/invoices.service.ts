@@ -34,6 +34,7 @@ export class InvoicesService {
   }
 
   updateInvoice(invoiceId: number, payload: any): Promise<any> {
+    console.log(payload);
     return this.prisma.invoice.update({
       where: {
         id: invoiceId,
@@ -301,11 +302,15 @@ export class InvoicesService {
       where: {
         customerId,
         rentalDate: {
-          gte: new Date().toISOString(),
+          gte: new Date(
+            new Date().getTime() - 7 * 60 * 60 * 1000,
+          ).toISOString(),
+          // gte: new Date().toISOString(),
         },
       },
       select: {
         id: true,
+        rentalDate: true,
         invoiceFootballPitchRental: {
           select: {
             invoiceId: true,

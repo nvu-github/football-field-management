@@ -35,28 +35,7 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
       </v-card-title>
       <v-card-text>
         <v-row class="football-info">
-          <v-col
-            v-if="
-              customerFootballPitchRentalDetail &&
-              customerFootballPitchRentalDetail?.footballPitchImages.length > 0
-            "
-            md="7"
-            class="image"
-          >
-            <common-carousel
-              class="carousel"
-              :images="customerFootballPitchRentalDetail?.footballPitchImages"
-            />
-          </v-col>
-          <v-col
-            :md="
-              customerFootballPitchRentalDetail &&
-              customerFootballPitchRentalDetail?.footballPitchImages.length > 0
-                ? columnSizeWithImage
-                : columnSizeNotImage
-            "
-            class="rental-info"
-          >
+          <v-col :md="8" class="rental-info">
             <ul class="list -customer">
               <li class="item -title">Khách hàng</li>
               <li class="item -name">
@@ -76,14 +55,7 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
                 }}
               </li>
             </ul>
-            <ul
-              :class="[
-                'list -football',
-                {
-                  '-bordernone': user?.roleId === CUSTOMER_ROLE,
-                },
-              ]"
-            >
+            <ul :class="['list -football -bordernone']">
               <li class="item -title">Sân bóng</li>
               <li class="item -name">
                 <span class="label">Tên sân bóng: </span>
@@ -154,6 +126,8 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
                 >
               </li>
             </ul>
+          </v-col>
+          <v-col :md="4" class="rental-info -right">
             <ul class="list -invoice">
               <li class="item -title">Hóa đơn</li>
               <li class="item -price">
@@ -274,6 +248,9 @@ footballPitchStore.getCustomerFootballPitchRentalDetail(id);
     &.-bordernone {
       border-bottom: none;
     }
+  }
+  &.-right {
+    border-left: 1px solid;
   }
 
   > .list > .item {

@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { Injectable } from '@nestjs/common';
 import { MailerService } from '@nestjs-modules/mailer';
 import { google } from 'googleapis';
 import { Options } from 'nodemailer/lib/smtp-transport';
@@ -14,10 +14,10 @@ export class MailService {
 
   constructor(private readonly mailerService: MailerService) {
     const { mail } = configuration();
-    this.clientId = mail.clientId
-    this.clientSecret = mail.clientSecret
-    this.refreshToken = mail.refreshToken
-    this.address = mail.address
+    this.clientId = mail.clientId;
+    this.clientSecret = mail.clientSecret;
+    this.refreshToken = mail.refreshToken;
+    this.address = mail.address;
   }
 
   private async setTransport() {
@@ -35,7 +35,7 @@ export class MailService {
     const accessToken: string = await new Promise((resolve, reject) => {
       oauth2Client.getAccessToken((err, token) => {
         if (err) {
-          console.log(err)
+          console.log(err);
           reject('Failed to create access token');
         }
         resolve(token);
@@ -56,7 +56,7 @@ export class MailService {
   }
 
   async sendMail(mailParam: any) {
-    const { to, from, subject, template, data } = mailParam
+    const { to, from, subject, template, data } = mailParam;
     await this.mailerService
       .sendMail({
         to,
@@ -66,7 +66,7 @@ export class MailService {
         context: data,
       })
       .then((success) => {
-        console.log(success);
+        console.log('SendMail success!');
       })
       .catch((err) => {
         console.log(err);

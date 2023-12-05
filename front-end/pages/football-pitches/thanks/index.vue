@@ -54,7 +54,12 @@ customerStore
     await accessoryStore.getAccessories();
     await invoiceStore.getInvoiceCustomerRental(+customerId);
 
-    if (invoiceCustomer.value && invoiceCustomer.value.length > 0) {
+    console.log(invoiceCustomer.value);
+    if (
+      invoiceCustomer.value &&
+      invoiceCustomer.value.length > 0 &&
+      invoiceCustomer.value[0].invoiceFootballPitchRental
+    ) {
       await updateInvoice(id);
     } else {
       await createInvoice(id);
@@ -112,23 +117,24 @@ async function updateInvoice(customerFootballPitchRentalId: number) {
   const moneyPaid = amountPayment;
 
   const customerFootballIds = invoiceCustomer.value.map(({ id }) => id);
+  const totalPrice =
+    Number(rentalPrice) +
+    Number(
+      invoiceCustomer.value[0].invoiceFootballPitchRental.invoice.totalPrice
+    );
+  const moneyPaidPayload =
+    Number(moneyPaid) +
+    Number(
+      invoiceCustomer.value[0].invoiceFootballPitchRental.invoice.moneyPaid
+    );
 
   payloadInvoice.value = {
     id: invoiceCustomer.value[0].invoiceFootballPitchRental.invoiceId,
-    totalPrice:
-      Number(rentalPrice) +
-      Number(
-        invoiceCustomer.value[0].invoiceFootballPitchRental.invoice.totalPrice
-      ),
-    moneyPaid:
-      Number(moneyPaid) +
-      Number(
-        invoiceCustomer.value[0].invoiceFootballPitchRental.invoice.moneyPaid
-      ),
-    customerFootballIds: [
-      ...customerFootballIds,
-      customerFootballPitchRentalId,
-    ],
+    totalPrice,
+    moneyPaid: moneyPaidPayload,
+    customerFootballIds,
+    status:
+      Number(totalPrice) === Number(moneyPaidPayload) ? "PAID" : "DEPOSIT",
   };
 
   if (customerAccessoryRentals) {

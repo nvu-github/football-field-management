@@ -36,6 +36,7 @@ export class InvoicesController {
 
     if (!staffBody) body.staffId = staffId;
 
+    if (!body.moneyPaid) body.moneyPaid = body.totalPrice;
     delete body.invoiceDetails;
     delete body.customerFootballIds;
     const invoiceCreated = await this.invoicesService.createInvoice(body);
@@ -117,6 +118,7 @@ export class InvoicesController {
       );
     }
 
+    if (!body.moneyPaid) body.moneyPaid = body.totalPrice;
     delete body.invoiceDetails;
     delete body.customerFootballIds;
     if (!body.staffId) delete body.staffId;
@@ -165,8 +167,8 @@ export class InvoicesController {
   }
 
   @Get(':id/customer')
-  // @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   async getInvoiceByCustomer(@Param('id') id: string) {
     return this.invoicesService.getInvoiceByCustomer(+id);
   }

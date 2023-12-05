@@ -6,6 +6,7 @@ import { FootballPitchesService } from './football-pitches.service';
 import { UploadService } from 'common/upload/upload.service';
 import { AccessoriesService } from '@app/accessories/accessories.service';
 import { InvoicesService } from '@app/invoices/invoices.service';
+import { MailService } from 'common/mail/mail.service';
 
 @Module({
   controllers: [FootballPitchesController],
@@ -15,6 +16,7 @@ import { InvoicesService } from '@app/invoices/invoices.service';
     UploadService,
     AccessoriesService,
     InvoicesService,
+    MailService,
   ],
 })
 export class FootballPitchesModule {}
