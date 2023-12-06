@@ -187,7 +187,7 @@ async function paymentInvoice(invoiceId: number, price: number) {
                 {{ formatPrice(customerFootballPitchRental.moneyPaid) }} ₫
               </div>
               <div class="price">
-                <label class="label">Tổng tiền: </label>
+                <label class="label">Tổng tiền thuê: </label>
                 {{ formatPrice(customerFootballPitchRental.totalPrice) }} ₫
               </div>
             </div>
@@ -216,6 +216,9 @@ async function paymentInvoice(invoiceId: number, price: number) {
                       customerFootballPitchRental.invoiceStatus === 'PAID' ||
                       customerFootballPitchRental.footballPitch.some(
                         (item) => item.status === 'PENDING'
+                      ) ||
+                      customerFootballPitchRental.footballPitch.some(
+                        (item) => item.status === 'REJECT'
                       )
                     "
                     @click="

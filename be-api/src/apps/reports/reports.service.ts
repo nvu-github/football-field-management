@@ -193,7 +193,7 @@ export class ReportsService {
           select: {
             id: true,
             status: true,
-            createdAt: true,
+            rentalDate: true,
             invoiceFootballPitchRental: {
               select: {
                 invoice: {
@@ -220,8 +220,8 @@ export class ReportsService {
       const total = customerFootballPitchRental.reduce(
         (accumulator, rental) => {
           let condition = true;
-          const monthRentalCreated = format(new Date(rental.createdAt), 'MM');
-          const yearRentalCreated = format(new Date(rental.createdAt), 'yyyy');
+          const monthRentalCreated = format(new Date(rental.rentalDate), 'MM');
+          const yearRentalCreated = format(new Date(rental.rentalDate), 'yyyy');
 
           if (month)
             condition =

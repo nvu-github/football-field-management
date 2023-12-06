@@ -34,7 +34,7 @@ const timer = ref(10);
 
 const intervalId = setInterval(() => {
   if (timer.value === 0) {
-    // navigateTo("/football-pitches/histories");
+    navigateTo("/football-pitches/histories");
     clearInterval(intervalId);
   } else {
     timer.value -= 1;
@@ -54,7 +54,6 @@ customerStore
     await accessoryStore.getAccessories();
     await invoiceStore.getInvoiceCustomerRental(+customerId);
 
-    console.log(invoiceCustomer.value);
     if (
       invoiceCustomer.value &&
       invoiceCustomer.value.length > 0 &&

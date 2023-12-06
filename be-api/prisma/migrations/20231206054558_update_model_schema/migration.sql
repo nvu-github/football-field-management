@@ -1,17 +1,17 @@
 /*
   Warnings:
 
-  - You are about to drop the `invoicefootballpitchrental` table. If the table is not empty, all the data it contains will be lost.
+  - You are about to drop the `InvoiceFootballPitchRental` table. If the table is not empty, all the data it contains will be lost.
 
 */
 -- DropForeignKey
-ALTER TABLE `invoicefootballpitchrental` DROP FOREIGN KEY `InvoiceFootballPitchRental_customer_football_pitch_id_fkey`;
+ALTER TABLE `InvoiceFootballPitchRental` DROP FOREIGN KEY `InvoiceFootballPitchRental_customer_football_pitch_id_fkey`;
 
 -- DropForeignKey
-ALTER TABLE `invoicefootballpitchrental` DROP FOREIGN KEY `InvoiceFootballPitchRental_invoice_id_fkey`;
+ALTER TABLE `InvoiceFootballPitchRental` DROP FOREIGN KEY `InvoiceFootballPitchRental_invoice_id_fkey`;
 
 -- DropTable
-DROP TABLE `invoicefootballpitchrental`;
+DROP TABLE `InvoiceFootballPitchRental`;
 
 -- CreateTable
 CREATE TABLE `invoice_football_pitch_rental` (
@@ -19,6 +19,7 @@ CREATE TABLE `invoice_football_pitch_rental` (
     `invoice_id` INTEGER NOT NULL,
     `customer_football_pitch_id` INTEGER NOT NULL,
 
+    UNIQUE INDEX `invoice_football_pitch_rental_customer_football_pitch_id_key`(`customer_football_pitch_id`),
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 

@@ -70,17 +70,17 @@ async function main() {
           accountId: 1,
         },
         {
-          name: 'John Doe',
+          name: 'Nguyen Van A',
           phoneNumber: '1234567890',
           address: 'Phu Tho',
           gender: 'MALE',
           accountId: 2,
         },
         {
-          name: 'Jane Smith',
+          name: 'Nguyen Van B',
           phoneNumber: '9876543210',
           address: 'Ha Noi',
-          gender: 'FEMALE',
+          gender: 'MALE',
           accountId: 3,
         },
       ],
@@ -90,13 +90,13 @@ async function main() {
     await prisma.customer.createMany({
       data: [
         {
-          name: 'Customer 1',
+          name: 'Khach hang 1',
           teamName: 'Team A',
           phoneNumber: '5555555555',
           accountId: 4,
         },
         {
-          name: 'Customer 2',
+          name: 'Khach hang 2',
           teamName: 'Team B',
           phoneNumber: '7777777777',
           accountId: 5,

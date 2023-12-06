@@ -188,7 +188,7 @@ async function loginGoogle() {
                             class="mt-2 mb-1"
                             :rules="[rules.password]"
                           />
-                          <v-row>
+                          <!-- <v-row>
                             <v-col cols="12" class="mb-5">
                               <NuxtLink to="/auth/login"
                                 ><span class="caption blue--text"
@@ -196,7 +196,7 @@ async function loginGoogle() {
                                 ></NuxtLink
                               >
                             </v-col>
-                          </v-row>
+                          </v-row> -->
                           <v-btn
                             color="blue"
                             class="btn"
