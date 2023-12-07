@@ -305,6 +305,9 @@ export class InvoicesService {
           gte: new Date(
             new Date().getTime() - 7 * 60 * 60 * 1000,
           ).toISOString(),
+          // lte: new Date(
+          //   new Date().getTime() - 7 * 60 * 60 * 1000,
+          // ).toISOString(),
           // gte: new Date().toISOString(),
         },
       },
