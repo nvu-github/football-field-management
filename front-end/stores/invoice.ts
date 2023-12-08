@@ -48,6 +48,10 @@ export const invoiceStatuses: any = [
     key: "UNPAID",
     name: "Chưa thanh toán",
   },
+  {
+    key: "CANCELED",
+    name: "Hủy",
+  },
 ];
 
 export const useInvoiceStore = defineStore("invoiceStore", () => {
@@ -121,11 +125,16 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     switch (status) {
       case "DEPOSIT":
         text = "Đã cọc";
-        color = "orange";
+        color = "primary";
         break;
 
       case "UNPAID":
         text = "Chưa thanh toán";
+        color = "orange";
+        break;
+
+      case "CANCELED":
+        text = "Hủy";
         color = "danger";
         break;
     }
