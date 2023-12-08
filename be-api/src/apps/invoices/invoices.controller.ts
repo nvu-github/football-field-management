@@ -11,6 +11,7 @@ import {
   Patch,
   Delete,
   Request,
+  Query,
 } from '@nestjs/common';
 
 import { InvoicesService } from './invoices.service';
@@ -169,8 +170,9 @@ export class InvoicesController {
   @Get(':id/customer')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getInvoiceByCustomer(@Param('id') id: string) {
-    return this.invoicesService.getInvoiceByCustomer(+id);
+  async getInvoiceByCustomer(@Param('id') id: string, @Query() query: any) {
+    const { rentalDate } = query;
+    return this.invoicesService.getInvoiceByCustomer(+id, rentalDate);
   }
 
   @Get(':id/detail')

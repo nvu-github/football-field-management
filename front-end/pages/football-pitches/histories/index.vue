@@ -217,9 +217,10 @@ async function paymentInvoice(invoiceId: number, price: number) {
                       customerFootballPitchRental.footballPitch.some(
                         (item) => item.status === 'PENDING'
                       ) ||
-                      customerFootballPitchRental.footballPitch.some(
-                        (item) => item.status === 'REJECT'
-                      )
+                      (customerFootballPitchRental.footballPitch.length == 1 &&
+                        customerFootballPitchRental.footballPitch.some(
+                          (item) => item.status === 'REJECT'
+                        ))
                     "
                     @click="
                       paymentInvoice(

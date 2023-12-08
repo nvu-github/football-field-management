@@ -6,6 +6,8 @@ import { FootballPitchesService } from '@app/football-pitches/football-pitches.s
 import { PayloadInvoiceDto } from './dtos/payload-invoices.dto';
 import { PayloadInvoiceTypeDto } from './dtos';
 
+import { format } from 'date-fns';
+
 @Injectable()
 export class InvoicesService {
   constructor(
@@ -297,18 +299,18 @@ export class InvoicesService {
     };
   }
 
-  getInvoiceByCustomer(customerId: number): Promise<any> {
+  getInvoiceByCustomer(customerId: number, rentalDate: any): Promise<any> {
+    const rentalDateCustomer = new Date(rentalDate);
+    rentalDateCustomer.setHours(0, 0, 0, 0);
+
     return this.prisma.customerFootballPitchRental.findMany({
       where: {
         customerId,
         rentalDate: {
-          gte: new Date(
-            new Date().getTime() - 7 * 60 * 60 * 1000,
+          gte: rentalDateCustomer.toISOString(),
+          lt: new Date(
+            rentalDateCustomer.getTime() + 24 * 60 * 60 * 1000,
           ).toISOString(),
-          // lte: new Date(
-          //   new Date().getTime() - 7 * 60 * 60 * 1000,
-          // ).toISOString(),
-          // gte: new Date().toISOString(),
         },
       },
       select: {

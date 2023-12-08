@@ -137,14 +137,14 @@ footballPitchStore.getFootballPitches();
     >
       <v-row class="row">
         <v-col
-          :md="payloadCustomerFootballPitchRental.footballPitchId ? 4 : 12"
+          :md="payloadCustomerFootballPitchRental.footballPitchId ? 3 : 12"
           class="form"
         >
           <user-football-pitch-rental-form />
         </v-col>
         <v-col
           v-if="payloadCustomerFootballPitchRental.footballPitchId"
-          md="7"
+          md="8"
           class="info"
         >
           <user-football-pitch-rental-info

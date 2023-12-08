@@ -711,6 +711,7 @@ export class FootballPitchesService {
       select: {
         id: true,
         customerId: true,
+        rentalDate: true,
       },
     });
   }

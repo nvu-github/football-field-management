@@ -104,9 +104,12 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
     invoiceDetail.value = invoiceDetailSingle.data;
   }
 
-  async function getInvoiceCustomerRental(customerRentalId: number) {
+  async function getInvoiceCustomerRental(
+    customerRentalId: number,
+    rentalDate: any
+  ) {
     const invoiceCustomerRentals = await $apis.get(
-      `invoices/${customerRentalId}/customer`
+      `invoices/${customerRentalId}/customer?rentalDate=${rentalDate}`
     );
     invoiceCustomer.value = invoiceCustomerRentals.data;
   }

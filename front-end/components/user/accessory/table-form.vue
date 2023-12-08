@@ -40,6 +40,13 @@ const headers = [
     key: "accessory",
   },
   {
+    title: "Loại phụ kiện",
+    width: "20%",
+    align: "start",
+    sortable: false,
+    key: "accessoryType",
+  },
+  {
     title: "Giá thuê",
     width: "20%",
     sortable: false,
@@ -68,7 +75,7 @@ const { accessories } = storeToRefs(accessoryStore);
 const dialogStore = useDialogStore();
 const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 const priceAccessories = ref<any>({});
-const formattedAccessories = ref<any>([]);
+const accessoryTypes = ref<any>({});
 
 watchEffect(() => {
   const accessoryIds =
@@ -81,18 +88,23 @@ watchEffect(() => {
       const accessoryFound = accessories.value.find(
         (accessory) => id === accessory.id
       );
-      const { id: accessoryId, price }: any = accessoryFound;
-      priceAccessories.value = {
-        ...priceAccessories.value,
-        [accessoryId]: { price },
-      };
+      if (accessoryFound) {
+        const {
+          id: accessoryId,
+          price,
+          accessoryTypeName,
+        }: any = accessoryFound;
+        priceAccessories.value = {
+          ...priceAccessories.value,
+          [accessoryId]: price,
+        };
+        accessoryTypes.value = {
+          ...accessoryTypes.value,
+          [accessoryId]: accessoryTypeName,
+        };
+      }
     }
   });
-
-  if (accessories.value)
-    formattedAccessories.value = accessories.value.filter(
-      (accessory: any) => accessory.accessoryTypeId === 1
-    );
 });
 
 function addAccessoryRental() {
@@ -154,18 +166,23 @@ accessoryStore.getAccessories();
           variant="outlined"
           menu-icon="false"
           class="pt-3"
-          :items="formattedAccessories"
+          :items="accessories"
           :rules="[rules.accessoryId]"
         ></v-autocomplete>
+      </template>
+      <template #[`item.accessoryType`]="{ item }">
+        <span class="type">{{
+          accessoryTypes[item.raw.accessoryId]
+            ? accessoryTypes[item.raw.accessoryId]
+            : ""
+        }}</span>
       </template>
       <template #[`item.price`]="{ item }">
         <span class="price">
           {{
             `${
               priceAccessories[item.raw.accessoryId]
-                ? `${formatPrice(
-                    priceAccessories[item.raw.accessoryId].price
-                  )} ₫`
+                ? `${formatPrice(priceAccessories[item.raw.accessoryId])} ₫`
                 : ""
             }`
           }}
@@ -220,7 +237,8 @@ accessoryStore.getAccessories();
     margin: 3px;
     padding: 0;
   }
-  :deep(.price) {
+  :deep(.price),
+  :deep(.type) {
     position: relative;
     top: -5px;
   }
