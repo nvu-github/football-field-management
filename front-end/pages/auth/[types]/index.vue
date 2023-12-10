@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useNuxtApp, useRoute, useRouter } from "nuxt/app";
 import { signInWithPopup, GoogleAuthProvider } from "firebase/auth";
@@ -70,7 +70,7 @@ function changeRouter() {
 }
 
 async function loginUser() {
-  isLoading.value = true
+  isLoading.value = true;
   try {
     const { email, password } = loginPayloads.value;
     const userLogin = await authStore.signIn({ email, password });
@@ -102,7 +102,7 @@ async function loginUser() {
     console.log(error);
     $toast.error("Thông tin email hoặc mật khẩu không chính xác");
   }
-  isLoading.value = false
+  isLoading.value = false;
 }
 
 async function Register() {
@@ -110,7 +110,7 @@ async function Register() {
     await authStore.signUp(registerPayloads.value);
     $toast.success("Đăng ký tài khoản thành công");
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    router.push('/auth/login');
+    router.push("/auth/login");
   } catch (error) {
     console.log(error);
     $toast.error("Có lỗi xảy ra, vui lòng thử lại sau");
@@ -212,8 +212,8 @@ async function loginGoogle() {
                               >đăng ký ngay.</nuxt-link
                             >
                           </p>
-                          <h5 class="text-center grey--text mt-4 mb-3">Hoặc</h5>
-                          <div
+                          <!-- <h5 class="text-center grey--text mt-4 mb-3">Hoặc</h5> -->
+                          <!-- <div
                             class="d-flex justify-center align-center mx-20 mb-16"
                           >
                             <v-btn
@@ -231,7 +231,7 @@ async function loginGoogle() {
                               />
                               Đăng nhập với Google
                             </v-btn>
-                          </div>
+                          </div> -->
                         </v-col>
                       </v-row>
                     </v-form>
@@ -342,8 +342,8 @@ async function loginGoogle() {
                             Bạn đã có tài khoản?
                             <nuxt-link to="/auth/login">đăng nhập.</nuxt-link>
                           </p>
-                          <h5 class="text-center grey--text mt-4 mb-3">Hoặc</h5>
-                          <div
+                          <!-- <h5 class="text-center grey--text mt-4 mb-3">Hoặc</h5> -->
+                          <!-- <div
                             class="d-flex justify-center align-center mx-20 mb-6"
                           >
                             <v-btn
@@ -361,7 +361,7 @@ async function loginGoogle() {
                               />
                               Đăng nhập với Google
                             </v-btn>
-                          </div>
+                          </div> -->
                         </v-col>
                       </v-row>
                     </v-form>

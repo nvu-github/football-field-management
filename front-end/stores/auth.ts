@@ -51,5 +51,12 @@ export const useAuthStore = defineStore("authStore", () => {
     localStorage.removeItem("userLogin");
   }
 
-  return { user, setUserInfoFromLocalStorage, signIn, signUp, signInGoogle, signOut };
+  return {
+    user,
+    setUserInfoFromLocalStorage,
+    signIn,
+    signUp,
+    signInGoogle,
+    signOut,
+  };
 });

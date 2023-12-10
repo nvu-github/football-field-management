@@ -16,7 +16,7 @@ const footballPitchPriceStore = useFootballPitchPriceStore();
 const paymentStore = usePaymentStore();
 const authStore = useAuthStore();
 const { footballPitchPrices } = storeToRefs(footballPitchPriceStore);
-const { footballPitch, customerFootballPitchRentals } =
+const { footballPitch, checkFootballPitchRental } =
   storeToRefs(footballPitchStore);
 const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 const { payloadAmountPayment } = storeToRefs(paymentStore);
@@ -45,6 +45,10 @@ watchEffect(async () => {
       footballPitchPriceFound.value.price;
   }
 });
+
+function handleCustomerAccessoryRental(value: any) {
+  payloadCustomerFootballPitchRental.value.customerAccessoryRentals = value;
+}
 
 function getStatusCustomerFootballPitchRental(status: string | null) {
   let color = "primary";
@@ -106,17 +110,15 @@ function getStatusCustomerFootballPitchRental(status: string | null) {
                 v-if="footballPitchPriceFound && footballPitchPriceFound.id"
                 :color="
                   getStatusCustomerFootballPitchRental(
-                    customerFootballPitchRentals &&
-                      customerFootballPitchRentals.length > 0
-                      ? customerFootballPitchRentals[0].status
+                    checkFootballPitchRental
+                      ? checkFootballPitchRental.status
                       : null
                   ).color
                 "
                 >{{
                   getStatusCustomerFootballPitchRental(
-                    customerFootballPitchRentals &&
-                      customerFootballPitchRentals.length > 0
-                      ? customerFootballPitchRentals[0].status
+                    checkFootballPitchRental
+                      ? checkFootballPitchRental.status
                       : null
                   ).text
                 }}</v-chip
@@ -152,7 +154,10 @@ function getStatusCustomerFootballPitchRental(status: string | null) {
       <v-divider class="mt-2 mb-2"></v-divider>
       <div class="accessory">
         <p class="title">Đăng ký thuê phụ kiện</p>
-        <user-accessory-table-form />
+        <user-accessory-table-form
+          :payload="payloadCustomerFootballPitchRental.customerAccessoryRentals"
+          @handle-customer-accessory-rental="handleCustomerAccessoryRental"
+        />
       </div>
     </div>
   </div>

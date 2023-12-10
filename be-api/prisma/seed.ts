@@ -64,21 +64,21 @@ async function main() {
       data: [
         {
           name: 'Admin',
-          phoneNumber: '1234567890',
+          phoneNumber: '01234567890',
           address: 'Phu Tho',
           gender: 'MALE',
           accountId: 1,
         },
         {
           name: 'Nguyen Van A',
-          phoneNumber: '1234567890',
+          phoneNumber: '01234567890',
           address: 'Phu Tho',
           gender: 'MALE',
           accountId: 2,
         },
         {
           name: 'Nguyen Van B',
-          phoneNumber: '9876543210',
+          phoneNumber: '09876543210',
           address: 'Ha Noi',
           gender: 'MALE',
           accountId: 3,
@@ -92,13 +92,13 @@ async function main() {
         {
           name: 'Khach hang 1',
           teamName: 'Team A',
-          phoneNumber: '5555555555',
+          phoneNumber: '0912341232',
           accountId: 4,
         },
         {
           name: 'Khach hang 2',
           teamName: 'Team B',
-          phoneNumber: '7777777777',
+          phoneNumber: '0912341232',
           accountId: 5,
         },
       ],

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { resolveComponent, watchEffect } from "vue";
+import { resolveComponent, watchEffect, onBeforeMount } from "vue";
 import { isSameDay, isAfter } from "date-fns";
 import { storeToRefs } from "pinia";
 import { useRoute, useNuxtApp } from "nuxt/app";
@@ -24,7 +24,7 @@ const footballPitchStore = useFootballPitchStore();
 const footballPitchPriceStore = useFootballPitchPriceStore();
 const { isLoading } = storeToRefs(appStore);
 const { breadCrumbs } = storeToRefs(appStore);
-const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
+const { checkFootballPitchRental } = storeToRefs(footballPitchStore);
 const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 
 await footballPitchPriceStore.getFootballPitchPrices();
@@ -41,6 +41,10 @@ breadCrumbs.value = [
   },
 ];
 
+onBeforeMount(() => {
+  checkFootballPitchRental.value = {};
+});
+
 watchEffect(async () => {
   const { footballPitchId } = payloadCustomerFootballPitchRental.value;
   if (footballPitchId) {
@@ -51,7 +55,9 @@ watchEffect(async () => {
 });
 
 const { type } = route.query;
+
 if (!type) customerStore.resetForm();
+
 async function submitRentalInfo() {
   isLoading.value = true;
   const formValidation = validForm();
@@ -66,9 +72,9 @@ async function submitRentalInfo() {
   }
 
   if (
-    customerFootballPitchRentals &&
-    customerFootballPitchRentals.value.length > 0 &&
-    customerFootballPitchRentals.value[0].status !== "REJECT"
+    checkFootballPitchRental.value &&
+    checkFootballPitchRental.value.status &&
+    checkFootballPitchRental.value.status !== "REJECT"
   ) {
     isLoading.value = false;
     return $toast.warning(
@@ -86,7 +92,7 @@ async function handleFootballPitchLeasngDuration(id: number) {
   const { footballPitchId, rentalDate } =
     payloadCustomerFootballPitchRental.value;
   if (footballPitchId && id) {
-    await footballPitchStore.getCustomerFootballPitchRentals({
+    await footballPitchStore.checkCustomerFootballPitchRental({
       footballPitchId,
       footballPitchLeasingDurationId: id,
       rentalDate,

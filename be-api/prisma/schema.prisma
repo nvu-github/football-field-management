@@ -354,6 +354,7 @@ enum InvoiceStatus {
   PAID
   DEPOSIT
   UNPAID
+  CANCELED
 
   @@map("invoice_status")
 }

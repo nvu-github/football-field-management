@@ -78,6 +78,7 @@ async function createInvoice(customerFootballPitchRentalId: number) {
   const { rentalPrice, customerAccessoryRentals } =
     payloadCustomerFootballPitchRental.value;
   const { vnp_Amount } = route.query;
+  // const amountPayment = vnp_Amount;
   const amountPayment = Number(vnp_Amount) / 100;
   const moneyPaid = amountPayment;
 
@@ -112,6 +113,7 @@ async function updateInvoice(customerFootballPitchRentalId: number) {
   const { rentalPrice, customerAccessoryRentals } =
     payloadCustomerFootballPitchRental.value;
   const { vnp_Amount } = route.query;
+  // const amountPayment = vnp_Amount;
   const amountPayment = Number(vnp_Amount) / 100;
   const moneyPaid = amountPayment;
 

@@ -48,7 +48,6 @@ async function logout() {
         <v-icon>mdi mdi-account-circle</v-icon>
       </div>
     </template>
-
     <v-card min-width="250">
       <v-list>
         <v-list-item

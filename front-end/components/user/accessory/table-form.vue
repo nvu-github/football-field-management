@@ -2,7 +2,7 @@
 import { ref, resolveComponent, watchEffect } from "vue";
 import { useNuxtApp } from "nuxt/app";
 import { storeToRefs } from "pinia";
-import { useCustomerStore, useAccessoryStore, useDialogStore } from "~/stores";
+import { useAccessoryStore, useDialogStore } from "~/stores";
 import { generateId, formatPrice } from "~/utils/string";
 
 const { $toast }: any = useNuxtApp();
@@ -17,8 +17,8 @@ const rules = {
     if (!value) {
       return "Vui lòng nhập số lượng!";
     }
-    if (Number(value) < 0) {
-      return "Số lượng không được nhỏ hơn 0!";
+    if (Number(value) <= 0) {
+      return "Vui lòng nhập số lượng lớn hơn 0!";
     }
     return true;
   },
@@ -69,19 +69,35 @@ const headers = [
   },
 ];
 
-const customerStore = useCustomerStore();
+const props = defineProps({
+  payload: {
+    type: Array,
+    required: true,
+  },
+  footballPitchId: {
+    type: Number,
+    default: null,
+  },
+  isAdmin: {
+    type: Boolean,
+    default: false,
+  },
+  isDisabled: {
+    type: Boolean,
+    default: false,
+  },
+});
+const emit = defineEmits(["handle-customer-accessory-rental"]);
+
 const accessoryStore = useAccessoryStore();
 const { accessories } = storeToRefs(accessoryStore);
 const dialogStore = useDialogStore();
-const { payloadCustomerFootballPitchRental }: any = storeToRefs(customerStore);
 const priceAccessories = ref<any>({});
 const accessoryTypes = ref<any>({});
+const payloadRef = ref(props.payload);
 
 watchEffect(() => {
-  const accessoryIds =
-    payloadCustomerFootballPitchRental.value.customerAccessoryRentals?.map(
-      (customerAccessoryRental: any) => customerAccessoryRental.accessoryId
-    );
+  const accessoryIds = payloadRef.value?.map((item: any) => item.accessoryId);
 
   accessoryIds?.forEach((id: number) => {
     if (id) {
@@ -105,6 +121,20 @@ watchEffect(() => {
       }
     }
   });
+
+  if (payloadRef.value)
+    return emit(
+      "handle-customer-accessory-rental",
+      props.footballPitchId
+        ? {
+            id:
+              payloadRef.value.length != props.payload.length
+                ? props.footballPitchId
+                : null,
+            value: payloadRef.value,
+          }
+        : payloadRef.value
+    );
 });
 
 function addAccessoryRental() {
@@ -113,22 +143,17 @@ function addAccessoryRental() {
     accessoryId: null,
     amount: null,
   };
-  payloadCustomerFootballPitchRental.value.customerAccessoryRentals.push(
-    accessory
-  );
+  payloadRef.value = [...payloadRef.value, accessory];
 }
 
 function deleteAccessoryRental(id: string) {
-  const { customerAccessoryRentals } = payloadCustomerFootballPitchRental.value;
-  payloadCustomerFootballPitchRental.value.customerAccessoryRentals =
-    customerAccessoryRentals.filter(
-      (accessoryRental: any) => accessoryRental.id !== id
-    );
+  payloadRef.value = payloadRef.value.filter(
+    (accessoryRental: any) => accessoryRental.id !== id
+  );
 }
 
 async function getAccessoryDetail(id: string) {
-  const { customerAccessoryRentals } = payloadCustomerFootballPitchRental.value;
-  const accessoryFound = customerAccessoryRentals.find(
+  const accessoryFound: any = payloadRef.value.find(
     (accessoryRental: any) => accessoryRental.id === id
   );
 
@@ -144,16 +169,33 @@ async function getAccessoryDetail(id: string) {
   );
 }
 
+function handleAmount(accessoryId: number, amount: number) {
+  const accessoryFound: any = accessories.value.find(
+    (accessory: any) => accessory.id === accessoryId
+  );
+
+  if (accessoryFound) {
+    if (Number(amount) > accessoryFound.amount) {
+      return $toast.error("Số lượng phụ kiện không hợp lệ!");
+    }
+  }
+  return emit(
+    "handle-customer-accessory-rental",
+    props.footballPitchId
+      ? {
+          id: props.footballPitchId,
+          value: payloadRef.value,
+        }
+      : payloadRef.value
+  );
+}
+
 accessoryStore.getAccessories();
 </script>
 
 <template>
   <div class="accessory-table-form">
-    <v-data-table
-      class="table"
-      :headers="headers"
-      :items="payloadCustomerFootballPitchRental.customerAccessoryRentals"
-    >
+    <v-data-table class="table" :headers="headers" :items="payloadRef">
       <template #[`item.sno`]="{ item }">
         {{ item.index + 1 }}
       </template>
@@ -168,6 +210,7 @@ accessoryStore.getAccessories();
           class="pt-3"
           :items="accessories"
           :rules="[rules.accessoryId]"
+          :disabled="isDisabled"
         ></v-autocomplete>
       </template>
       <template #[`item.accessoryType`]="{ item }">
@@ -196,15 +239,28 @@ accessoryStore.getAccessories();
           variant="outlined"
           class="pt-3"
           :rules="[rules.amount]"
-          :disabled="!item.raw.accessoryId"
+          :disabled="!item.raw.accessoryId || isDisabled"
+          @update:modelValue="
+            handleAmount(item.raw.accessoryId, item.raw.amount)
+          "
         ></v-text-field>
       </template>
       <template #[`item.actions`]="{ item }">
-        <v-btn class="button -warning" @click="getAccessoryDetail(item.raw.id)">
+        <v-btn
+          v-if="!isAdmin"
+          class="button -warning"
+          @click="getAccessoryDetail(item.raw.id)"
+        >
           <v-icon> mdi mdi-list-box-outline </v-icon>
         </v-btn>
         <v-btn
-          class="button -danger"
+          :class="[
+            'button -danger',
+            {
+              '-admin': isAdmin,
+            },
+          ]"
+          :disabled="isDisabled"
           @click="deleteAccessoryRental(item.raw.id)"
         >
           <v-icon> mdi-delete </v-icon>
@@ -212,7 +268,10 @@ accessoryStore.getAccessories();
       </template>
       <template #bottom>
         <div class="action">
-          <v-btn class="button -primary btnadd" @click="addAccessoryRental"
+          <v-btn
+            class="button -primary btnadd"
+            :disabled="isDisabled"
+            @click="addAccessoryRental"
             >Thêm phụ kiện
             <template #prepend>
               <v-icon>mdi mdi-plus-box-outline</v-icon>
@@ -255,6 +314,10 @@ accessoryStore.getAccessories();
   }
   :deep(.v-field) > .v-field__append-inner {
     display: none !important;
+  }
+  :deep(.-admin) {
+    position: relative;
+    top: -5px;
   }
 }
 

@@ -42,7 +42,13 @@ export const useUserStore = defineStore("userStore", () => {
   const account = ref<Account>();
   const accounts = ref<Account[]>([]);
   const roles = ref<Role[]>([]);
-  const personalInfo = ref<PersonalInfo>();
+  const personalInfo = ref<PersonalInfo>({
+    name: "",
+    phoneNumber: "",
+    dateOfBirth: "",
+    address: "",
+    gender: "",
+  });
 
   async function getRoles() {
     const roleList = await $apis.get("users/roles");

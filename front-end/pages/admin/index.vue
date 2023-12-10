@@ -33,7 +33,6 @@ watchEffect(() => {
     );
     totalAccessoryRented.value = accessoriesReport.value.reduce(
       (total, accessoriesReport): any => {
-        console.log(accessoriesReport.totalRented);
         return (total += accessoriesReport.totalRented);
       },
       0

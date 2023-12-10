@@ -32,11 +32,12 @@ const { personalInfo }: any = storeToRefs(userStore);
 const { user }: any = storeToRefs(authStore);
 const CUSTOMER_ROLE = 4;
 const fileUpload = ref<any>();
+const fileUploadPreview = ref<any>();
 if (user.value?.roleId === CUSTOMER_ROLE) personalInfo.value.gender = "MALE";
 if (user.value) {
-  fileUpload.value = user.value.avatar
+  fileUploadPreview.value = user.value.avatar
     ? `${runtimeConfig.public.API_URL}public/${user.value.avatar}`
-    : userImg;
+    : "";
 }
 
 (await user.value?.roleId) === CUSTOMER_ROLE
@@ -56,14 +57,14 @@ async function UpdatePersonalInfo() {
     if (!validForm) {
       return $toast.error("Vui lòng nhập đầy đủ thông tin");
     }
-    const urlAvatar =
-      typeof fileUpload.value === "object" ? (await uploadFile()).data.url : "";
+    const urlAvatar = await uploadFile();
 
     const updatedInfo = {
       ...personalInfo.value,
       avatar: urlAvatar,
     };
 
+    if (!fileUpload.value) delete updatedInfo.avatar;
     if (user.value?.roleId === CUSTOMER_ROLE) {
       userStore.updatePersonalInfoCustomer(updatedInfo);
     } else {
@@ -80,10 +81,14 @@ async function UpdatePersonalInfo() {
 }
 
 async function uploadFile() {
-  const formData = new FormData();
-  formData.append("type", "avatar");
-  formData.append("file", fileUpload.value);
-  return await appStore.uploadImage(formData);
+  if (fileUpload.value) {
+    const formData = new FormData();
+    formData.append("type", "avatar");
+    formData.append("file", fileUpload.value);
+    const uploaded = await appStore.uploadImage(formData);
+    return uploaded.data.url;
+  }
+  return null;
 }
 
 function updateLocalStorage() {
@@ -94,7 +99,8 @@ function updateLocalStorage() {
 
 function handleUploadFile(e: any) {
   const file = e.target.files[0];
-  fileUpload.value = URL.createObjectURL(file);
+  fileUpload.value = file;
+  fileUploadPreview.value = URL.createObjectURL(file);
 }
 
 function validForm() {
@@ -123,7 +129,7 @@ function validForm() {
   <div class="persional-info">
     <v-form v-model="personalInfo.value" @submit.prevent="UpdatePersonalInfo">
       <v-row class="row">
-        <v-col md="4">
+        <v-col md="6">
           <v-text-field
             v-model="personalInfo.name"
             label="Họ tên*"
@@ -175,13 +181,13 @@ function validForm() {
             </v-btn>
           </div>
         </v-col>
-        <v-col class="avatar" md="2">
-          <p class="title">Ảnh đại diện</p>
-          <v-row>
-            <v-avatar color="grey" size="150" rounded="0">
-              <v-img cover :src="fileUpload"></v-img>
+        <v-col v-if="fileUploadPreview" class="avatar" md="2">
+          <div class="content">
+            <p class="title">Ảnh đại diện</p>
+            <v-avatar color="grey" size="120" rounded="0">
+              <v-img cover :src="fileUploadPreview"></v-img>
             </v-avatar>
-          </v-row>
+          </div>
         </v-col>
       </v-row>
     </v-form>
@@ -198,17 +204,20 @@ function validForm() {
   }
 }
 .avatar {
-  border: 1px solid #a9ca31;
-  border-radius: 5px;
-  > .title {
-    text-align: center;
-    font-size: 20px;
-    font-weight: bold;
-  }
-  > .v-row {
+  > .content {
+    display: flex;
     align-items: center;
     flex-direction: column;
-    margin-top: 20px;
+    border: 1px solid #a9ca31;
+    border-radius: 5px;
+    padding: 10px;
+  }
+  > .content > .title {
+    border-bottom: 2px solid #a9ca31;
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 15px;
+    font-weight: bold;
   }
 }
 </style>

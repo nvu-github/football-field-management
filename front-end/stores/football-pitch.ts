@@ -121,8 +121,8 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
   const footballPitchRentalInfo = ref<FootballPitchRentalInfo[]>([]);
   const footballPitchRental = ref<FootballPitchRentalInfo[]>([]);
   const customerFootballPitchRentals = ref<CustomerFootballPitchRental[]>([]);
-  const customerFootballPitchRentalDetail =
-    ref<CustomerFootballPitchRentalDetail>();
+  const customerFootballPitchRentalDetail = ref<any>();
+  const checkFootballPitchRental = ref<any>();
 
   function createFootballPitch(params: ParamsFootballPitch) {
     delete params.id;
@@ -141,6 +141,15 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     return $apis.patch(`football-pitches/${id}`, {
       ...convertProjectObjToObj(params),
     });
+  }
+
+  function updateAccessoryRental(footballPitchRentalId: number, payload: any) {
+    return $apis.patch(
+      `football-pitches/rental/${footballPitchRentalId}/accessory`,
+      {
+        ...payload,
+      }
+    );
   }
 
   function updateStatusFootballPitchRental({
@@ -180,19 +189,9 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     )?.name;
   }
 
-  async function getCustomerFootballPitchRentals(query?: any) {
-    const queryParams = {
-      footballPitchId: query ? query.footballPitchId : "",
-      footballPitchLeasingDurationId: query
-        ? query.footballPitchLeasingDurationId
-        : "",
-      rentalDate: query ? query.rentalDate : "",
-    };
+  async function getCustomerFootballPitchRentals() {
     const customerFootballPitchRentalList = await $apis.get(
-      `football-pitches/rental/confirm`,
-      {
-        params: queryParams,
-      }
+      `football-pitches/rental/confirm`
     );
     customerFootballPitchRentals.value = customerFootballPitchRentalList.data;
   }
@@ -203,6 +202,20 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     );
     customerFootballPitchRentalDetail.value =
       customerFootballPitchRentalDetailData.data;
+  }
+
+  async function checkCustomerFootballPitchRental(query?: any) {
+    const queryParams = {
+      footballPitchId: query ? query.footballPitchId : "",
+      footballPitchLeasingDurationId: query
+        ? query.footballPitchLeasingDurationId
+        : "",
+      rentalDate: query ? query.rentalDate : "",
+    };
+    const response = await $apis.get(`football-pitches/rental/check`, {
+      params: queryParams,
+    });
+    checkFootballPitchRental.value = response.data;
   }
 
   function getStatusCustomerFootballPitchRental(status: string | any) {
@@ -238,9 +251,11 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     footballPitchRental,
     customerFootballPitchRentals,
     customerFootballPitchRentalDetail,
+    checkFootballPitchRental,
     createFootballPitch,
     updateFootballPitch,
     updateStatusFootballPitchRental,
+    updateAccessoryRental,
     getFootballPitches,
     getFootballPitch,
     getStatusFootballPitch,
@@ -251,6 +266,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     getCustomerFootballPitchRentalDetail,
     getStatusCustomerFootballPitchRental,
     getColorStatusFootballPitch,
+    checkCustomerFootballPitchRental,
   };
 });
 

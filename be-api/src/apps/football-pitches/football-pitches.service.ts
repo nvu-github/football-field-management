@@ -722,109 +722,81 @@ export class FootballPitchesService {
     });
   }
 
-  async getCustomerFootballPitchRentals(query?: any): Promise<any> {
-    const { footballPitchId, footballPitchLeasingDurationId, rentalDate } =
-      query;
-    const footballPitchRentalCustomers: any = await this.prisma.$queryRaw`
-      SELECT  cfpr.id,
-              c.id as customerId, 
-              c.name, 
-              f.id as footballPitchId,
-              f.name as footballPitchName,
-              cfpr.status, 
-              cfpr.rental_date as rentalDate, 
-              fpl.id as footballPitchLeasingDurationId, 
-              fpl.price, 
-              ld.start_time as startTime, 
-              ld.end_time as endTime,
-              i.id as invoiceId,
-              i.status as invoiceStatus
-      FROM customers c 
-      INNER JOIN customer_football_pitch_rental cfpr on c.id = cfpr.customer_id
-      INNER JOIN football_pitch_leasing_duration fpl on fpl.id = cfpr.football_pitch_lease_duration_id
-      INNER JOIN football_pitches f on f.id = fpl.football_pitch_id
-      INNER JOIN leasing_durations ld on ld.id = fpl.leasing_duration_id
-      LEFT JOIN invoice_football_pitch_rental ifpr on ifpr.customer_football_pitch_id = cfpr.id
-      LEFT JOIN invoices i on i.id = ifpr.invoice_id
-      ORDER BY 
-        CASE cfpr.status
-          WHEN 'PENDING' THEN 1
-          WHEN 'ACCEPT' THEN 2
-          WHEN 'REJECT' THEN 3
-        END;
-    `;
-
-    const accessoryRentalCustomers =
-      await this.prisma.accessoryRentalCustomer.findMany({
-        select: {
-          id: true,
-          customerFootballPitchRentalId: true,
-          accessory: {
-            select: {
-              id: true,
-              price: true,
+  async getCustomerFootballPitchConfirmRentals(): Promise<any> {
+    const footballPitchRentalList = await this.prisma.invoice.findMany({
+      select: {
+        id: true,
+        invoiceFootballPitchRental: {
+          select: {
+            customerFootballPitchRental: {
+              select: {
+                status: true,
+                rentalDate: true,
+                customer: {
+                  select: {
+                    name: true,
+                  },
+                },
+                footballPitch: {
+                  select: {
+                    name: true,
+                  },
+                },
+                footballPitchLeasingDuration: {
+                  select: {
+                    leasingDuration: {
+                      select: {
+                        startTime: true,
+                        endTime: true,
+                      },
+                    },
+                  },
+                },
+              },
             },
           },
-          amount: true,
         },
-      });
+      },
+    });
 
-    return (
-      footballPitchRentalCustomers
-        .filter((footballPitchRentalCustomer) => {
-          let condition = true;
-          if (footballPitchId) {
-            condition =
-              condition &&
-              footballPitchRentalCustomer.footballPitchId ===
-                Number(footballPitchId);
-          }
+    return footballPitchRentalList.map((footballPitchRental) => {
+      const { id, invoiceFootballPitchRental } = footballPitchRental;
+      const customerName =
+        invoiceFootballPitchRental.find(
+          (invoiceFootballPitch) =>
+            invoiceFootballPitch.customerFootballPitchRental.customer.name,
+        )?.customerFootballPitchRental.customer.name || '';
+      const rentalDate =
+        invoiceFootballPitchRental.find(
+          (invoiceFootballPitch) =>
+            invoiceFootballPitch.customerFootballPitchRental.rentalDate,
+        )?.customerFootballPitchRental.rentalDate || '';
 
-          if (footballPitchLeasingDurationId) {
-            condition =
-              condition &&
-              footballPitchRentalCustomer.footballPitchLeasingDurationId ===
-                Number(footballPitchLeasingDurationId);
-          }
-
-          if (rentalDate) {
-            condition =
-              condition &&
-              format(new Date(rentalDate), 'dd/MM/yyyy') ===
-                format(
-                  new Date(footballPitchRentalCustomer.rentalDate),
-                  'dd/MM/yyyy',
-                );
-          }
-
-          return condition;
-        })
-        .map((footballPitchRentalCustomer: any) => {
-          const accessoryRentalCustomerFound = accessoryRentalCustomers.filter(
-            (accessoryRentalCustomer) =>
-              accessoryRentalCustomer.customerFootballPitchRentalId ===
-              footballPitchRentalCustomer.id,
-          );
-
-          const totalPriceAccessory = accessoryRentalCustomerFound.reduce(
-            (total, item) => {
-              return total + Number(item.amount) * Number(item.accessory.price);
-            },
-            0,
-          );
-
-          return {
-            ...footballPitchRentalCustomer,
-            price:
-              Number(footballPitchRentalCustomer.price) +
-              Number(totalPriceAccessory),
-            accessoryRentalCustomers: accessoryRentalCustomerFound,
-          };
-        }) || []
-    );
+      return {
+        id,
+        rentalDate,
+        customerName,
+        footballPitches: invoiceFootballPitchRental.map(
+          (invoiceFootballPitch) => {
+            const {
+              customerFootballPitchRental: {
+                status,
+                footballPitch,
+                footballPitchLeasingDuration,
+              },
+            } = invoiceFootballPitch;
+            return {
+              status,
+              name: footballPitch.name,
+              leasingDuration: `${footballPitchLeasingDuration.leasingDuration.startTime} - ${footballPitchLeasingDuration.leasingDuration.endTime}`,
+            };
+          },
+        ),
+      };
+    });
   }
 
-  async getCustomerFootballPitchRental(
+  async getCustomerFootballPitchRentalSingle(
     customerFootballPitchId: number,
   ): Promise<any> {
     const customerFootballPitchRental =
@@ -929,6 +901,173 @@ export class FootballPitchesService {
       },
       data: {
         status,
+      },
+    });
+  }
+
+  async getCustomerFootballPitchRentalConfirmDetail(invoiceId: number) {
+    const customerFootballPitch = await this.prisma.invoice.findUnique({
+      where: {
+        id: invoiceId,
+      },
+      select: {
+        id: true,
+        totalPrice: true,
+        moneyPaid: true,
+        status: true,
+        invoiceFootballPitchRental: {
+          select: {
+            customerFootballPitchRental: {
+              select: {
+                id: true,
+                status: true,
+                rentalDate: true,
+                customer: {
+                  select: {
+                    name: true,
+                    phoneNumber: true,
+                  },
+                },
+                footballPitchLeasingDuration: {
+                  select: {
+                    price: true,
+                    leasingDuration: {
+                      select: {
+                        startTime: true,
+                        endTime: true,
+                      },
+                    },
+                  },
+                },
+                footballPitch: {
+                  select: {
+                    name: true,
+                    footballType: {
+                      select: {
+                        id: true,
+                        name: true,
+                      },
+                    },
+                  },
+                },
+                accessoryRentalCustomer: {
+                  select: {
+                    id: true,
+                    amount: true,
+                    accessoryId: true,
+                    accessory: {
+                      select: {
+                        name: true,
+                        price: true,
+                        accessoryType: {
+                          select: {
+                            name: true,
+                          },
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (!customerFootballPitch) {
+      return {};
+    }
+
+    const { id, totalPrice, moneyPaid, status, invoiceFootballPitchRental } =
+      customerFootballPitch;
+    const customerName =
+      invoiceFootballPitchRental.find(
+        (invoiceFootballPitch) =>
+          invoiceFootballPitch.customerFootballPitchRental.customer.name,
+      )?.customerFootballPitchRental.customer.name || '';
+    const customerPhoneNumber =
+      invoiceFootballPitchRental.find(
+        (invoiceFootballPitch) =>
+          invoiceFootballPitch.customerFootballPitchRental.customer.phoneNumber,
+      )?.customerFootballPitchRental.customer.phoneNumber || '';
+
+    return {
+      id,
+      totalPrice,
+      moneyPaid,
+      status,
+      customerName,
+      customerPhoneNumber,
+      footballPitchRentals: invoiceFootballPitchRental.map((item) => {
+        const {
+          id,
+          status,
+          rentalDate,
+          footballPitch,
+          footballPitchLeasingDuration,
+          accessoryRentalCustomer,
+        } = item.customerFootballPitchRental;
+        return {
+          id,
+          status,
+          footballPitchName: footballPitch.name,
+          footballPitchTypeId: footballPitch.footballType.id,
+          footballPitchTypeName: footballPitch.footballType.name,
+          rentalDate,
+          price: footballPitchLeasingDuration.price,
+          leasingDuration: `${footballPitchLeasingDuration.leasingDuration.startTime} - ${footballPitchLeasingDuration.leasingDuration.endTime}`,
+          accessoryRentals: accessoryRentalCustomer,
+        };
+      }),
+    };
+  }
+
+  checkCustomerFootballPitchConfirmRental(query?: any): Promise<any> {
+    const { footballPitchId, footballPitchLeasingDurationId, rentalDate } =
+      query;
+    const rentalDateCustomer = new Date(rentalDate);
+    rentalDateCustomer.setHours(0, 0, 0, 0);
+    return this.prisma.customerFootballPitchRental.findFirst({
+      where: {
+        footballPitchId: Number(footballPitchId),
+        rentalDate: {
+          gte: rentalDateCustomer.toISOString(),
+          lt: new Date(
+            rentalDateCustomer.getTime() + 24 * 60 * 60 * 1000,
+          ).toISOString(),
+        },
+        footballPitchLeasingDurationId: Number(footballPitchLeasingDurationId),
+      },
+    });
+  }
+
+  async getAccessoryRentalCustomerByCustomerFootballPitchId(
+    customerFootballPitchIds: Array<number>,
+  ): Promise<any> {
+    return this.prisma.accessoryRentalCustomer.findMany({
+      where: {
+        customerFootballPitchRentalId: {
+          in: customerFootballPitchIds,
+        },
+      },
+      select: {
+        id: true,
+        amount: true,
+        accessoryId: true,
+        accessory: {
+          select: {
+            price: true,
+          },
+        },
+      },
+    });
+  }
+
+  deleteAccessoryRentals(customerFootballPitchRentalId: number): Promise<any> {
+    return this.prisma.accessoryRentalCustomer.deleteMany({
+      where: {
+        customerFootballPitchRentalId,
       },
     });
   }

@@ -90,7 +90,6 @@ async function confirmPayment() {
         status: "rental",
       })
     );
-    console.log(paymentRedirect);
     // navigateTo(`/football-pitches/rental?vnp_Amount=${amount}`);
     window.location.href = paymentRedirect;
   } catch (err) {

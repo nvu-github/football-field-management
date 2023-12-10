@@ -32,7 +32,7 @@ const { id, title, action }: any = dialog.data;
 const formattedCustomerFootballPitchRental = ref<any>([]);
 const customInvoiceStatuses = ref<any>();
 
-const formattedPrice = computed({
+const formattedTotalPrice = computed({
   get: () => {
     const totalPrice = payloadInvoice.value.totalPrice;
     if (totalPrice !== null && totalPrice !== "") {
@@ -45,6 +45,24 @@ const formattedPrice = computed({
       const numericValue = parseInt(value.replace(/\./g, ""), 10);
       if (!isNaN(numericValue)) {
         payloadInvoice.value.totalPrice = Number(numericValue);
+      }
+    }
+  },
+});
+
+const formattedMoneyPaid = computed({
+  get: () => {
+    const moneyPaid = payloadInvoice.value.moneyPaid;
+    if (moneyPaid !== null && moneyPaid !== "") {
+      return formatPrice(moneyPaid);
+    }
+    return null;
+  },
+  set: (value) => {
+    if (value) {
+      const numericValue = parseInt(value.replace(/\./g, ""), 10);
+      if (!isNaN(numericValue)) {
+        payloadInvoice.value.moneyPaid = Number(numericValue);
       }
     }
   },
@@ -76,7 +94,7 @@ formattedCustomerFootballPitchRental.value =
         : invoiceFound.length === 0 && isAccept;
     }
   );
-
+console.log(formattedCustomerFootballPitchRental.value);
 watchEffect(() => {
   const { customerFootballIds } = payloadInvoice.value;
 
@@ -152,6 +170,7 @@ async function actionInvoice() {
 function setInvoiceToForm() {
   const {
     totalPrice,
+    moneyPaid,
     status,
     invoiceDetails,
     invoiceFootballPitchRental,
@@ -161,6 +180,7 @@ function setInvoiceToForm() {
       invoiceFootballPitchRental.customerFootballPitchRental.id
   );
   payloadInvoice.value.totalPrice = totalPrice;
+  payloadInvoice.value.moneyPaid = moneyPaid;
   payloadInvoice.value.status = status;
   payloadInvoice.value.invoiceDetails = invoiceDetails;
 }
@@ -175,30 +195,19 @@ function setInvoiceToForm() {
         <v-card-text>
           <v-row>
             <v-col cols="12">
-              <v-select
-                v-model="payloadInvoice.customerFootballIds"
-                label="Chọn khách hàng thuê sân*"
-                item-value="id"
-                item-title="name"
-                variant="underlined"
-                :items="formattedCustomerFootballPitchRental"
-                :rules="[rules.customerFootballId]"
-                required
-                multiple
-              ></v-select>
               <v-row>
                 <v-col md="6">
-                  <v-text-field
-                    v-model="formattedPrice"
-                    label="Tổng tiền hóa đơn (₫)*"
-                    type="text"
+                  <v-select
+                    v-model="payloadInvoice.customerFootballIds"
+                    label="Chọn khách hàng thuê sân*"
+                    item-value="id"
+                    item-title="name"
                     variant="underlined"
+                    :items="formattedCustomerFootballPitchRental"
+                    :rules="[rules.customerFootballId]"
                     required
-                    class="mr-2"
-                    :rules="[rules.totalPrice]"
-                  >
-                    <template #append> ₫ </template>
-                  </v-text-field>
+                    multiple
+                  ></v-select>
                 </v-col>
                 <v-col md="6">
                   <v-select
@@ -211,6 +220,34 @@ function setInvoiceToForm() {
                     :items="customInvoiceStatuses"
                     :rules="[rules.status]"
                   ></v-select>
+                </v-col>
+              </v-row>
+              <v-row>
+                <v-col md="6">
+                  <v-text-field
+                    v-model="formattedMoneyPaid"
+                    label="Tiền đã thanh toán (₫)*"
+                    type="text"
+                    variant="underlined"
+                    required
+                    class="mr-2"
+                    :rules="[rules.totalPrice]"
+                  >
+                    <template #append> ₫ </template>
+                  </v-text-field>
+                </v-col>
+                <v-col md="6">
+                  <v-text-field
+                    v-model="formattedTotalPrice"
+                    label="Tổng tiền hóa đơn (₫)*"
+                    type="text"
+                    variant="underlined"
+                    required
+                    class="mr-2"
+                    :rules="[rules.totalPrice]"
+                  >
+                    <template #append> ₫ </template>
+                  </v-text-field>
                 </v-col>
               </v-row>
             </v-col>

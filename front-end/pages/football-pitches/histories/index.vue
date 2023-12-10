@@ -198,9 +198,7 @@ async function paymentInvoice(invoiceId: number, price: number) {
                     v-bind="props"
                     class="button -primary -rental"
                     @click="
-                      openDialogDetail(
-                        customerFootballPitchRental.customerFootballPitchRentalId
-                      )
+                      openDialogDetail(customerFootballPitchRental.invoiceId)
                     "
                   >
                     <v-icon>mdi mdi-alpha-d-circle-outline</v-icon>

@@ -8,21 +8,22 @@ import { formatPrice } from "~/utils/string";
 const headers = [
   {
     title: "STT",
+    width: "5%",
     align: "center",
     sortable: false,
     key: "sno",
   },
   {
-    title: "Tên sân bóng",
-    width: "20%",
-    align: "start",
-    key: "footballPitchName",
-  },
-  {
     title: "Tên khách hàng",
     width: "20%",
     align: "start",
-    key: "name",
+    key: "customerName",
+  },
+  {
+    title: "Sân bóng",
+    width: "25%",
+    align: "start",
+    key: "footballPitch",
   },
   {
     title: "Ngày thuê",
@@ -30,17 +31,10 @@ const headers = [
     align: "start",
     key: "rentalDate",
   },
-  {
-    title: "Khung giờ",
-    width: "18%",
-    align: "start",
-    key: "leasingDuration",
-  },
-  { title: "Giá thuê", width: "15%", align: "start", key: "price" },
   { title: "Trạng thái", width: "15%", align: "start", key: "status" },
   {
     title: "Tác vụ",
-    width: "20%",
+    width: "15%",
     align: "center",
     key: "actions",
     sortable: false,
@@ -86,49 +80,6 @@ watchEffect(() => {
   if (customerFootballPitchRentals) filterFootballConfirm();
 });
 
-function openDialogConfirm(id: number, status: string) {
-  dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
-    store: footballPitchStore,
-    action: "updateStatusFootballPitchRental",
-    callback: "getCustomerFootballPitchRentals",
-    payload: {
-      id,
-      status,
-    },
-    message: {
-      success: "Xác nhận đặt sân thành công",
-      error: "Xác nhận đặt sân thất bại",
-    },
-    title: "Bạn có chắc chắn muốn xác nhận?",
-    button: {
-      text: "Xác nhận",
-      class: "-primary",
-    },
-  });
-}
-
-function openDialogReject(id: number, status: string) {
-  dialogStore.showDialog(resolveComponent("common-dialog-confirm"), {
-    store: footballPitchStore,
-    action: "updateStatusFootballPitchRental",
-    callback: "getCustomerFootballPitchRentals",
-    payload: {
-      id,
-      status,
-    },
-    name: "đặt sân",
-    message: {
-      success: "Hủy đặt sân thành công",
-      error: "Hủy đặt sân thất bại",
-    },
-    title: "Bạn có chắc chắn muốn hủy đặt sân?",
-    button: {
-      text: "Xác nhận",
-      class: "-danger",
-    },
-  });
-}
-
 function openDialogDetail(id: number) {
   dialogStore.showDialog(
     resolveComponent("common-football-pitch-dialog-rental-detail"),
@@ -139,8 +90,7 @@ function openDialogDetail(id: number) {
 }
 
 function filterFootballConfirm() {
-  const { rentalDate, leasingDuration, status } =
-    conditionFilterFootballPitch.value;
+  const { rentalDate, status } = conditionFilterFootballPitch.value;
   footballPitchConfirmFound.value = customerFootballPitchRentals.value.filter(
     (footballPitch) => {
       let condition = true;
@@ -152,11 +102,6 @@ function filterFootballConfirm() {
             format(new Date(footballPitch.rentalDate), "dd/MM/yyyy");
       }
 
-      if (leasingDuration) {
-        const footballLeasingDuration = `${footballPitch.startTime} - ${footballPitch.endTime}`;
-        condition = condition && footballLeasingDuration === leasingDuration;
-      }
-
       if (status) {
         condition = condition && footballPitch.status === status;
       }
@@ -164,6 +109,31 @@ function filterFootballConfirm() {
       return condition;
     }
   );
+}
+
+function getStatusCustomerFootballPitchRental(footballPitches: any) {
+  let message = "Đã xác nhận";
+  let color = "success";
+  const isPending = footballPitches.some(
+    (footballPitch: any) => footballPitch.status === "PENDING"
+  );
+  const isReject = footballPitches.every(
+    (footballPitch: any) => footballPitch.status === "REJECT"
+  );
+  if (isPending) {
+    message = "Chờ xác nhận";
+    color = "orange";
+  }
+
+  if (isReject) {
+    message = "Đã hủy";
+    color = "error";
+  }
+
+  return {
+    text: message,
+    color,
+  };
 }
 </script>
 <template>
@@ -187,18 +157,6 @@ function filterFootballConfirm() {
           variant="underlined"
         ></v-autocomplete>
       </v-col>
-      <!-- <v-col class="action" md="lg" xs="12">
-        <v-btn
-          class="button -success"
-          :loading="isLoading"
-          @click="filterFootballConfirm"
-        >
-          <template #prepend>
-            <v-icon>mdi mdi-magnify</v-icon>
-          </template>
-          Tìm kiếm
-        </v-btn>
-      </v-col> -->
     </v-row>
     <v-row>
       <v-col md="12">
@@ -210,45 +168,38 @@ function filterFootballConfirm() {
           <template #[`item.sno`]="{ item }">
             {{ item.index + 1 }}
           </template>
+          <template #[`item.footballPitch`]="{ item }">
+            <ol class="list">
+              <li
+                v-for="(footballPitch, index) in item.raw.footballPitches"
+                :key="index"
+                class="item"
+              >
+                {{ footballPitch.name }}
+                <p>
+                  (<b
+                    ><i>{{ footballPitch.leasingDuration }}</i></b
+                  >)
+                </p>
+              </li>
+            </ol>
+          </template>
           <template #[`item.rentalDate`]="{ item }">
             {{ format(new Date(item.raw.rentalDate), "dd/MM/yyyy") }}
-          </template>
-          <template #[`item.leasingDuration`]="{ item }">
-            {{ item.raw.startTime }} - {{ item.raw.endTime }}
-          </template>
-          <template #[`item.price`]="{ item }">
-            {{ formatPrice(item.raw.price) }} ₫
           </template>
           <template #[`item.status`]="{ item }">
             <v-chip
               :color="
-                footballPitchStore.getStatusCustomerFootballPitchRental(
-                  item.raw.status
-                ).color
+                getStatusCustomerFootballPitchRental(item.raw.footballPitches)
+                  .color
               "
               >{{
-                footballPitchStore.getStatusCustomerFootballPitchRental(
-                  item.raw.status
-                ).text
+                getStatusCustomerFootballPitchRental(item.raw.footballPitches)
+                  .text
               }}</v-chip
             >
           </template>
           <template #[`item.actions`]="{ item }">
-            <v-btn
-              class="button -success"
-              :disabled="item.raw.status !== 'PENDING'"
-              @click="openDialogConfirm(item.raw.id, 'ACCEPT')"
-            >
-              <v-icon> mdi mdi-check-bold </v-icon>
-            </v-btn>
-            <v-btn
-              class="button -danger"
-              :disabled="item.raw.status === 'REJECT'"
-              @click="openDialogReject(item.raw.id, 'REJECT')"
-            >
-              <v-icon> mdi mdi-close-circle-outline </v-icon>
-            </v-btn>
-
             <v-btn
               class="button -warning"
               @click="openDialogDetail(item.raw.id)"
@@ -277,6 +228,9 @@ function filterFootballConfirm() {
   }
   :deep(.dp__clear_icon) {
     display: block;
+  }
+  :deep(.list) {
+    line-height: 2;
   }
 }
 </style>

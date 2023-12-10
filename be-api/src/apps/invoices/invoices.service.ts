@@ -6,7 +6,7 @@ import { FootballPitchesService } from '@app/football-pitches/football-pitches.s
 import { PayloadInvoiceDto } from './dtos/payload-invoices.dto';
 import { PayloadInvoiceTypeDto } from './dtos';
 
-import { format } from 'date-fns';
+import { format } from 'date-fns-tz';
 
 @Injectable()
 export class InvoicesService {
@@ -36,7 +36,6 @@ export class InvoicesService {
   }
 
   updateInvoice(invoiceId: number, payload: any): Promise<any> {
-    console.log(payload);
     return this.prisma.invoice.update({
       where: {
         id: invoiceId,
@@ -299,43 +298,64 @@ export class InvoicesService {
     };
   }
 
-  getInvoiceByCustomer(customerId: number, rentalDate: any): Promise<any> {
-    const rentalDateCustomer = new Date(rentalDate);
-    rentalDateCustomer.setHours(0, 0, 0, 0);
+  async getInvoiceByCustomer(
+    customerId: number,
+    rentalDate: any,
+  ): Promise<any> {
+    const rentalDateTime = format(new Date(rentalDate), 'dd/MM/yyyy');
 
-    return this.prisma.customerFootballPitchRental.findMany({
-      where: {
-        customerId,
-        rentalDate: {
-          gte: rentalDateCustomer.toISOString(),
-          lt: new Date(
-            rentalDateCustomer.getTime() + 24 * 60 * 60 * 1000,
-          ).toISOString(),
+    const customerFootballRentals =
+      await this.prisma.customerFootballPitchRental.findMany({
+        where: {
+          customerId,
         },
-      },
-      select: {
-        id: true,
-        rentalDate: true,
-        invoiceFootballPitchRental: {
-          select: {
-            invoiceId: true,
-            invoice: {
-              select: {
-                totalPrice: true,
-                moneyPaid: true,
-                invoiceDetail: {
-                  select: {
-                    accessoryId: true,
-                    amount: true,
-                    price: true,
-                    finalCost: true,
+        select: {
+          id: true,
+          rentalDate: true,
+          invoiceFootballPitchRental: {
+            select: {
+              invoiceId: true,
+              invoice: {
+                select: {
+                  totalPrice: true,
+                  moneyPaid: true,
+                  invoiceDetail: {
+                    select: {
+                      accessoryId: true,
+                      amount: true,
+                      price: true,
+                      finalCost: true,
+                    },
                   },
                 },
               },
             },
           },
         },
-      },
+      });
+
+    return customerFootballRentals.filter((customerFootballRental) => {
+      const rentalDate = format(
+        new Date(customerFootballRental.rentalDate),
+        'dd/MM/yyyy',
+      );
+      return rentalDateTime == rentalDate;
     });
+  }
+
+  async getCustomerFootballIdByInvoiceId(invoiceId: number): Promise<any> {
+    const customerFootballPitchIds =
+      await this.prisma.invoiceFootballPitchRental.findMany({
+        where: {
+          invoiceId,
+        },
+        select: {
+          customerFootballPitchId: true,
+        },
+      });
+
+    return customerFootballPitchIds.map(
+      ({ customerFootballPitchId }) => customerFootballPitchId,
+    );
   }
 }

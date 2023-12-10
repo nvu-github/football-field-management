@@ -135,7 +135,7 @@ export const useInvoiceStore = defineStore("invoiceStore", () => {
 
       case "CANCELED":
         text = "Hủy";
-        color = "danger";
+        color = "red";
         break;
     }
     return { text, color };

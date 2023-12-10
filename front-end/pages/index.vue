@@ -25,7 +25,7 @@ function formattedFootballPitchRental(footballPitchRentalInfo: any) {
           format(new Date(rentalInfo.rentalDate), "dd/MM/yyyy") ===
           format(new Date(), "dd/MM/yyyy")
       )
-      .slice(0, 4);
+      .slice(0, 6);
   }
   return [];
 }

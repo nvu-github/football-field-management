@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { resolveComponent } from "vue";
+import { resolveComponent, watchEffect, ref } from "vue";
 import { storeToRefs } from "pinia";
 import format from "date-fns/format";
 import { useAppStore, useInvoiceStore, useDialogStore } from "~/stores";
@@ -80,6 +80,15 @@ function openDialogConfirm(id: string) {
   });
 }
 
+function openDialogDetail(id: number) {
+  dialogStore.showDialog(
+    resolveComponent("common-football-pitch-dialog-rental-detail"),
+    {
+      id,
+    }
+  );
+}
+
 invoiceStore.getInvoices();
 </script>
 <template>
@@ -138,8 +147,21 @@ invoiceStore.getInvoices();
             <v-btn
               class="button -primary"
               @click="openDialogUpdateInvoiceType(item.raw.id)"
+              :disabled="
+                item.raw.invoiceFootballPitchRental.some(
+                  (item) =>
+                    item.customerFootballPitchRental.status === 'PENDING'
+                )
+              "
             >
               <v-icon> mdi-pencil </v-icon>
+            </v-btn>
+            <v-btn
+              class="button"
+              color="deep-purple-lighten-4"
+              @click="openDialogDetail(item.raw.id)"
+            >
+              <v-icon> mdi mdi-list-box-outline </v-icon>
             </v-btn>
             <v-btn
               :href="`/admin/invoices/${item.raw.id}/detail`"
@@ -151,6 +173,12 @@ invoiceStore.getInvoices();
             <v-btn
               class="button -danger"
               @click="openDialogConfirm(item.raw.id)"
+              :disabled="
+                item.raw.invoiceFootballPitchRental.some(
+                  (item) =>
+                    item.customerFootballPitchRental.status === 'PENDING'
+                )
+              "
             >
               <v-icon> mdi-delete </v-icon>
             </v-btn>

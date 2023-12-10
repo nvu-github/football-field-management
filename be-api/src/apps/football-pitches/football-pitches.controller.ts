@@ -22,7 +22,9 @@ import { MailService } from 'common/mail/mail.service';
 
 import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
 
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
+
+import { mergeAccessoryRental } from 'utils/app';
 
 import {
   PayloadFootballPitchTypeDto,
@@ -66,6 +68,7 @@ export class FootballPitchesController {
         footballPitchLeasingDurationId: body.leasingDurationId,
         status: 'PENDING',
         customerId,
+        rentalDate: parseISO(body.rentalDate),
       });
 
     const payloadCustomerAccessoryRental = customerAccessoryRentals.map(
@@ -86,9 +89,11 @@ export class FootballPitchesController {
   @Get('rental/:id/detail')
   async getFootballPitchRentalDetail(@Param('id') id: string) {
     const footballPitchRentalFound =
-      await this.footballPitchService.getCustomerFootballPitchRental(+id);
+      await this.footballPitchService.getCustomerFootballPitchRentalConfirmDetail(
+        +id,
+      );
 
-    if (footballPitchRentalFound.length === 0)
+    if (!footballPitchRentalFound)
       throw new HttpException(
         'Không tìm thấy thông tin đặt sân',
         HttpStatus.BAD_REQUEST,
@@ -105,7 +110,7 @@ export class FootballPitchesController {
     @Body() body: any,
   ) {
     const footballPitchRentalFound =
-      await this.footballPitchService.getCustomerFootballPitchRental(+id);
+      await this.footballPitchService.getCustomerFootballPitchRentalSingle(+id);
 
     if (footballPitchRentalFound.length === 0) {
       throw new HttpException(
@@ -157,6 +162,7 @@ export class FootballPitchesController {
 
     if (body.status === 'REJECT') {
       let payloadInvoice = null;
+
       const accessoryPriceTotal =
         footballPitchRentalFound.accessoryRentals &&
         footballPitchRentalFound.accessoryRentals.length > 0
@@ -164,18 +170,21 @@ export class FootballPitchesController {
               return total + Number(item.price) * Number(item.amount);
             }, 0)
           : 0;
+
       const totalPrice =
         Number(footballPitchRentalFound.invoice.totalPrice) -
         Number(footballPitchRentalFound.price) -
         Number(accessoryPriceTotal);
-      const moneyPaid =
-        footballPitchRentalFound.invoice.totalPrice ==
-        footballPitchRentalFound.invoice.moneyPaid
-          ? footballPitchRentalFound.invoice.moneyPaid - totalPrice
-          : footballPitchRentalFound.invoice.moneyPaid;
 
-      if (totalPrice > 0) payloadInvoice = { totalPrice, moneyPaid };
-      else payloadInvoice = { status: 'UNPAID' };
+      // const moneyPaid =
+      //   Number(footballPitchRentalFound.invoice.totalPrice) ==
+      //   Number(footballPitchRentalFound.invoice.moneyPaid)
+      //     ? Number(footballPitchRentalFound.invoice.moneyPaid) -
+      //       Number(totalPrice)
+      //     : Number(footballPitchRentalFound.invoice.moneyPaid);
+
+      if (totalPrice > 0) payloadInvoice = { totalPrice };
+      else payloadInvoice = { status: 'CANCELED' };
 
       await this.invoiceService.updateInvoice(
         footballPitchRentalFound.invoice.id,
@@ -205,6 +214,77 @@ export class FootballPitchesController {
     );
   }
 
+  @Patch('rental/:id/accessory')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async updateAccessoryFootballPitchRental(
+    @Param('id') id: string,
+    @Body() body: any,
+  ) {
+    const { invoiceId, payloadAccessoryRentals } = body;
+    const payloadCustomerAccessoryRental = payloadAccessoryRentals.map(
+      (accessory) => ({
+        accessoryId: accessory.accessoryId,
+        amount: Number(accessory.amount),
+        customerFootballPitchRentalId: Number(id),
+      }),
+    );
+
+    await this.footballPitchService.deleteAccessoryRentals(+id);
+    await this.footballPitchService.createAccessoryFootballPitchRental(
+      payloadCustomerAccessoryRental,
+    );
+
+    const invoice = await this.invoiceService.getInvoice(+invoiceId);
+    const customerFootballPitchIds =
+      await this.invoiceService.getCustomerFootballIdByInvoiceId(+invoiceId);
+    const accessoryRentals =
+      await this.footballPitchService.getAccessoryRentalCustomerByCustomerFootballPitchId(
+        customerFootballPitchIds,
+      );
+
+    const payloadInvoiceDetails: any = mergeAccessoryRental(
+      accessoryRentals.map((accessoryRental) => {
+        return {
+          accessoryId: accessoryRental.accessoryId,
+          amount: accessoryRental.amount,
+          price: Number(accessoryRental.accessory.price),
+          finalCost:
+            Number(accessoryRental.accessory.price) *
+            Number(accessoryRental.amount),
+          invoiceId,
+        };
+      }),
+    );
+
+    const totalFinalCostInvoiceDetail = payloadInvoiceDetails.reduce(
+      (total, item) => {
+        return total + Number(item.finalCost);
+      },
+      0,
+    );
+
+    const totalFinalCostInvoiceDetailOld = invoice.invoiceDetails.reduce(
+      (total, item) => {
+        return total + Number(item.finalCost);
+      },
+      0,
+    );
+
+    const payloadInvoiceUpdate = {
+      totalPrice:
+        invoice.totalPrice -
+        totalFinalCostInvoiceDetailOld +
+        totalFinalCostInvoiceDetail,
+    };
+
+    await this.invoiceService.updateInvoice(+invoiceId, payloadInvoiceUpdate);
+    await this.invoiceService.deleteInvoiceDetails(+invoiceId);
+    await this.invoiceService.createInvoiceDetails(payloadInvoiceDetails);
+
+    return HttpStatus.OK;
+  }
+
   @Get('rental/info')
   async getFootballPitchRentalNows(@Query() query: any): Promise<any> {
     const { rentalDate } = query;
@@ -216,8 +296,17 @@ export class FootballPitchesController {
   @Get('rental/confirm')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
-  async getCustomerFootballPitchRentals(@Query() query?: any): Promise<any> {
-    return await this.footballPitchService.getCustomerFootballPitchRentals(
+  async getCustomerFootballPitchConfirmRentals(): Promise<any> {
+    return await this.footballPitchService.getCustomerFootballPitchConfirmRentals();
+  }
+
+  @Get('rental/check')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  async checkCustomerFootballPitchConfirmRental(
+    @Query() query?: any,
+  ): Promise<any> {
+    return await this.footballPitchService.checkCustomerFootballPitchConfirmRental(
       query,
     );
   }

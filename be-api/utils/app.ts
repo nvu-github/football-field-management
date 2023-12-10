@@ -24,3 +24,25 @@ export const sortObject = (obj: object) => {
   }
   return sorted;
 };
+
+export const mergeAccessoryRental = (arr) => {
+  const idMap = {};
+
+  arr.forEach((obj) => {
+    const { accessoryId, amount, price, finalCost, invoiceId } = obj;
+    if (!idMap[accessoryId]) {
+      idMap[accessoryId] = { accessoryId, amount, price, finalCost, invoiceId };
+    } else {
+      idMap[accessoryId] = {
+        accessoryId,
+        amount: idMap[accessoryId].amount + amount,
+        price: idMap[accessoryId].price,
+        finalCost: idMap[accessoryId].finalCost + finalCost,
+        invoiceId,
+      };
+    }
+  });
+  const mergedArray = Object.values(idMap);
+
+  return mergedArray;
+};
