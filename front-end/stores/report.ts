@@ -88,6 +88,8 @@ export interface RentalFieldReport {
   };
   totalRented: number;
   totalCanceled: number;
+  totalRevenueFootball: number;
+  totalRevenueAccessory: number;
   totalRevenue: number;
 }
 

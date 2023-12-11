@@ -61,7 +61,7 @@ export const useEvaluationStore = defineStore("evaluationStore", () => {
         break;
 
       case 4:
-        text = "Hà lòng";
+        text = "Hài lòng";
         color = "primary";
         break;
     }

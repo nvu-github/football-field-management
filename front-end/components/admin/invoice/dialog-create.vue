@@ -73,7 +73,8 @@ customInvoiceStatuses.value = invoiceStatuses;
 formattedCustomerFootballPitchRental.value =
   customerFootballPitchRentalAll.value.filter(
     (customerFootballPitchRental: any) => {
-      const { footballPitchName, name, status } = customerFootballPitchRental;
+      const { footballPitchName, customerName, status } =
+        customerFootballPitchRental;
       const invoiceFound = invoices.value.filter((invoice: any) => {
         const invoiceFootballPitchRentalFound =
           invoice.invoiceFootballPitchRental.find(
@@ -86,15 +87,13 @@ formattedCustomerFootballPitchRental.value =
       });
       const isAccept = status === "ACCEPT";
 
-      customerFootballPitchRental.name = `${footballPitchName} - ${name}`;
-      return id
-        ? isAccept &&
-            (customerFootballPitchRental.invoiceId === id ||
-              !customerFootballPitchRental.invoiceStatus)
-        : invoiceFound.length === 0 && isAccept;
+      customerFootballPitchRental.name = `${footballPitchName} - ${customerName}`;
+      // return id
+      //   ? isAccept && customerFootballPitchRental.invoiceId === id
+      //   : invoiceFound.length === 0 && isAccept;
+      return true;
     }
   );
-console.log(formattedCustomerFootballPitchRental.value);
 watchEffect(() => {
   const { customerFootballIds } = payloadInvoice.value;
 
@@ -116,8 +115,11 @@ watchEffect(() => {
               0
             );
           total +=
-            Number(customerFootballPitchRentalFound.price) +
-            totalAccessoryRentalCustomer;
+            customerFootballPitchRentalFound.status != "REJECT"
+              ? Number(customerFootballPitchRentalFound.price)
+              : 0;
+          // +
+          // totalAccessoryRentalCustomer;
         }
         return total;
       },
@@ -180,7 +182,7 @@ function setInvoiceToForm() {
       invoiceFootballPitchRental.customerFootballPitchRental.id
   );
   payloadInvoice.value.totalPrice = totalPrice;
-  payloadInvoice.value.moneyPaid = moneyPaid;
+  payloadInvoice.value.moneyPaid = Number(moneyPaid);
   payloadInvoice.value.status = status;
   payloadInvoice.value.invoiceDetails = invoiceDetails;
 }
@@ -205,6 +207,7 @@ function setInvoiceToForm() {
                     variant="underlined"
                     :items="formattedCustomerFootballPitchRental"
                     :rules="[rules.customerFootballId]"
+                    :disabled="id"
                     required
                     multiple
                   ></v-select>

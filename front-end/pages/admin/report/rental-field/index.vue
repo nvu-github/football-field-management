@@ -15,6 +15,8 @@ const condition = ref({
 const totalRentalField = ref({
   rented: 0,
   canceled: 0,
+  revenueFootball: 0,
+  revenueAccessory: 0,
   revenue: 0,
 });
 app.value.title = "Thống kê lượt thuê";
@@ -26,12 +28,18 @@ watchEffect(() => {
         return {
           rented: (total.rented += reportAccessory.totalRented),
           canceled: (total.canceled += reportAccessory.totalCanceled),
+          revenueFootball: (total.revenueFootball +=
+            reportAccessory.totalRevenueFootball),
+          revenueAccessory: (total.revenueAccessory +=
+            reportAccessory.totalRevenueAccessory),
           revenue: (total.revenue += reportAccessory.totalRevenue),
         };
       },
       {
         rented: 0,
         canceled: 0,
+        revenueFootball: 0,
+        revenueAccessory: 0,
         revenue: 0,
       }
     );
@@ -86,12 +94,17 @@ reportStore.getRentalFieldReport(condition.value);
         <v-table class="table">
           <thead class="head">
             <tr class="row">
-              <th class="column" width="50">STT</th>
-              <th class="column" width="300">Tên sân bóng</th>
-              <th class="column" width="150">Loại sân bóng</th>
-              <th class="column" width="100">Tổng số lượt thuê (lượt)</th>
-              <th class="column" width="150">Tổng số lượt hủy (lượt)</th>
-              <th class="column" width="150">Tổng tiền thuê</th>
+              <th class="column" width="50" rowspan="2">STT</th>
+              <th class="column" width="300" rowspan="2">Tên sân bóng</th>
+              <th class="column" width="150" rowspan="2">Loại sân bóng</th>
+              <th class="column" width="100" colspan="2">Tổng số (lượt)</th>
+              <th class="column" width="150" rowspan="2">Tổng tiền sân</th>
+              <th class="column" width="150" rowspan="2">Tổng tiền phụ kiện</th>
+              <th class="column" width="150" rowspan="2">Tổng tiền thuê</th>
+            </tr>
+            <tr class="row">
+              <th class="column" width="100">Thuê</th>
+              <th class="column" width="100">Hủy</th>
             </tr>
           </thead>
           <tbody
@@ -114,17 +127,45 @@ reportStore.getRentalFieldReport(condition.value);
               </td>
               <td class="column text-center">
                 {{
+                  rentalField.totalRevenueFootball > 0
+                    ? `${formatPrice(rentalField.totalRevenueFootball)} ₫`
+                    : 0
+                }}
+              </td>
+              <td class="column text-center">
+                {{
+                  rentalField.totalRevenueAccessory > 0
+                    ? `${formatPrice(rentalField.totalRevenueAccessory)} ₫`
+                    : 0
+                }}
+              </td>
+              <td class="column text-center">
+                {{
                   rentalField.totalRevenue > 0
                     ? `${formatPrice(rentalField.totalRevenue)} ₫`
                     : 0
                 }}
               </td>
             </tr>
-            <!-- <tr class="row">
+            <tr class="row">
               <td class="column text-end" colspan="3">Tổng cộng</td>
               <td class="column text-center">{{ totalRentalField.rented }}</td>
               <td class="column text-center">
                 {{ totalRentalField.canceled }}
+              </td>
+              <td class="column text-center">
+                {{
+                  totalRentalField.revenueFootball > 0
+                    ? `${formatPrice(totalRentalField.revenueFootball)} ₫`
+                    : 0
+                }}
+              </td>
+              <td class="column text-center">
+                {{
+                  totalRentalField.revenueAccessory > 0
+                    ? `${formatPrice(totalRentalField.revenueAccessory)} ₫`
+                    : 0
+                }}
               </td>
               <td class="column text-center">
                 {{
@@ -133,7 +174,7 @@ reportStore.getRentalFieldReport(condition.value);
                     : 0
                 }}
               </td>
-            </tr> -->
+            </tr>
           </tbody>
           <tbody v-else class="body">
             <tr class="row">

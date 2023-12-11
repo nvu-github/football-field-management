@@ -19,6 +19,9 @@ useHead({
     <admin-layout-navbar />
     <admin-layout-header />
     <v-main>
+      <div class="sp-header" @click="() => (isShowSidebar = !isShowSidebar)">
+        <v-icon>mdi mdi-menu</v-icon>
+      </div>
       <div class="main">
         <slot />
       </div>
@@ -71,7 +74,24 @@ useHead({
     font-weight: bold;
   }
 }
+.sp-header {
+  display: none;
+  padding-left: 10px;
+  height: 40px;
+  border-bottom: 1px solid #a9ca31;
+}
 .footer.-full {
   width: 100%;
+}
+
+@media (max-width: 768px) {
+  .v-main {
+    padding-top: 0;
+  }
+
+  .sp-header {
+    display: flex;
+    align-items: center;
+  }
 }
 </style>

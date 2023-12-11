@@ -278,11 +278,13 @@ export class FootballPitchesController {
       0,
     );
 
+    const totalPrice =
+      invoice.totalPrice -
+      totalFinalCostInvoiceDetailOld +
+      totalFinalCostInvoiceDetail;
     const payloadInvoiceUpdate = {
-      totalPrice:
-        invoice.totalPrice -
-        totalFinalCostInvoiceDetailOld +
-        totalFinalCostInvoiceDetail,
+      totalPrice,
+      status: invoice.moneyPaid != totalPrice ? 'UNPAID' : 'PAID',
     };
 
     await this.invoiceService.updateInvoice(+invoiceId, payloadInvoiceUpdate);

@@ -38,6 +38,7 @@ function handleScroll() {
         :key="index"
         :message="chat.content"
         :created-at="chat.createdAt"
+        :prev-created-at="index > 0 ? chats[index - 1].createdAt : ''"
         :is-active="chat.active === props.customerChatActive"
         :avatar="
           chat.active === props.customerChatActive ? userAvatar : adminAvatar

@@ -194,18 +194,20 @@ export class ReportsService {
             id: true,
             status: true,
             rentalDate: true,
-            invoiceFootballPitchRental: {
-              select: {
-                invoice: {
-                  select: {
-                    status: true,
-                  },
-                },
-              },
-            },
+            footballPitchId: true,
             footballPitchLeasingDuration: {
               select: {
                 price: true,
+              },
+            },
+            accessoryRentalCustomer: {
+              select: {
+                amount: true,
+                accessory: {
+                  select: {
+                    price: true,
+                  },
+                },
               },
             },
           },
@@ -229,17 +231,30 @@ export class ReportsService {
           if (year)
             condition = condition && Number(year) === Number(yearRentalCreated);
 
-          const statusInvoice =
-            rental?.invoiceFootballPitchRental?.invoice.status;
-          const isRented =
-            rental.status === 'ACCEPT' && statusInvoice === 'PAID';
+          const IsAccept = rental.status === 'ACCEPT';
           const isCanceled = rental.status === 'REJECT';
 
-          accumulator.rented += condition && isRented ? 1 : 0;
+          const totalAccessory = rental.accessoryRentalCustomer.reduce(
+            (total, accessoryRental) => {
+              return (total +=
+                Number(accessoryRental.amount) *
+                accessoryRental.accessory.price);
+            },
+            0,
+          );
+
+          accumulator.rented += condition && IsAccept ? 1 : 0;
           accumulator.canceled += condition && isCanceled ? 1 : 0;
-          accumulator.revenue +=
-            condition && isRented
+          accumulator.revenueFootball +=
+            condition && IsAccept
               ? Number(rental.footballPitchLeasingDuration.price)
+              : 0;
+          accumulator.revenueAccessory +=
+            condition && IsAccept ? Number(totalAccessory) : 0;
+          accumulator.revenue +=
+            condition && IsAccept
+              ? Number(rental.footballPitchLeasingDuration.price) +
+                Number(totalAccessory)
               : 0;
 
           return accumulator;
@@ -247,6 +262,8 @@ export class ReportsService {
         {
           rented: 0,
           canceled: 0,
+          revenueFootball: 0,
+          revenueAccessory: 0,
           revenue: 0,
         },
       );
@@ -257,6 +274,8 @@ export class ReportsService {
         footballType,
         totalRented: total.rented,
         totalCanceled: total.canceled,
+        totalRevenueFootball: total.revenueFootball,
+        totalRevenueAccessory: total.revenueAccessory,
         totalRevenue: total.revenue,
       };
     });
@@ -279,7 +298,7 @@ export class ReportsService {
         });
 
         const totalRevenueFootballPitch = footballPitches.reduce(
-          (total, fp) => total + fp.totalRevenue,
+          (total, fp) => total + fp.totalRevenueFootball,
           0,
         );
         const totalRevenueAccessory = accessories.reduce(

@@ -451,6 +451,11 @@ export class FootballPitchesService {
           note: true,
           status: true,
           rentalDate: true,
+          invoiceFootballPitchRental: {
+            select: {
+              invoiceId: true,
+            },
+          },
           customer: {
             select: {
               name: true,
@@ -473,6 +478,17 @@ export class FootballPitchesService {
               },
             },
           },
+          accessoryRentalCustomer: {
+            select: {
+              amount: true,
+              accessory: {
+                select: {
+                  name: true,
+                  price: true,
+                },
+              },
+            },
+          },
         },
       });
 
@@ -487,6 +503,8 @@ export class FootballPitchesService {
         rentalDate,
         customer,
         footballPitchLeasingDuration,
+        invoiceFootballPitchRental,
+        accessoryRentalCustomer,
       } = footballPitchRental;
 
       const customerName = customer.name || '';
@@ -511,6 +529,8 @@ export class FootballPitchesService {
         endTime,
         footballPitchName,
         price,
+        invoiceId: invoiceFootballPitchRental.invoiceId,
+        accessoryRentalCustomers: accessoryRentalCustomer,
       };
     });
   }

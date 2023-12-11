@@ -93,7 +93,7 @@ invoiceStore.getInvoices();
 </script>
 <template>
   <div class="invoice-pages">
-    <v-row class="row">
+    <!-- <v-row class="row">
       <v-col md="12" class="column">
         <v-btn class="button -success" @click="openDialogCreateInvoiceType">
           Tạo hóa đơn
@@ -102,7 +102,7 @@ invoiceStore.getInvoices();
           </template>
         </v-btn>
       </v-col>
-    </v-row>
+    </v-row> -->
     <v-row>
       <v-col md="12">
         <v-data-table :headers="headers" :items="invoices">
@@ -170,7 +170,7 @@ invoiceStore.getInvoices();
             >
               <v-icon>mdi mdi-receipt-text</v-icon>
             </v-btn>
-            <v-btn
+            <!-- <v-btn
               class="button -danger"
               @click="openDialogConfirm(item.raw.id)"
               :disabled="
@@ -181,7 +181,7 @@ invoiceStore.getInvoices();
               "
             >
               <v-icon> mdi-delete </v-icon>
-            </v-btn>
+            </v-btn> -->
           </template>
         </v-data-table>
       </v-col>

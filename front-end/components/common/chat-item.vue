@@ -24,7 +24,7 @@ const props = defineProps({
   },
 });
 
-const isCratedDateNow = props.prevCreatedAt
+const isCreatedDateNow = props.prevCreatedAt
   ? format(new Date(props.createdAt), "dd/MM/yyyy") !==
     format(new Date(props.prevCreatedAt), "dd/MM/yyyy")
   : false;
@@ -32,7 +32,7 @@ const isCratedDateNow = props.prevCreatedAt
 <template>
   <div>
     <div class="chat-item">
-      <p v-if="isCratedDateNow" class="senddate">
+      <p v-if="isCreatedDateNow" class="senddate">
         {{ format(new Date(props.createdAt), "dd/MM/yyyy") }}
       </p>
       <div

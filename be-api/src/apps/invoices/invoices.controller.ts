@@ -16,6 +16,9 @@ import {
 
 import { InvoicesService } from './invoices.service';
 import { AccessoriesService } from '@app/accessories/accessories.service';
+import { FootballPitchesService } from '@app/football-pitches/football-pitches.service';
+
+import { mergeAccessoryRental } from 'utils/app';
 
 import { JwtAuthGuard } from '@app/auth/jwt-auth.guard';
 import { PayloadInvoiceDto, PayloadInvoiceTypeDto } from './dtos';
@@ -26,6 +29,7 @@ export class InvoicesController {
   constructor(
     private readonly invoicesService: InvoicesService,
     private readonly accessoryService: AccessoriesService,
+    private readonly footballPitchesService: FootballPitchesService,
   ) {}
 
   @Post()
@@ -116,6 +120,39 @@ export class InvoicesController {
       );
       await this.invoicesService.createInvoiceDetails(
         formattedPayloadInvoiceDetails,
+      );
+    }
+
+    if (body.status === 'PAID') {
+      const customerFootballPitchIds =
+        await this.invoicesService.getCustomerFootballIdByInvoiceId(+id);
+      const accessoryRentals =
+        await this.footballPitchesService.getAccessoryRentalCustomerByCustomerFootballPitchId(
+          customerFootballPitchIds,
+        );
+
+      const dataAmountAccessories = await Promise.all(
+        accessoryRentals.map(async (accessory: any) => {
+          const amountAccessory = await this.accessoryService.getAccessory(
+            accessory.accessoryId,
+          );
+          return {
+            id: accessory.accessoryId,
+            amount:
+              accessory.accessoryTypeId == 1
+                ? amountAccessory.amount + accessory.amount
+                : amountAccessory.amount,
+          };
+        }),
+      );
+
+      await Promise.all(
+        dataAmountAccessories.map(
+          async (accessory) =>
+            await this.accessoryService.updateAnyAccessory(accessory.id, {
+              amount: accessory.amount,
+            }),
+        ),
       );
     }
 

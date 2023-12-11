@@ -113,7 +113,7 @@ const menus = ref<Menu>([
       },
       {
         icon: "mdi mdi-account-cash-outline",
-        title: "Lượt thuê",
+        title: "Đặt sân",
         url: "/admin/report/rental-field",
         roleId: [1],
       },
