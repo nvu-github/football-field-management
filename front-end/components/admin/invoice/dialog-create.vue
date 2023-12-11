@@ -23,7 +23,7 @@ const rules = {
 const appStore = useAppStore();
 const invoiceStore: any = useInvoiceStore();
 const footballPitchStore = useFootballPitchStore();
-const { customerFootballPitchRentals } = storeToRefs(footballPitchStore);
+const { customerFootballPitchRentalAll } = storeToRefs(footballPitchStore);
 const { $toast }: any = useNuxtApp();
 const { isLoading } = storeToRefs(appStore);
 const { invoices, invoice, payloadInvoice } = storeToRefs(invoiceStore);
@@ -68,10 +68,10 @@ const formattedMoneyPaid = computed({
   },
 });
 
-await footballPitchStore.getCustomerFootballPitchRentals();
+await footballPitchStore.getAllCustomerFootballPitchRental();
 customInvoiceStatuses.value = invoiceStatuses;
 formattedCustomerFootballPitchRental.value =
-  customerFootballPitchRentals.value.filter(
+  customerFootballPitchRentalAll.value.filter(
     (customerFootballPitchRental: any) => {
       const { footballPitchName, name, status } = customerFootballPitchRental;
       const invoiceFound = invoices.value.filter((invoice: any) => {

@@ -51,6 +51,13 @@ export class FootballPitchesController {
     return this.footballPitchService.getLeasingDurations();
   }
 
+  @Get('rental/all')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
+  getAllCustomerFootballPitchRental() {
+    return this.footballPitchService.getFootballPitchRentals();
+  }
+
   @Post('customer/rental')
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)

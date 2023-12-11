@@ -123,6 +123,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
   const customerFootballPitchRentals = ref<CustomerFootballPitchRental[]>([]);
   const customerFootballPitchRentalDetail = ref<any>();
   const checkFootballPitchRental = ref<any>();
+  const customerFootballPitchRentalAll = ref<any>();
 
   function createFootballPitch(params: ParamsFootballPitch) {
     delete params.id;
@@ -218,6 +219,13 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     checkFootballPitchRental.value = response.data;
   }
 
+  async function getAllCustomerFootballPitchRental() {
+    const customerFootballPitchRentalList = await $apis.get(
+      `football-pitches/rental/all`
+    );
+    customerFootballPitchRentalAll.value = customerFootballPitchRentalList.data;
+  }
+
   function getStatusCustomerFootballPitchRental(status: string | any) {
     let color = "success";
     let text = "Xác nhận";
@@ -252,6 +260,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     customerFootballPitchRentals,
     customerFootballPitchRentalDetail,
     checkFootballPitchRental,
+    customerFootballPitchRentalAll,
     createFootballPitch,
     updateFootballPitch,
     updateStatusFootballPitchRental,
@@ -267,6 +276,7 @@ export const useFootballPitchStore = defineStore("footBallPitchStore", () => {
     getStatusCustomerFootballPitchRental,
     getColorStatusFootballPitch,
     checkCustomerFootballPitchRental,
+    getAllCustomerFootballPitchRental
   };
 });
 
