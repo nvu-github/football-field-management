@@ -62,6 +62,7 @@ async function UpdatePersonalInfo() {
     const updatedInfo = {
       ...personalInfo.value,
       avatar: urlAvatar,
+      teamName: "",
     };
 
     if (!fileUpload.value) delete updatedInfo.avatar;
@@ -136,13 +137,13 @@ function validForm() {
             variant="underlined"
             :rules="[rules.name]"
           ></v-text-field>
-          <v-text-field
+          <!-- <v-text-field
             v-if="user?.roleId === CUSTOMER_ROLE"
             v-model="personalInfo.teamName"
             label="Tên đội bóng*"
             variant="underlined"
             :rules="[rules.teamName]"
-          ></v-text-field>
+          ></v-text-field> -->
           <v-text-field
             v-model="personalInfo.phoneNumber"
             label="Số điện thoại*"

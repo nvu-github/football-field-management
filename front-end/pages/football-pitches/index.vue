@@ -124,7 +124,7 @@ leasingDurationStore.getLeasingDurationPublics();
           <template #prepend>
             <v-icon>mdi mdi-magnify</v-icon>
           </template>
-          Tìm kiếm
+          Lọc
         </v-btn>
       </v-col>
     </v-row>
